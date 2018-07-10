@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+
+{% for bookmark in bookmarks %}
+	<p><a href="{{ bookmark.url }}" target="_blank">
+		{% if bookmark.title %}
+			{{ bookmark.title }}
+		{% else %}
+			{{ bookmark.url }}
+		{% endif %}</a></p>
+{% endfor %}
+	
+{% endblock %}
