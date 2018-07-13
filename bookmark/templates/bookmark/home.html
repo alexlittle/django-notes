@@ -10,7 +10,13 @@
 			{{ bookmark.title }}
 		{% else %}
 			{{ bookmark.url }}
-		{% endif %}</a></p>
+		{% endif %}</a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
+	{% for bt in bookmark.tags.all %}
+		{{ bt.name }}
+	{% endfor %}
+		
+		
+	</p>
 {% endfor %}
 	
 {% endblock %}

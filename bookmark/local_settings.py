@@ -1,4 +1,4 @@
 
 
 def modify(settings):
-    pass
+    settings['INSTALLED_APPS'] += ('crispy_forms',)
