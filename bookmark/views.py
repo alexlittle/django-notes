@@ -14,7 +14,15 @@ def add_bookmark(request):
     if request.method == 'POST':
         form = BookmarkForm(request.POST)
         if form.is_valid(): # All validation rules pass
-            pass
+            bookmark = Bookmark()
+            bookmark.title = form.cleaned_data.get("title")
+            bookmark.url = form.cleaned_data.get("url")
+            bookmark.save()
+            new_tags = form.cleaned_data.get("tags")
+            tags = [x.strip() for x in new_tags.split(',')]
+            for t in tags:
+                tag, created = Tag.objects.get_or_create(name=t)
+                bookmark_tag, created = BookmarkTag.objects.get_or_create(bookmark=bookmark, tag= tag)
         return HttpResponseRedirect(reverse('bookmark_home'))
      
     else:
