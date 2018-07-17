@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 import os
 
-from django.core.urlresolvers import reverse_lazy
+from django.core import urlresolvers
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -147,7 +147,7 @@ ADVANCED_SEARCH_CATEGORIES = [
 
 #####################################################################
 # Authentication
-LOGIN_URL = reverse_lazy('profile_login')
+LOGIN_URL = urlresolvers.reverse_lazy('profile_login')
 AUTHENTICATION_BACKENDS =  [
     'orb.auth.UserModelEmailBackend',
     'django.contrib.auth.backends.ModelBackend',
