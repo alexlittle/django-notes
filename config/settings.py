@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Django settings for mpowering project.
+Django settings for django-bookmark project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -10,17 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
-import os
+import os,sys
 
 from django.core import urlresolvers
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
-SECRET_KEY = '*****************************'
+BASE_DIR = os.path.dirname(os.path.dirname(__file__)) 
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'testserver']
+ALLOWED_HOSTS = ['localhost.bookmark']
 
 ADMINS = (
     ('Admin', 'org@example.com'),
@@ -28,9 +28,9 @@ ADMINS = (
 
 SITE_ID = 1
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'urls'
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'wsgi.application'
 
 
 INSTALLED_APPS = [
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'crispy_forms',
-
+    'bookmark'
 ]
 
 
@@ -83,16 +83,6 @@ TEMPLATES = [
 #####################################################################
 
 
-#####################################################################
-# Database configuration
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'orb.sqlite3',
-    }
-}
-#####################################################################
-
 
 #####################################################################
 # Internationalization
@@ -108,7 +98,7 @@ USE_TZ = True
 #####################################################################
 # Static assets & media uploads
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'orb/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'bookmark/static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -123,26 +113,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/'
 #####################################################################
 
-
-#####################################################################
-# Search settings
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
-        'URL': 'http://127.0.0.1:8983/solr'
-    },
-}
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-
-ADVANCED_SEARCH_CATEGORIES = [
-    ('health_topic', 'health-domain'),
-    ('resource_type', 'type'),
-    ('audience', 'audience'),
-    ('geography', 'geography'),
-    ('language', 'language'),
-    ('device', 'device'),
-]
-#####################################################################
 
 
 #####################################################################
