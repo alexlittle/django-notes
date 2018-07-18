@@ -98,7 +98,7 @@ USE_TZ = True
 #####################################################################
 # Static assets & media uploads
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'bookmark/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'bookmark', 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -107,8 +107,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 #####################################################################
 # Email
-SERVER_EMAIL = 'ORB <orb@example.com>'
-EMAIL_SUBJECT_PREFIX = '[ORB]: '
+SERVER_EMAIL = 'Alex Little <consult@alexlittle.net>'
+EMAIL_SUBJECT_PREFIX = '[Alex Little]: '
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_FILE_PATH = '/tmp/'
 #####################################################################
