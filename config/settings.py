@@ -119,7 +119,6 @@ EMAIL_FILE_PATH = '/tmp/'
 # Authentication
 LOGIN_URL = urlresolvers.reverse_lazy('profile_login')
 AUTHENTICATION_BACKENDS =  [
-    'orb.auth.UserModelEmailBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 #####################################################################
