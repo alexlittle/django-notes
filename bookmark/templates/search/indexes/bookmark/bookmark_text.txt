@@ -1,0 +1,8 @@
+
+{{ object.bookmark.url }}
+{{ object.bookmark.title }}
+{{ object.bookmark.description }}
+
+{% for tag in object.tags.all %}
+	{{ tag.name }}
+{% endfor %}

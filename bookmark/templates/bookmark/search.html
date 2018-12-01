@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h2>{% trans 'Search' %}</h2>
+
+    {% crispy form %}
+
+    {% if query %}
+        <h3>{% trans 'Results' %}</h3>
+
+		{% if page.has_previous or page.has_next %}
+            <div>
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
+        {% endif %}
+        
+        {% for result in page.object_list %}
+        	{% with bookmark=result.object %}
+        		<p><a href="{{ bookmark.url }}" target="_blank">
+		<strong>{% if bookmark.title %}
+			{{ bookmark.title }}
+		{% else %}
+			{{ bookmark.url }}
+		{% endif %}</strong></a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
+	{% for bt in bookmark.tags.all %}
+		<a href="{% url 'tag_view' bt.slug %}">{{ bt.name }}</a>
+	{% endfor %}
+		
+		
+	</p>
+        	{% endwith %}
+        {% empty %}
+            <p>{% trans 'No results found.' %}</p>
+        {% endfor %}
+
+        {% if page.has_previous or page.has_next %}
+            <div style="clear:both;">
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        {# Show some example queries to run, maybe query syntax, something else? #}
+    {% endif %}
+{% endblock %}

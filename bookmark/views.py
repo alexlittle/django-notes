@@ -3,8 +3,10 @@ from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
-from bookmark.forms import BookmarkForm
+from bookmark.forms import BookmarkForm, SearchForm
 from bookmark.models import Bookmark, Tag, BookmarkTag
+
+from haystack.query import SearchQuerySet
 
 def home_view(request):
     
@@ -85,6 +87,37 @@ def tag_view(request, tag_slug):
                            'bookmarks': bookmarks})  
     
     
+def search_view(request):
+    search_query = request.GET.get('q', '')
+
+    if search_query:
+        search_results = SearchQuerySet().filter(content=search_query)
+    else:
+        search_results = []
+
+    data = {}
+    data['q'] = search_query
+    form = SearchForm(initial=data)
+
+    paginator = Paginator(search_results, 50)
+    # Make sure page request is an int. If not, deliver first page.
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        results = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        results = paginator.page(paginator.num_pages)
+
+
+    return render(request, 'bookmark/search.html', {
+        'form': form,
+        'query': search_query,
+        'page': results,
+        'total_results': paginator.count,
+    })
     
     
     
