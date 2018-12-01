@@ -73,4 +73,24 @@ def edit_bookmark(request, bookmark_id):
         data['url'] = bookmark.url
         form = BookmarkForm(initial=data)
     return render(request, 'bookmark/form.html',
-                          {'form': form})   
+                          {'form': form})  
+    
+    
+def tag_view(request, tag_slug): 
+    tag = Tag.objects.get(slug=tag_slug)
+    bookmarks = Bookmark.objects.filter(bookmarktag__tag=tag)
+    
+    return render(request, 'bookmark/tag.html',
+                          {'tag': tag,
+                           'bookmarks': bookmarks})  
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

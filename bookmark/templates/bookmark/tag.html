@@ -4,12 +4,9 @@
 
 {% block content %}
 
+<h2>{{ tag.name }}</h2>
 
-{% if page.object_list.count > 0  %}
-	{% include "includes/bookmark_nav.html" %}
-{% endif %}
-
-{% for bookmark in page.object_list %}
+{% for bookmark in bookmarks %}
 	<p><a href="{{ bookmark.url }}" target="_blank">
 		<strong>{% if bookmark.title %}
 			{{ bookmark.title }}
@@ -24,8 +21,4 @@
 	</p>
 {% endfor %}
 
-{% if page.object_list.count > 0  %}
-	{% include "includes/bookmark_nav.html" %}
-{% endif %}
-	
 {% endblock %}
