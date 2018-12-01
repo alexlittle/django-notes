@@ -20,7 +20,7 @@ if BASE_DIR not in sys.path:
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost.bookmark']
+ALLOWED_HOSTS = []
 
 ADMINS = (
     ('Admin', 'org@example.com'),

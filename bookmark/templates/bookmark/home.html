@@ -4,13 +4,18 @@
 
 {% block content %}
 
-{% for bookmark in bookmarks %}
+
+{% if page.object_list.count > 0  %}
+	{% include "includes/bookmark_nav.html" %}
+{% endif %}
+
+{% for bookmark in page.object_list %}
 	<p><a href="{{ bookmark.url }}" target="_blank">
-		{% if bookmark.title %}
+		<strong>{% if bookmark.title %}
 			{{ bookmark.title }}
 		{% else %}
 			{{ bookmark.url }}
-		{% endif %}</a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
+		{% endif %}</strong></a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
 	{% for bt in bookmark.tags.all %}
 		{{ bt.name }}
 	{% endfor %}
@@ -18,5 +23,9 @@
 		
 	</p>
 {% endfor %}
+
+{% if page.object_list.count > 0  %}
+	{% include "includes/bookmark_nav.html" %}
+{% endif %}
 	
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -6,9 +7,24 @@ from bookmark.forms import BookmarkForm
 from bookmark.models import Bookmark, Tag, BookmarkTag
 
 def home_view(request):
-    bookmarks = Bookmark.objects.all().order_by('-create_date')
+    
+    bmarks = Bookmark.objects.all().order_by('-create_date')
+    
+    paginator = Paginator(bmarks, 50)
+    
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    
+    try:
+        bookmarks = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        bookmarks = paginator.page(paginator.num_pages)
+        
+    
     return render(request, 'bookmark/home.html',
-                          {'bookmarks': bookmarks})
+                          {'page': bookmarks})
     
 def add_bookmark(request):
     if request.method == 'POST':
