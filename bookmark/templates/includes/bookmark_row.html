@@ -1,0 +1,12 @@
+{% load i18n %}
+<p><a href="{{ bookmark.url }}" target="_blank">
+		<strong>{% if bookmark.title %}
+			{{ bookmark.title }}
+		{% else %}
+			{{ bookmark.url }}
+		{% endif %}</strong></a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
+	{% for bt in bookmark.tags.all %}
+		<a href="{% url 'tag_view' bt.slug %}">{{ bt.name }}</a>
+	{% endfor %}
+	<small>[{{ bookmark.create_date }}]</small>
+</p>

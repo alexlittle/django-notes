@@ -7,18 +7,7 @@
 <h2>{{ tag.name }}</h2>
 
 {% for bookmark in bookmarks %}
-	<p><a href="{{ bookmark.url }}" target="_blank">
-		<strong>{% if bookmark.title %}
-			{{ bookmark.title }}
-		{% else %}
-			{{ bookmark.url }}
-		{% endif %}</strong></a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
-	{% for bt in bookmark.tags.all %}
-		<a href="{% url 'tag_view' bt.slug %}">{{ bt.name }}</a>
-	{% endfor %}
-		
-		
-	</p>
+	{% include "includes/bookmark_row.html" %}
 {% endfor %}
 
 {% endblock %}

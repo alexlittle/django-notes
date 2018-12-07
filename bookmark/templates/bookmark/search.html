@@ -20,18 +20,7 @@
         
         {% for result in page.object_list %}
         	{% with bookmark=result.object %}
-        		<p><a href="{{ bookmark.url }}" target="_blank">
-		<strong>{% if bookmark.title %}
-			{{ bookmark.title }}
-		{% else %}
-			{{ bookmark.url }}
-		{% endif %}</strong></a> [<a href="{% url 'bookmark_edit' bookmark.id %}">{% trans 'edit' %}</a>]<br/>
-	{% for bt in bookmark.tags.all %}
-		<a href="{% url 'tag_view' bt.slug %}">{{ bt.name }}</a>
-	{% endfor %}
-		
-		
-	</p>
+        		{% include "includes/bookmark_row.html" %}
         	{% endwith %}
         {% empty %}
             <p>{% trans 'No results found.' %}</p>
