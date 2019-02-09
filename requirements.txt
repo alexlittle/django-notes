@@ -1,5 +1,5 @@
-django==1.11.15
-django-autoslug==1.9.3
+django==2.1.5
+django-autoslug==1.9.4
 django-crispy-forms==1.7.1
 django-haystack>=2.3.0
 pysolr>=3.3.0

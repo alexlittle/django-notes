@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 import os,sys
 
-from django.core import urlresolvers
+from django import urls
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__)) 
 if BASE_DIR not in sys.path:
@@ -20,7 +20,7 @@ if BASE_DIR not in sys.path:
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost.bookmark']
+ALLOWED_HOSTS = ['localhost.bookmark', 'localhost']
 
 ADMINS = (
     ('Admin', 'org@example.com'),
@@ -118,7 +118,7 @@ EMAIL_FILE_PATH = '/tmp/'
 
 #####################################################################
 # Authentication
-LOGIN_URL = urlresolvers.reverse_lazy('profile_login')
+LOGIN_URL = urls.reverse_lazy('profile_login')
 AUTHENTICATION_BACKENDS =  [
     'django.contrib.auth.backends.ModelBackend',
 ]
