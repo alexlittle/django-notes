@@ -10,7 +10,7 @@ class Tag (models.Model):
     name = models.CharField(max_length=100, blank=False, null=False)
     slug = AutoSlugField(populate_from='name', max_length=100, blank=True, null=True)
     
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 class Bookmark (models.Model):
@@ -21,7 +21,7 @@ class Bookmark (models.Model):
     description = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags' )
     
-    def __unicode__(self):
+    def __str__(self):
         if self.title:
             return self.title
         else:
