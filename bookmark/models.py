@@ -19,6 +19,8 @@ class Bookmark (models.Model):
     url = models.TextField(blank=False, null=False)
     title = models.TextField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
+    link_check_date = models.DateTimeField(default=timezone.now)
+    link_check_result = models.TextField(blank=True, null=True)
     tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags' )
     
     def __str__(self):
