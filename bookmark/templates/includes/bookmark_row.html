@@ -8,5 +8,15 @@
 	{% for bt in bookmark.tags.all %}
 		<a href="{% url 'tag_view' bt.slug %}">{{ bt.name }}</a>
 	{% endfor %}
-	<small>[{{ bookmark.create_date }}]</small>
+	<small>
+		[{{ bookmark.create_date }}] 
+	
+		{% if bookmark.link_check_result %}
+			{% if bookmark.link_check_result == "OK" %}
+				<span class="status_ok">[OK]</span>
+			{% else %}
+				<span class="status_error">[error]</span>
+			{% endif %}
+		{% endif %}
+	</small>
 </p>

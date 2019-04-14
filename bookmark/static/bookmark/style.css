@@ -211,3 +211,11 @@ th.number, td.number {
 th.negative, td.negative {
 	color:#ff0000;
 }
+
+span.status_ok {
+	color: green;
+}
+
+span.status_error {
+	color: red;
+}

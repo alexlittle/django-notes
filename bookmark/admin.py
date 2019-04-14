@@ -3,8 +3,8 @@ from django.contrib import admin
 from bookmark.models import Bookmark, Tag, BookmarkTag
 
 class BookmarkAdmin(admin.ModelAdmin):
-    list_display = ('url', 'title', 'description')
-    search_fields = ['url','title', 'description']
+    list_display = ('url', 'title', 'link_check_date', 'link_check_result')
+    search_fields = ['url','title', 'description', 'link_check_date', 'link_check_result']
   
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug')
