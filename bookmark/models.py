@@ -9,6 +9,7 @@ class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=100, blank=False, null=False)
     slug = AutoSlugField(populate_from='name', max_length=100, blank=True, null=True)
+    favourite = models.BooleanField(default=False)
     
     def __str__(self):
         return self.name

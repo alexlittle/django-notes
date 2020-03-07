@@ -119,7 +119,11 @@ def search_view(request):
         'total_results': paginator.count,
     })
     
+def favourites_view(request): 
+    tags = Tag.objects.filter(favourite=True)
     
+    return render(request, 'bookmark/fav.html',
+                          {'tags': tags })  
     
     
     

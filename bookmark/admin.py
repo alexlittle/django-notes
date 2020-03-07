@@ -7,7 +7,7 @@ class BookmarkAdmin(admin.ModelAdmin):
     search_fields = ['url','title', 'description', 'link_check_date', 'link_check_result']
   
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug')
+    list_display = ('name', 'slug', 'favourite')
     search_fields = ['name', 'slug']  
     
 class BookmarkTagAdmin(admin.ModelAdmin):
