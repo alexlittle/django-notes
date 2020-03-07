@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'crispy_forms',
     'haystack',
-    'bookmark'
+    'bookmark',
+    'ckeditor',
 ]
 
 

@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from bookmark.fields import AutoSlugField
 
+from ckeditor.fields import RichTextField
+
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -19,9 +21,10 @@ class Bookmark (models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     url = models.TextField(blank=False, null=False)
     title = models.TextField(blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
+    description = RichTextField(blank=True, null=True)
     link_check_date = models.DateTimeField(default=timezone.now)
     link_check_result = models.TextField(blank=True, null=True)
+    favourite = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags' )
     
     def __str__(self):

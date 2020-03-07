@@ -1,14 +1,15 @@
-# bookmark/urls.py
-from django.conf.urls import url
+
 from django.urls import path
+from django.views.generic import TemplateView
 
 from bookmark import views as bookmark_views
 
+app_name = 'bookmark'
 urlpatterns = [
-    url(r'^$', bookmark_views.home_view, name="bookmark_home"),
-    url(r'^add/$', bookmark_views.add_bookmark, name="bookmark_add"),
-    url(r'^edit/(?P<bookmark_id>\d+)/$', bookmark_views.edit_bookmark, name="bookmark_edit"),
-    url(r'^tag/(?P<tag_slug>\w[\w/-]*)$', bookmark_views.tag_view, name="tag_view"),
-    url(r'^search/$', bookmark_views.search_view, name="bookmark_search"),
-    path('fav/', bookmark_views.favourites_view, name="bookmark_favs"),
+    path('', bookmark_views.HomeView.as_view(), name="home"),
+    path('add/', bookmark_views.AddView.as_view(), name="add"),
+    path('edit/<int:bookmark_id>/', bookmark_views.EditView.as_view(), name="edit"),
+    path('tag/<tag_slug>', bookmark_views.TagView.as_view(), name="tag_view"),
+    path('search/', bookmark_views.SearchView.as_view(), name="search"),
+    path('fav/', bookmark_views.FavouritesView.as_view(), name="favs"),
 ]

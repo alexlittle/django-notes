@@ -8,7 +8,7 @@
 
 <ul>
 {% for tag in tags %}
-	<li><a href="{% url 'tag_view' tag.slug %}">{{ tag.name }}</a></li>
+	<li><a href="{% url 'bookmark:tag_view' tag.slug %}">{{ tag.name }}</a></li>
 {% endfor %}
 </ul>
 

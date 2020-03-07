@@ -8,13 +8,13 @@
 	      <span class="icon-bar"></span>
 	      <span class="icon-bar"></span>
 	    </button>
-	    <a class="navbar-brand" href="{% url 'bookmark_home' %}">{% trans 'Bookmarks' %}</a>
+	    <a class="navbar-brand" href="{% url 'bookmark:home' %}">{% trans 'Bookmarks' %}</a>
 	  </div>
 	  <div class="navbar-collapse collapse">
 		    <ul class="nav navbar-nav navbar-right">
-		  		<li><a href="{% url 'bookmark_add' %}">{% trans 'Add Bookmark' %}</a></li>
-		  		<li><a href="{% url 'bookmark_search' %}">{% trans 'Search' %}</a></li>
-		  		<li><a href="{% url 'bookmark_favs' %}">{% trans 'Favourites' %}</a></li>
+		  		<li><a href="{% url 'bookmark:add' %}">{% trans 'Add Bookmark' %}</a></li>
+		  		<li><a href="{% url 'bookmark:search' %}">{% trans 'Search' %}</a></li>
+		  		<li><a href="{% url 'bookmark:favs' %}">{% trans 'Favourites' %}</a></li>
 		    </ul>
 	  </div>
 </div>
