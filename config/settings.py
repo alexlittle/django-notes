@@ -29,9 +29,9 @@ ADMINS = (
 
 SITE_ID = 1
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'config.urls'
 
-WSGI_APPLICATION = 'wsgi.application'
+WSGI_APPLICATION = 'config.wsgi.application'
 
 
 INSTALLED_APPS = [
@@ -167,7 +167,7 @@ LOGGING = {
 
 
 try:
-    from local_settings import *  # noqa
+    from config.local_settings import *
 except ImportError:
     import warnings
     warnings.warn("Using default settings. Add `config.local_settings.py`"
