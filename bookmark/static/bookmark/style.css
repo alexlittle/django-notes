@@ -1,3 +1,7 @@
+/* GLOBAL STYLES
+-------------------------------------------------- */
+/* Padding below the footer and lighter body text */
+
 /*
 bf7c0b - mid brown
 e7d2a7 - light brown
@@ -19,7 +23,6 @@ html {
 body {
   padding-bottom: 40px;
   color: #5a5a5a;
-  padding-top: 50px;
   margin-bottom: 60px;
   font-family: 'Ubuntu', sans-serif;
 }
@@ -28,80 +31,52 @@ body {
   position: absolute;
   bottom: 0;
   width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 60px;
-  background-color: #f8ffff;
-  border-top: 1px solid #2fcbfe;
+  background-image: url("images/banner.png");
+  background-repeat: repeat ;
+  border-top: 1px solid #04689a;
   padding-top:10px;
+  color: #111111;
 }
 
-/* CUSTOMIZE THE NAVBAR
--------------------------------------------------- */
+/* Customise the navbar */
 
-.navbar-inverse {
-	background-color: #f8ffff;
-	border-color: #2fcbfe;
+.navbar-light {
+  	border-bottom: 1px solid #04689a;
+  	background-image: url("images/banner.png");
+    background-repeat: repeat-x;
 }
 
-.navbar-inverse .navbar-brand {
-	color: #5a5a5a;
+.navbar-light .navbar-brand {
+	color: #111111;
+	font-weight: bold;
 }
 
 .navbar-brand {
-	padding: 5px 10px 3px 10px;
+	padding: 5px 20px 3px 10px;
 }
 
-.navbar-inverse .navbar-brand:focus, .navbar-inverse .navbar-brand:hover{
-	color: #04689a;	
+.strapline {
+	color: #04689a;
+	font-size: 80%;
+	font-weight: normal;
 }
 
-.navbar-inverse .navbar-brand img{
-	display:inline;
-	padding-right: 10px;
-}
-
-.navbar-inverse .navbar-nav > li > a {
-    color: #5a5a5a;
-}
-
-.navbar-inverse .navbar-nav > li > a:focus, 
-.navbar-inverse .navbar-nav > li > a:hover 
+.navbar-light .navbar-nav > .nav-item > a
 {
-	background-color: #04689a;
-}
- 
-
-.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:focus, .navbar-inverse .navbar-nav > .active > a:hover {
-    background-color: #04689a;
-    color: #fff;
+	color: #010101;
 }
 
-/* Special class on .container surrounding .navbar, used for positioning it into place. */
-.navbar-wrapper {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 20;
+.navbar-light .navbar-nav > .nav-item > a:focus, 
+.navbar-light .navbar-nav > .nav-item > a:hover 
+{
+	color: #04689a;
 }
 
-/* Flip around the padding for proper display in narrow viewports */
-.navbar-wrapper > .container {
-  padding-right: 0;
-  padding-left: 0;
+.navbar-light .navbar-nav > .active  a.nav-link, 
+.navbar-light .navbar-nav > .nav-item .active > a.nav-link:focus, 
+.navbar-light .navbar-nav > .nav-item .active > a.nav-link:hover {
+    color: #04689a;
 }
-.navbar-wrapper .navbar {
-  padding-right: 15px;
-  padding-left: 15px;
-}
-.navbar-wrapper .navbar .container {
-  width: auto;
-}
-
-
-/* Mapping
--------------------------------------------------- */
-#mapid { height: 300px; }
 
 
 /* h tags
@@ -113,15 +88,87 @@ body {
 }
 
 h1 {
-	color: #04689a;
+	color: #111111;
+	font-weight: bold;
 	font-size: 150%;
 }
+
 
 h2 {
 	color: #04689a;
 	font-size: 130%;
 }
 
+
+
+.content-text {
+    font-size: 120%;
+}
+
+.content-text p {
+	margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* page styles */
+.cv-row, .al-row{
+	margin-bottom:20px;
+}
+.contact-type {
+	font-weight:bold;
+}
+
+.cv-date {
+	font-weight:normal;
+}
+
+.cv-title, .cv-p-title {
+	font-weight:bold;
+}
+
+.cv-organisation {
+	font-weight:normal;
+}
+
+.cv-description {
+	margin-top:10px;
+}
+
+.project-row  {
+	margin-top:30px;
+}
+
+.project-row h2 {
+	margin-top:10px;
+}
+
+.project-row img {
+	border: none ;
+}
+
+.blog-row  {
+	margin: 0 0 30px 0;
+}
+
+img.blog-single-image  {
+	margin: 50px 0 30px 0;
+}
+
+h3.blog {
+	margin-top: 0;
+	color: #ff66c4;
+	font-size: 120%;
+}
+
+p.company-reg {
+	padding-bottom: 20px;
+	text-align: center;
+	
+}
+
+a {
+	color: #04689a;
+}
 
 /* RESPONSIVE CSS
 -------------------------------------------------- */
@@ -161,61 +208,4 @@ h2 {
   .featurette-heading {
     margin-top: 120px;
   }
-}
-
-/*
- * Forms
- */
- 
-.form-control:focus {
-	border-color: #2fcbfe;
-	box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(47,203,254,0.6);
-	outline: 0 none;
-}
-
-.btn-primary {
-    background-color: #2fcbfe;
-    border-color: ##04689a;
-    color: #FFFFFF;
-}
-
-.btn-primary:hover, .btn-primary:focus, .btn-primary:active,
-	.btn-primary.active, .open .dropdown-toggle.btn-primary {
-    background-color: #2fcbfe;
-    border-color: ##04689a;
-    color: #FFFFFF;
-}
-
-.btn a {
-    color: #fff;
-    text-decoration: none;
-}
-
-.btn a:hover, .btn a:focus {
-    color: #fff;
-    text-decoration: none;
-}
-
-div.photo {
-	width:250px;
-	min-height:300px;
-	display:block;
-	float:left;
-	text-align:center;
-	margin:10px;
-}
-th.number, td.number {
-	text-align:right;
-}
-
-th.negative, td.negative {
-	color:#ff0000;
-}
-
-span.status_ok {
-	color: green;
-}
-
-span.status_error {
-	color: red;
 }
