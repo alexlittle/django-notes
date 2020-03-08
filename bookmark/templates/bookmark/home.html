@@ -6,7 +6,7 @@
 
 
 {% if page.object_list.count > 0  %}
-	{% include "includes/bookmark_nav.html" %}
+	{% include "includes/pagination.html" %}
 {% endif %}
 
 {% for bookmark in page.object_list %}
@@ -14,7 +14,7 @@
 {% endfor %}
 
 {% if page.object_list.count > 0  %}
-	{% include "includes/bookmark_nav.html" %}
+	{% include "includes/pagination.html" %}
 {% endif %}
 	
 {% endblock %}
