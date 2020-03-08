@@ -5,6 +5,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div
 from crispy_forms.bootstrap import FieldWithButtons
 
+
 class BookmarkForm(forms.Form):
     url = forms.CharField(
                 required=True)
@@ -12,9 +13,9 @@ class BookmarkForm(forms.Form):
                 required=False)
     tags = forms.CharField(
                 required=True,
-                error_messages={'required': _('Please enter at least one tag')},)
-    
-    
+                error_messages={'required':
+                                _('Please enter at least one tag')},)
+
     def __init__(self, *args, **kwargs):
         super(BookmarkForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -30,13 +31,13 @@ class BookmarkForm(forms.Form):
                    css_class='col-lg-offset-2 col-lg-4',
                 ),
             )
-        
-        
-        
+
+
 class SearchForm(forms.Form):
     q = forms.CharField(
         required=True,
-        error_messages={'required': _(u'Please enter something to search for')},)
+        error_messages={'required':
+                        _(u'Please enter something to search for')},)
 
     def __init__(self, *args, **kwargs):
         super(SearchForm, self).__init__(*args, **kwargs)
@@ -47,6 +48,4 @@ class SearchForm(forms.Form):
         self.helper.field_class = 'col-lg-8'
         self.helper.layout = Layout(
             FieldWithButtons('q', Submit('submit', _(u'Go'),
-                                         css_class='btn btn-default')),
-
-        )
+                                         css_class='btn btn-default')))

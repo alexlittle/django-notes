@@ -14,6 +14,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tag',
             name='slug',
-            field=bookmark.fields.AutoSlugField(blank=True, editable=False, max_length=100, null=True, populate_from='name', unique=True),
+            field=bookmark.fields.AutoSlugField(blank=True,
+                                                editable=False,
+                                                max_length=100,
+                                                null=True,
+                                                populate_from='name',
+                                                unique=True),
         ),
     ]

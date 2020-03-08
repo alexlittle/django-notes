@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='bookmark',
             name='tags',
-            field=models.ManyToManyField(through='bookmark.BookmarkTag', to='bookmark.Tag'),
+            field=models.ManyToManyField(through='bookmark.BookmarkTag',
+                                         to='bookmark.Tag'),
         ),
     ]

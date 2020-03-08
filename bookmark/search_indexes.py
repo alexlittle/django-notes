@@ -1,5 +1,5 @@
 from haystack import indexes
-from bookmark.models import Bookmark, BookmarkTag, Tag
+from bookmark.models import Bookmark
 
 
 class BookmarkIndex(indexes.SearchIndex, indexes.Indexable):

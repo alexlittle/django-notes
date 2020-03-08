@@ -7,14 +7,19 @@ from bookmark.fields import AutoSlugField
 
 from ckeditor.fields import RichTextField
 
+
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=100, blank=False, null=False)
-    slug = AutoSlugField(populate_from='name', max_length=100, blank=True, null=True)
+    slug = AutoSlugField(populate_from='name',
+                         max_length=100,
+                         blank=True,
+                         null=True)
     favourite = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.name
+
 
 class Bookmark (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
@@ -25,22 +30,19 @@ class Bookmark (models.Model):
     link_check_date = models.DateTimeField(default=timezone.now)
     link_check_result = models.TextField(blank=True, null=True)
     favourite = models.BooleanField(default=False)
-    tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags' )
-    
+    tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags')
+
     def __str__(self):
         if self.title:
             return self.title
         else:
             return self.url
-        
 
-    
+
 class BookmarkTag(models.Model):
     bookmark = models.ForeignKey(Bookmark, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag,  on_delete=models.CASCADE)
- 
+
     class Meta:
         verbose_name = _('Bookmark Tag')
         verbose_name_plural = _('Bookmark Tags')
-        
-    

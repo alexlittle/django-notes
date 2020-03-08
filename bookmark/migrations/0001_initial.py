@@ -21,19 +21,31 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Bookmark',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True,
+                                        serialize=False,
+                                        verbose_name='ID')),
+                ('create_date', models.DateTimeField(
+                    default=django.utils.timezone.now)),
                 ('url', models.TextField()),
                 ('title', models.TextField(blank=True, null=True)),
                 ('description', models.TextField(blank=True, null=True)),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(
+                    null=True,
+                    on_delete=django.db.models.deletion.SET_NULL,
+                    to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(
             name='BookmarkTag',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('bookmark', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookmark.Bookmark')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True,
+                                        serialize=False,
+                                        verbose_name='ID')),
+                ('bookmark', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='bookmark.Bookmark')),
             ],
             options={
                 'verbose_name': 'Bookmark Tag',
@@ -43,15 +55,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_date', models.DateTimeField(default=django.utils.timezone.now)),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True,
+                                        serialize=False,
+                                        verbose_name='ID')),
+                ('create_date', models.DateTimeField(
+                    default=django.utils.timezone.now)),
                 ('name', models.CharField(max_length=100)),
-                ('slug', bookmark.fields.AutoSlugField(blank=True, editable=False, max_length=100, null=True, populate_from=b'name', unique=True)),
+                ('slug', bookmark.fields.AutoSlugField(blank=True,
+                                                       editable=False,
+                                                       max_length=100,
+                                                       null=True,
+                                                       populate_from=b'name',
+                                                       unique=True)),
             ],
         ),
         migrations.AddField(
             model_name='bookmarktag',
             name='tag',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='bookmark.Tag'),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to='bookmark.Tag'),
         ),
     ]
