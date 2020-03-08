@@ -20,6 +20,8 @@ class Tag (models.Model):
     def __str__(self):
         return self.name
 
+    def bookmark_count(self):
+        return Bookmark.objects.filter(tags=self).count()
 
 class Bookmark (models.Model):
     create_date = models.DateTimeField(default=timezone.now)

@@ -4,12 +4,19 @@
 
 {% block content %}
 
-<h2>{% trans "Favourites" %}</h2>
+
+{% if page.object_list.count > 0  %}
+	{% include "includes/pagination.html" %}
+{% endif %}
 
 <ul>
-{% for tag in tags %}
+{% for tag in page.object_list %}
 	<li><a href="{% url 'bookmark:tag_view' tag.slug %}">{{ tag.name }}</a> [{{ tag.bookmark_count }}]</li>
 {% endfor %}
 </ul>
 
+{% if page.object_list.count > 0  %}
+	{% include "includes/pagination.html" %}
+{% endif %}
+	
 {% endblock %}

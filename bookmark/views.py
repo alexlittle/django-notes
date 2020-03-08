@@ -137,3 +137,25 @@ class FavouritesView(TemplateView):
         return render(request,
                       'bookmark/fav.html',
                       {'tags': tags})
+
+
+class TagsView(TemplateView):
+    
+    def get(self, request):
+        tags = Tag.objects.all().order_by('-favourite', 'name')
+
+        paginator = Paginator(tags, 50)
+        # Make sure page request is an int. If not, deliver first page.
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        try:
+            results = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            results = paginator.page(paginator.num_pages)
+
+        return render(request,
+                      'bookmark/tags.html',
+                      {'page': results})

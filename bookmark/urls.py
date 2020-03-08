@@ -9,6 +9,7 @@ urlpatterns = [
     path('edit/<int:bookmark_id>/',
          bookmark_views.EditView.as_view(),
          name="edit"),
+    path('tags/', bookmark_views.TagsView.as_view(), name="tags"),
     path('tag/<tag_slug>', bookmark_views.TagView.as_view(), name="tag_view"),
     path('search/', bookmark_views.SearchView.as_view(), name="search"),
     path('fav/', bookmark_views.FavouritesView.as_view(), name="favs"),
