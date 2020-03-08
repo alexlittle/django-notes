@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load staticfiles %}
 <p><a href="{{ bookmark.url }}" target="_blank">
 		<strong>{% if bookmark.title %}
 			{{ bookmark.title }}
@@ -13,9 +14,12 @@
 	
 		{% if bookmark.link_check_result %}
 			{% if bookmark.link_check_result == "OK" %}
-				<span class="status_ok">[OK]</span>
+				<span class="status_ok"><img src="{% static '/admin/img/icon-yes.svg' %}" alt="True"></span>
 			{% else %}
-				<span class="status_error">[error]</span>
+				<span class="status_error">
+					<img src="{% static '/admin/img/icon-no.svg' %}" alt="False">
+					[<a href="{% url 'admin:bookmark_bookmark_delete' bookmark.id %}" target="_blank">{% trans 'delete' %}</a>]
+				</span>
 			{% endif %}
 		{% endif %}
 	</small>
