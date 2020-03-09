@@ -1,5 +1,4 @@
 from django.contrib import admin
-
 from bookmark.models import Bookmark, Tag, BookmarkTag
 
 
@@ -13,9 +12,17 @@ class BookmarkAdmin(admin.ModelAdmin):
 
 
 class TagAdmin(admin.ModelAdmin):
-    list_display = ('name', 'slug', 'favourite')
+    list_display = ('name',
+                    'slug',
+                    'favourite',
+                    'count')
     search_fields = ['name', 'slug']
+    ordering = ('-favourite', 'name',)
 
+    def count(self, obj):
+        return obj.bookmark_count()
+    
+    count.short_description = "Bookmark count"
 
 class BookmarkTagAdmin(admin.ModelAdmin):
     list_display = ('bookmark', 'tag')

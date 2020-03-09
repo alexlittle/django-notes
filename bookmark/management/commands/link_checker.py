@@ -22,9 +22,6 @@ class Command(BaseCommand):
     help = _(u"Checks the urls to ensure they are still valid links")
     errors = []
 
-    def add_arguments(self, parser):
-        pass
-
     def handle(self, *args, **options):
 
         today = timezone.now()
