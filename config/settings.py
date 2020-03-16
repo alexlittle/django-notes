@@ -156,11 +156,6 @@ LOGGING = {
             'handlers': ['console'],
             'propagate': False,
         },
-        'orb': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-            'propagate': False,
-        },
     },
 }
 #####################################################################

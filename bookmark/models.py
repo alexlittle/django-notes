@@ -23,6 +23,7 @@ class Tag (models.Model):
     def bookmark_count(self):
         return Bookmark.objects.filter(tags=self).count()
 
+
 class Bookmark (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
@@ -34,6 +35,11 @@ class Bookmark (models.Model):
     favourite = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags')
 
+
+    class Meta:
+        ordering = ['-create_date']
+
+    
     def __str__(self):
         if self.title:
             return self.title
