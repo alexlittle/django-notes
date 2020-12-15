@@ -22,19 +22,23 @@ class Command(BaseCommand):
     help = _(u"Checks the urls to ensure they are still valid links")
     errors = []
 
+    def add_arguments(self, parser):
+        parser.add_argument('days', type=int)
+        
     def handle(self, *args, **options):
 
+        days = options['days']
         today = timezone.now()
-        today_minus_7 = today + datetime.timedelta(days=-7)
+        today_minus_days = today + datetime.timedelta(days=-days)
         bookmarks = Bookmark.objects.filter(
-            link_check_date__lte=today_minus_7) \
+            link_check_date__lte=today_minus_days) \
             .exclude(link_check_result="OK")
 
         for bookmark in bookmarks:
             print("Checking: " + bookmark.url)
 
             try:
-                response = urllib.request.urlopen(bookmark.url, timeout=10)
+                response = urllib.request.urlopen(bookmark.url, timeout=20)
                 print(response.code)
                 self.update_link_check(bookmark, 'OK')
             except urllib.error.HTTPError:
@@ -56,3 +60,7 @@ class Command(BaseCommand):
         bookmark.link_check_date = timezone.now()
         bookmark.link_check_result = status
         bookmark.save()
+        if status == 'error':
+            accept = input(_(u"Delete this link? [y/n]"))
+            if accept == 'y':
+                bookmark.delete()
