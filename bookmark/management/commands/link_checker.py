@@ -38,7 +38,14 @@ class Command(BaseCommand):
             print("Checking: " + bookmark.url)
 
             try:
-                response = urllib.request.urlopen(bookmark.url, timeout=20)
+                request = urllib.request.Request(
+                    bookmark.url, 
+                    data=None, 
+                    headers={
+                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+                    }
+                )
+                response = urllib.request.urlopen(request, timeout=20)
                 print(response.code)
                 self.update_link_check(bookmark, 'OK')
             except urllib.error.HTTPError:

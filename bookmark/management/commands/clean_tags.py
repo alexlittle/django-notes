@@ -2,17 +2,9 @@
 Removes unused tags
 '''
 
-import datetime
-import http
-import socket
-import ssl
-import urllib.error
-import urllib.request
-
-
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
 
 from bookmark.models import Bookmark, BookmarkTag, Tag
 
@@ -22,7 +14,7 @@ class Command(BaseCommand):
     errors = []
 
     def handle(self, *args, **options):
-        tags = Tag.objects.filter(favourite=False)
+        tags = Tag.objects.filter(favourite=False).order_by('name')
         for tag in tags:
             if tag.bookmark_count() == 0:
                 print(tag.name + ": deleted")
@@ -30,4 +22,6 @@ class Command(BaseCommand):
 
         for tag in tags:        
             if tag.bookmark_count() == 1:
-                print(tag.name + ": only 1 use")
+                bookmark = Bookmark.objects.get(bookmarktag__tag=tag)
+                print(tag.name + ": only 1 use : http://localhost.bookmark" 
+                      + reverse('bookmark:edit', args=[bookmark.id]))
