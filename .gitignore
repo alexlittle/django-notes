@@ -8,3 +8,5 @@
 /django_oppia.egg-info
 /src
 /uwsgi.sock
+/env/
+/static/
