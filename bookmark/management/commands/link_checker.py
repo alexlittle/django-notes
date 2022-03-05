@@ -10,7 +10,6 @@ import ssl
 import urllib.error
 import urllib.request
 
-
 from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -20,22 +19,25 @@ from bookmark.models import Bookmark
 
 class Command(BaseCommand):
     help = _(u"Checks the urls to ensure they are still valid links")
-    errors = []
 
     def add_arguments(self, parser):
-        parser.add_argument('days', type=int)
+        parser.add_argument('days', type=int, default=0)
         
     def handle(self, *args, **options):
 
         days = options['days']
-        today = timezone.now()
-        today_minus_days = today + datetime.timedelta(days=-days)
-        bookmarks = Bookmark.objects.filter(
-            link_check_date__lte=today_minus_days) \
-            .exclude(link_check_result="OK")
+        
+        if days == 0:
+            bookmarks = Bookmark.objects.all()
+        else:
+            today = timezone.now()
+            today_minus_days = today - datetime.timedelta(days=days)
+            bookmarks = Bookmark.objects.filter(
+                link_check_date__lte=today_minus_days)
+        
 
-        for bookmark in bookmarks:
-            print("Checking: " + bookmark.url)
+        for idx, bookmark in enumerate(bookmarks):
+            print("Checking: %s (%d/%d)" % (bookmark.url, idx, len(bookmarks)))
 
             try:
                 request = urllib.request.Request(
@@ -48,19 +50,13 @@ class Command(BaseCommand):
                 response = urllib.request.urlopen(request, timeout=20)
                 print(response.code)
                 self.update_link_check(bookmark, 'OK')
-            except urllib.error.HTTPError:
-                self.update_link_check(bookmark, 'error')
-            except urllib.error.URLError:
-                self.update_link_check(bookmark, 'error')
-            except ssl.CertificateError:
-                self.update_link_check(bookmark, 'error')
-            except http.client.RemoteDisconnected:
-                self.update_link_check(bookmark, 'error')
-            except ConnectionResetError:
-                self.update_link_check(bookmark, 'error')
-            except socket.timeout:
-                self.update_link_check(bookmark, 'error')
-            except http.client.BadStatusLine:
+            except (urllib.error.HTTPError,
+                    urllib.error.URLError,
+                    ssl.CertificateError,
+                    http.client.RemoteDisconnected,
+                    ConnectionResetError,
+                    socket.timeout,
+                    http.client.BadStatusLine):
                 self.update_link_check(bookmark, 'error')
 
     def update_link_check(self, bookmark, status):
