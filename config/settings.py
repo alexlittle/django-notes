@@ -160,6 +160,15 @@ LOGGING = {
 }
 #####################################################################
 
+DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': ''
+        }
+    }
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+######################################################################
 
 try:
     from config.local_settings import *
