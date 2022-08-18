@@ -1,4 +1,4 @@
-django==3.2.14
+django==3.2.15
 django-autoslug==1.9.8
 django-crispy-forms==1.14.0
 django-haystack==3.1.1
