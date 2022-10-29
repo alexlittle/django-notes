@@ -4,7 +4,7 @@ Removes unused tags
 
 from django.core.management.base import BaseCommand
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from bookmark.models import Bookmark, BookmarkTag, Tag
 
