@@ -44,6 +44,7 @@ class AddView(TemplateView):
         if form.is_valid():
             bookmark = Bookmark()
             bookmark.title = form.cleaned_data.get("title")
+            bookmark.description = form.cleaned_data.get("description")
             bookmark.url = form.cleaned_data.get("url")
             bookmark.save()
             new_tags = form.cleaned_data.get("tags")
@@ -64,6 +65,7 @@ class EditView(TemplateView):
         data = {}
         data['tags'] = ", ".join(tags)
         data['title'] = bookmark.title
+        data['description'] = bookmark.description
         data['url'] = bookmark.url
         form = BookmarkForm(initial=data)
         return render(request,
@@ -83,6 +85,7 @@ class EditView(TemplateView):
                     .get_or_create(bookmark=bookmark, tag=tag)
             bookmark.title = form.cleaned_data.get("title")
             bookmark.url = form.cleaned_data.get("url")
+            bookmark.description = form.cleaned_data.get("description")
             bookmark.save()
         return HttpResponseRedirect(reverse('bookmark:home'))
 

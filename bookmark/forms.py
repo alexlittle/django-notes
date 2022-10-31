@@ -5,12 +5,13 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div
 from crispy_forms.bootstrap import FieldWithButtons
 
+from ckeditor.widgets import CKEditorWidget
+
 
 class BookmarkForm(forms.Form):
-    url = forms.CharField(
-                required=True)
-    title = forms.CharField(
-                required=False)
+    url = forms.CharField(required=True)
+    title = forms.CharField(required=False)
+    description = forms.CharField(widget=CKEditorWidget(), required=False)
     tags = forms.CharField(
                 required=True,
                 error_messages={'required':
@@ -25,6 +26,7 @@ class BookmarkForm(forms.Form):
         self.helper.layout = Layout(
                 'url',
                 'title',
+                'description',
                 'tags',
                 Div(
                    Submit('submit', _(u'Save'), css_class='btn btn-default'),
