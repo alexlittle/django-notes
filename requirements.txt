@@ -1,6 +1,7 @@
-django==4.1.7
-django-autoslug==1.9.8
-django-crispy-forms==1.14.0
+django==4.2
+django-autoslug==1.9.9
+django-crispy-forms==2.0
+crispy-bootstrap4
 django-haystack==3.2.1
 pysolr==3.9.0
 django-ckeditor==6.5.1

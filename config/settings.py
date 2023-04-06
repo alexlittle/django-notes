@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'haystack',
     'bookmark',
     'ckeditor',
+    'crispy_bootstrap4'
 ]
 
 
@@ -169,6 +170,8 @@ DATABASES = {
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ######################################################################
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 try:
     from config.local_settings import *
