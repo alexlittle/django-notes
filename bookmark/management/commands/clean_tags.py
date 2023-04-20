@@ -20,8 +20,8 @@ class Command(BaseCommand):
                 print(tag.name + ": deleted")
                 tag.delete()
 
-        for tag in tags:        
+        for tag in tags:
             if tag.bookmark_count() == 1:
                 bookmark = Bookmark.objects.get(bookmarktag__tag=tag)
-                print(tag.name + ": only 1 use : http://localhost.bookmark" 
+                print(tag.name + ": only 1 use : http://localhost.bookmark"
                       + reverse('bookmark:edit', args=[bookmark.id]))

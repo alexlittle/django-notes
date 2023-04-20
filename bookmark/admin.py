@@ -21,8 +21,9 @@ class TagAdmin(admin.ModelAdmin):
 
     def count(self, obj):
         return obj.bookmark_count()
-    
+
     count.short_description = "Bookmark count"
+
 
 class BookmarkTagAdmin(admin.ModelAdmin):
     list_display = ('bookmark', 'tag')

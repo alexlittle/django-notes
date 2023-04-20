@@ -143,7 +143,7 @@ class FavouritesView(TemplateView):
 
 
 class TagsView(TemplateView):
-    
+
     def get(self, request):
         tags = Tag.objects.all().order_by('-favourite', 'name')
 

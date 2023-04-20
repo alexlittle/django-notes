@@ -35,11 +35,9 @@ class Bookmark (models.Model):
     favourite = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, through='BookmarkTag', name='tags')
 
-
     class Meta:
         ordering = ['-create_date']
 
-    
     def __str__(self):
         if self.title:
             return self.title
