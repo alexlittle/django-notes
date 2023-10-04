@@ -35,7 +35,7 @@ class Command(BaseCommand):
             bookmarks = Bookmark.objects.filter(link_check_date__lte=today_minus_days)
 
         error_list = []
-        
+
         for idx, bookmark in enumerate(bookmarks):
             print("Checking: %s (%d/%d)" % (bookmark.url, idx, len(bookmarks)))
 
@@ -61,15 +61,15 @@ class Command(BaseCommand):
                 bookmark.link_check_result = "error"
                 bookmark.save()
                 error_list.append(bookmark)
-        
+
         print("%d errors" % len(error_list))
-        for el in error_list:  
-                  
+        for el in error_list:
+            print(el.url)
             accept = input(_(u"Delete this link? [y/n]"))
             if accept == 'y':
-                bookmark.delete()
+                el.delete()
 
     def update_link_check_ok(self, bookmark):
         bookmark.link_check_date = timezone.now()
         bookmark.link_check_result = "ok"
-        bookmark.save()            
+        bookmark.save()
