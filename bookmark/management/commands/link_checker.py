@@ -32,9 +32,10 @@ class Command(BaseCommand):
         else:
             today = timezone.now()
             today_minus_days = today - datetime.timedelta(days=days)
-            bookmarks = Bookmark.objects.filter(
-                link_check_date__lte=today_minus_days)
+            bookmarks = Bookmark.objects.filter(link_check_date__lte=today_minus_days)
 
+        error_list = []
+        
         for idx, bookmark in enumerate(bookmarks):
             print("Checking: %s (%d/%d)" % (bookmark.url, idx, len(bookmarks)))
 
@@ -48,7 +49,7 @@ class Command(BaseCommand):
                 )
                 response = urllib.request.urlopen(request, timeout=20)
                 print(response.code)
-                self.update_link_check(bookmark, 'OK')
+                self.update_link_check_ok(bookmark)
             except (urllib.error.HTTPError,
                     urllib.error.URLError,
                     ssl.CertificateError,
@@ -56,13 +57,19 @@ class Command(BaseCommand):
                     ConnectionResetError,
                     socket.timeout,
                     http.client.BadStatusLine):
-                self.update_link_check(bookmark, 'error')
-
-    def update_link_check(self, bookmark, status):
-        bookmark.link_check_date = timezone.now()
-        bookmark.link_check_result = status
-        bookmark.save()
-        if status == 'error':
+                bookmark.link_check_date = timezone.now()
+                bookmark.link_check_result = "error"
+                bookmark.save()
+                error_list.append(bookmark)
+        
+        print("%d errors" % len(error_list))
+        for el in error_list:  
+                  
             accept = input(_(u"Delete this link? [y/n]"))
             if accept == 'y':
                 bookmark.delete()
+
+    def update_link_check_ok(self, bookmark):
+        bookmark.link_check_date = timezone.now()
+        bookmark.link_check_result = "ok"
+        bookmark.save()            
