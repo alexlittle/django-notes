@@ -63,8 +63,8 @@ class Command(BaseCommand):
                 error_list.append(bookmark)
 
         print("%d errors" % len(error_list))
-        for el in error_list:
-            print(el.url)
+        for idx, el in enumerate(error_list):
+            print("%d/%d %s" % (idx, len(error_list), el.url))
             accept = input(_(u"Delete this link? [y/n]"))
             if accept == 'y':
                 el.delete()
