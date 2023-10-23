@@ -31,7 +31,6 @@ body {
   position: absolute;
   bottom: 0;
   width: 100%;
-  background-image: url("images/banner.png");
   background-repeat: repeat ;
   border-top: 1px solid #04689a;
   padding-top:10px;
