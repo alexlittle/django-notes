@@ -15,7 +15,7 @@
 		[{{ bookmark.create_date }}] 
 	
 		{% if bookmark.link_check_result %}
-			{% if bookmark.link_check_result == "OK" %}
+			{% if bookmark.link_check_result == "ok" %}
 				<span class="status_ok"><img src="{% static '/admin/img/icon-yes.svg' %}" alt="True"></span>
 			{% else %}
 				<span class="status_error">

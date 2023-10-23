@@ -3,6 +3,7 @@
 .project
 .pydevproject
 .settings/
+/.idea/
 /build
 /dist
 /django_oppia.egg-info
