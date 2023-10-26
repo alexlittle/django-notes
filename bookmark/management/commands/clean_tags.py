@@ -21,7 +21,7 @@ class Command(BaseCommand):
         for tag in unused_tags:
             print(tag.name + ": deleted")
             tag.delete()
-
+        print("--------------------------")
         used_once_tags = tags.filter(bmcount=1).order_by("name")
         for idx, tag in enumerate(used_once_tags):
             url = "http://localhost:9030" + reverse('bookmark:tag_view', args=[tag.slug])

@@ -2,6 +2,11 @@ from django.contrib import admin
 from bookmark.models import Bookmark, Tag, BookmarkTag
 
 
+class BookmarkTagInline(admin.TabularInline):
+    model = BookmarkTag
+    extra = 1
+
+
 class BookmarkAdmin(admin.ModelAdmin):
     list_display = ('url', 'title', 'link_check_date', 'link_check_result')
     search_fields = ['url',
@@ -9,6 +14,9 @@ class BookmarkAdmin(admin.ModelAdmin):
                      'description',
                      'link_check_date',
                      'link_check_result']
+    inlines = [
+        BookmarkTagInline
+    ]
 
 
 class TagAdmin(admin.ModelAdmin):

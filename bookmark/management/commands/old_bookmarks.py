@@ -2,6 +2,7 @@
 import dateutil.relativedelta
 
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
@@ -25,6 +26,7 @@ class Command(BaseCommand):
             print()
             print("%d/%d %s - %s " % (idx, old_bookmarks.count(), ob.title, ob.url))
             print("Added: %s" % ob.create_date)
+            print("Edit: %s%s" % ("http://localhost:9030", reverse('admin:bookmark_bookmark_change', args=[ob.id])))
             tags = ', '.join(ob.tags.all().values_list('name', flat=True))
             print("Tags: %s" % tags)
             print()
