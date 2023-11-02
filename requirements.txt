@@ -1,4 +1,4 @@
-django==4.2.6
+django==4.2.7
 django-autoslug==1.9.9
 django-crispy-forms==2.1
 crispy-bootstrap4==2023.1
