@@ -171,6 +171,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ######################################################################
 
+SESSION_COOKIE_NAME = "bookmark"
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 try:
