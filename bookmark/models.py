@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from bookmark.fields import AutoSlugField
 
-from ckeditor.fields import RichTextField
+from tinymce.models import HTMLField
 
 
 class Tag (models.Model):
@@ -29,7 +29,7 @@ class Bookmark (models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     url = models.TextField(blank=False, null=False)
     title = models.TextField(blank=True, null=True)
-    description = RichTextField(blank=True, null=True)
+    description = HTMLField(blank=True, null=True)
     link_check_date = models.DateTimeField(default=timezone.now)
     link_check_result = models.TextField(blank=True, null=True)
     favourite = models.BooleanField(default=False)

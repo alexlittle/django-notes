@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'haystack',
     'bookmark',
-    'ckeditor',
+    'tinymce',
     'crispy_bootstrap4'
 ]
 

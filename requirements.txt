@@ -2,9 +2,8 @@ django==5.0.2
 django-autoslug==1.9.9
 django-crispy-forms==2.1
 crispy-bootstrap4==2023.1
-git+https://github.com/django-haystack/django-haystack.git
 pysolr==3.9.0
-django-ckeditor==6.7.1
+django-tinymce==3.7.1
 pycodestyle==2.11.1
 pytest==8.0.0
 pytest-django==4.8.0

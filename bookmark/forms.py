@@ -5,13 +5,13 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Div
 from crispy_forms.bootstrap import FieldWithButtons
 
-from ckeditor.widgets import CKEditorWidget
+from tinymce.widgets import TinyMCE
 
 
 class BookmarkForm(forms.Form):
     url = forms.CharField(required=True)
     title = forms.CharField(required=False)
-    description = forms.CharField(widget=CKEditorWidget(), required=False)
+    description = forms.CharField(widget=TinyMCE(), required=False)
     tags = forms.CharField(
                 required=True,
                 error_messages={'required':
