@@ -3,7 +3,7 @@ django-autoslug==1.9.9
 django-crispy-forms==2.1
 crispy-bootstrap4==2024.1
 pysolr==3.9.0
-django-tinymce==3.7.1
+django-tinymce==4.1.0
 pycodestyle==2.11.1
 pytest==8.1.1
 pytest-django==4.8.0
