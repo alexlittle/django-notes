@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <h2>{% trans 'Search' %}</h2>
+
+    {% crispy form %}
+
+    {% if query %}
+        <h3>{% trans 'Results' %}</h3>
+
+		{% if page.has_previous or page.has_next %}
+            <div>
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
+        {% endif %}
+        
+        {% for result in page.object_list %}
+        	{% with note=result.object %}
+        		{% include "includes/note_row.html" %}
+        	{% endwith %}
+        {% empty %}
+            <p>{% trans 'No results found.' %}</p>
+        {% endfor %}
+
+        {% if page.has_previous or page.has_next %}
+            <div style="clear:both;">
+                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
+                |
+                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
+            </div>
+        {% endif %}
+    {% else %}
+        {# Show some example queries to run, maybe query syntax, something else? #}
+    {% endif %}
+{% endblock %}

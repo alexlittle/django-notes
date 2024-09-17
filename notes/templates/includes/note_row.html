@@ -1,0 +1,31 @@
+{% load i18n %}
+{% load static %}
+<p>
+		<strong>{% if note.url %}
+			<a href="{{ note.url }}" target="_blank">{{ note.title }}</a>
+		{% else %}
+			{{ note.title }}
+		{% endif %}</strong>
+		[<a href="{% url 'notes:edit' note.id %}">{% trans 'edit' %}</a> |
+		<a href="{% url 'admin:notes_note_delete' note.id %}" target="_blank">{% trans 'delete' %}</a>]<br/>
+	{% for nt in note.tags.all %}
+		<a href="{% url 'notes:tag_view' nt.slug %}">{{ nt.name }}</a>
+	{% endfor %}
+	<small>
+		[{{ note.create_date }}]
+	
+		{% if note.link_check_result %}
+			{% if note.link_check_result == "ok" %}
+				<span class="status_ok"><img src="{% static '/admin/img/icon-yes.svg' %}" alt="True"></span>
+			{% else %}
+				<span class="status_error">
+					<img src="{% static '/admin/img/icon-no.svg' %}" alt="False">
+					[<a href="{% url 'admin:notes_note_delete' note.id %}" target="_blank">{% trans 'delete' %}</a>]
+				</span>
+			{% endif %}
+		{% endif %}
+	</small><br/>
+	{% if note.description %}
+		{{ note.description|safe }}
+	{% endif %}
+</p>

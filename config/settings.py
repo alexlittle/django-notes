@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Django settings for django-bookmark project.
+Django settings for django-notes project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -21,7 +21,7 @@ if BASE_DIR not in sys.path:
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost.bookmark', 'localhost']
+ALLOWED_HOSTS = ['localhost.notes', 'localhost']
 
 ADMINS = (
     ('Admin', 'org@example.com'),
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'crispy_forms',
     'haystack',
-    'bookmark',
+    'notes',
     'tinymce',
     'crispy_bootstrap4'
 ]
@@ -101,7 +101,7 @@ USE_TZ = True
 #####################################################################
 # Static assets & media uploads
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'bookmark', 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'notes', 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -171,7 +171,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 ######################################################################
 
-SESSION_COOKIE_NAME = "bookmark"
+SESSION_COOKIE_NAME = "notes"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 

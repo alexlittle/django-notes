@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+
+
+{% if page.object_list.count > 0  %}
+	{% include "includes/pagination.html" %}
+{% endif %}
+
+{% for note in page.object_list %}
+	{% include "includes/note_row.html" %}
+{% endfor %}
+
+{% if page.object_list.count > 0  %}
+	{% include "includes/pagination.html" %}
+{% endif %}
+	
+{% endblock %}

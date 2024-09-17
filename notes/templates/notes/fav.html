@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+
+<h2>{% trans "Favourites" %}</h2>
+
+<ul>
+{% for tag in tags %}
+	<li><a href="{% url 'notes:tag_view' tag.slug %}">{{ tag.name }}</a> [{{ tag.note_count }}]</li>
+{% endfor %}
+</ul>
+
+{% endblock %}
