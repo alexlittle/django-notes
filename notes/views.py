@@ -1,5 +1,6 @@
 from django.urls import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView
@@ -92,11 +93,14 @@ class EditView(TemplateView):
 
 class TagView(TemplateView):
     def get(self, request, tag_slug):
-        tag = Tag.objects.get(slug=tag_slug)
-        notes = Note.objects.filter(notetag__tag=tag)
+        slug_list = tag_slug.split('+')
+        tags = Tag.objects.filter(slug__in=slug_list)
+        notes = Note.objects.filter(notetag__tag__slug__in=slug_list) \
+                .annotate(count=Count('id')) \
+                .filter(count=len(slug_list))
         return render(request,
                       'notes/tag.html',
-                      {'tag': tag,
+                      {'tags': tags,
                        'notes': notes})
 
 
