@@ -59,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'notes.middleware.LoginRequiredMiddleware',
 ]
 
 
@@ -174,6 +175,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 SESSION_COOKIE_NAME = "notes"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+LOGIN_URL = '/admin/'
+LOGIN_REDIRECT_URL = '/'
 
 try:
     from config.local_settings import *

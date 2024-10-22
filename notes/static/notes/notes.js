@@ -1,21 +1,23 @@
-// hide an element
-const hide = elem => {
-  elem.style.display = 'none'
-}
+$(document).ready(function() {
 
-// show an element
-const show = elem => {
-  elem.style.display = 'block'
-}
+    $('[id^="desc-"]').not('[id$="-toggle"]').hide();
 
-// toggle the element visibility
-const toggle = elem => {
-  // if the element is visible, hide it
-  if (window.getComputedStyle(elem).display !== 'none') {
-    hide(elem)
-    return
-  }
+    // Attach a click event listener to the toggle div
+    $('[id^="desc-"][id$="-toggle"]').click(function() {
+        // Get the ID of the clicked toggle div
+        var toggleId = $(this).attr('id');
 
-  // show the element
-  show(elem)
-}
+        // Extract the part of the ID related to the note.id
+        var noteId = toggleId.replace('-toggle', '');
+
+        var descDiv = $('#' + noteId);
+        descDiv.toggle();
+
+        // Update the text of the toggle button depending on whether the description div is visible or not
+        if (descDiv.is(':visible')) {
+            $(this).text('Hide description');
+        } else {
+            $(this).text('Show description');
+        }
+    });
+});

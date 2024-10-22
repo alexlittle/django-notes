@@ -4,7 +4,7 @@ import xml.dom.minidom
 
 from django.core.management.base import BaseCommand
 
-from notes.models import Bookmark, BookmarkTag, Tag
+from notes.models import Note, NoteTag, Tag
 
 
 class Command(BaseCommand):
@@ -26,7 +26,7 @@ class Command(BaseCommand):
             import_tags = bookmark_element.getAttribute('tags')
             date = bookmark_element.getAttribute('add_date')
 
-            bookmark, created = Bookmark.objects.get_or_create(url=url)
+            bookmark, created = Note.objects.get_or_create(url=url)
             if created:
                 bookmark.url = url
                 bookmark.title = title
@@ -39,7 +39,7 @@ class Command(BaseCommand):
                 tags = [x.strip() for x in import_tags.split(',')]
                 for t in tags:
                     tag, created = Tag.objects.get_or_create(name=t)
-                    bookmark_tag, created = BookmarkTag.objects \
+                    bookmark_tag, created = NoteTag.objects \
                         .get_or_create(bookmark=bookmark, tag=tag)
 
                 self.stdout.write(bookmark.url + ": added")

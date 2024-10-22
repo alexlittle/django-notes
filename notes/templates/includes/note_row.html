@@ -26,6 +26,9 @@
 		{% endif %}
 	</small><br/>
 	{% if note.description %}
-		{{ note.description|safe }}
+		<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
+		<div id="desc-{{ note.id }}">
+			{{ note.description|safe }}
+		</div>
 	{% endif %}
 </p>
