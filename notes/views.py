@@ -1,36 +1,25 @@
+from django.conf import settings
 from django.urls import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag
 from haystack.query import SearchQuerySet
 
+#from assistant.airag import NotesAssistant
 
-class HomeView(TemplateView):
 
-    def get(self, request):
+class HomeView(ListView):
+    template_name = 'notes/home.html'
+    paginate_by = 50
+    context_object_name = 'notes'
 
-        bmarks = Note.objects.all().order_by('-create_date')
-
-        paginator = Paginator(bmarks, 50)
-
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
-
-        try:
-            notes = paginator.page(page)
-        except (EmptyPage, InvalidPage):
-            notes = paginator.page(paginator.num_pages)
-
-        return render(request,
-                      'notes/home.html',
-                      {'page': notes})
+    def get_queryset(self):
+        return Note.objects.all().order_by('-create_date')
 
 
 class AddView(TemplateView):
@@ -52,9 +41,11 @@ class AddView(TemplateView):
             tags = [x.strip() for x in new_tags.split(',')]
             for t in tags:
                 tag, created = Tag.objects.get_or_create(name=t)
-                bookmark_tag, created = \
-                    NoteTag.objects.get_or_create(note=note,
-                                                      tag=tag)
+                NoteTag.objects.get_or_create(note=note, tag=tag)
+            if settings.NOTES_ASSISTANT_ENABLED and note.url is not None:
+                #assistant = NotesAssistant()
+                #assistant.add_note(note.url)
+                pass
         return HttpResponseRedirect(reverse('notes:home'))
 
 
@@ -91,17 +82,22 @@ class EditView(TemplateView):
         return HttpResponseRedirect(reverse('notes:home'))
 
 
-class TagView(TemplateView):
-    def get(self, request, tag_slug):
-        slug_list = tag_slug.split('+')
-        tags = Tag.objects.filter(slug__in=slug_list)
-        notes = Note.objects.filter(notetag__tag__slug__in=slug_list) \
+class TagView(ListView):
+    template_name = 'notes/tag.html'
+    context_object_name = 'notes'
+
+    def get_queryset(self):
+        slug_list = self.kwargs['tag_slug'].split('+')
+        return Note.objects.filter(notetag__tag__slug__in=slug_list) \
                 .annotate(count=Count('id')) \
                 .filter(count=len(slug_list))
-        return render(request,
-                      'notes/tag.html',
-                      {'tags': tags,
-                       'notes': notes})
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        slug_list = self.kwargs['tag_slug'].split('+')
+        context["tags"] = Tag.objects.filter(slug__in=slug_list)
+        return context
 
 
 class SearchView(TemplateView):
@@ -137,32 +133,20 @@ class SearchView(TemplateView):
         })
 
 
-class FavouritesView(TemplateView):
-    def get(self, request):
-        tags = Tag.objects.filter(favourite=True)
+class FavouritesView(ListView):
 
-        return render(request,
-                      'notes/fav.html',
-                      {'tags': tags})
+    template_name = 'notes/fav.html'
+    context_object_name = 'tags'
+
+    def get_queryset(self):
+        return Tag.objects.filter(favourite=True)
 
 
-class TagsView(TemplateView):
+class TagsView(ListView):
 
-    def get(self, request):
-        tags = Tag.objects.all().order_by('-favourite', 'name')
+    template_name = 'notes/tags.html'
+    paginate_by = 50
+    context_object_name = 'tags'
 
-        paginator = Paginator(tags, 50)
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
-
-        try:
-            results = paginator.page(page)
-        except (EmptyPage, InvalidPage):
-            results = paginator.page(paginator.num_pages)
-
-        return render(request,
-                      'notes/tags.html',
-                      {'page': results})
+    def get_queryset(self):
+        return Tag.objects.all().order_by('-favourite', 'name')

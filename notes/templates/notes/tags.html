@@ -4,19 +4,14 @@
 
 {% block content %}
 
-
-{% if page.object_list.count > 0  %}
-	{% include "includes/pagination.html" %}
-{% endif %}
+{% include "includes/pagination.html" %}
 
 <ul>
-{% for tag in page.object_list %}
+{% for tag in tags %}
 	<li><a href="{% url 'notes:tag_view' tag.slug %}">{{ tag.name }}</a> [{{ tag.note_count }}]</li>
 {% endfor %}
 </ul>
 
-{% if page.object_list.count > 0  %}
-	{% include "includes/pagination.html" %}
-{% endif %}
+{% include "includes/pagination.html" %}
 	
 {% endblock %}

@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     'haystack',
     'notes',
     'tinymce',
-    'crispy_bootstrap4'
+    'crispy_bootstrap4',
+    'assistant'
 ]
 
 
@@ -178,6 +179,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_URL = '/admin/'
 LOGIN_REDIRECT_URL = '/'
+
+NOTES_ASSISTANT_ENABLED = False
 
 try:
     from config.local_settings import *

@@ -11,3 +11,4 @@
 /uwsgi.sock
 /env/
 /static/
+/assistant/vs-data/

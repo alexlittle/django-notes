@@ -4,17 +4,12 @@
 
 {% block content %}
 
+{% include "includes/pagination.html" %}
 
-{% if page.object_list.count > 0  %}
-	{% include "includes/pagination.html" %}
-{% endif %}
-
-{% for note in page.object_list %}
+{% for note in notes %}
 	{% include "includes/note_row.html" %}
 {% endfor %}
 
-{% if page.object_list.count > 0  %}
-	{% include "includes/pagination.html" %}
-{% endif %}
-	
+{% include "includes/pagination.html" %}
+
 {% endblock %}
