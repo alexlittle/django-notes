@@ -18,7 +18,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from notes.models import Note
 
 os.environ['USER_AGENT'] = 'Alex Laptop'
-BASE_DIR = dir = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class NotesAssistant():
 
@@ -90,38 +90,13 @@ class NotesAssistant():
             return file.read()
 
     def format_docs(self, docs):
-        print(len(docs))
-        #print("\n\n".join(doc.page_content for doc in docs))
         return "\n\n".join(doc.page_content for doc in docs)
 
     def query(self, question, template='recommend'):
 
         rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
 
-        results = self.vs.similarity_search(question, k=10)
-        context_text = "\n\n - -\n\n".join([doc.page_content for doc in results])
-
-        prompt = rag_prompt.format(context=context_text, question=question)
-        response_text = self.llm.invoke(prompt)
-
-        # Get sources of the matching documents
-        sources = [doc.metadata.get("source", None) for doc in results]
-
-        # Format and return response including generated text and sources
-        formatted_response = f"Response: {response_text}\nSources: {sources}"
-        print(sources)
-
-        return response_text
-
-    def query_old(self, question, template='recommend'):
-
-        rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
-
         retriever = self.vs.as_retriever(search_kwargs={"k": 10})
-        retriever.invoke(question)
-        docs = retriever.invoke(question)
-
-        #docs = retriever.invoke(question)
 
         rag_chain = (
                 {"context": retriever | self.format_docs, "question": RunnablePassthrough()}

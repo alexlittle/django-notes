@@ -32,7 +32,7 @@
     <script src="{% static 'assistant/chatscript.js' %}"
             defer
             data-userimage="{% static 'assistant/user.jpeg' %}"
-            data-posturl="http://localhost:8000/assistant/"
+            data-posturl="{% url 'assistant:home' %}"
             data-botimage="{% static 'assistant/bot_logo.png' %}"
             data-errorimage="{% static 'assistant/error.png' %}">
     </script>
