@@ -5,4 +5,6 @@ Use the following pieces of retrieved context to answer the question {question}
 {context}
 </context>
 
-do not refer to external figures, images or tables
+Only use the retrieved context provided and do not refer to external figures, images or tables
+
+Provide a source link/document for your answer

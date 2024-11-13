@@ -41,6 +41,7 @@ class Note (models.Model):
     favourite = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, through='NoteTag', name='tags')
     status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default='open')
+    assistant_loaded = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-create_date']

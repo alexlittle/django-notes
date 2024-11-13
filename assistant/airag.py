@@ -4,6 +4,7 @@ import http
 import requests
 import socket
 from urllib import error
+import urllib3
 
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnablePassthrough
@@ -16,6 +17,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from notes.models import Note
 
+os.environ['USER_AGENT'] = 'Alex Laptop'
+BASE_DIR = dir = os.path.abspath(os.path.dirname(__file__))
+
 class NotesAssistant():
 
     vs = None
@@ -23,7 +27,7 @@ class NotesAssistant():
     llm_model = "llama3.2:latest"
     collection_name = "notes"
     embedding_model = "sentence-transformers/all-mpnet-base-v2"
-    vs_data_dir = "./vs-data"
+    vs_data_dir = os.path.join(BASE_DIR, "vs-data")
     chunk_size = 1000
     chunk_overlap = 200
 
@@ -40,7 +44,7 @@ class NotesAssistant():
             docs = loader.load()
             text_splitter = RecursiveCharacterTextSplitter(chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap)
             splits = text_splitter.split_documents(docs)
-            print("added")
+
             return True, splits
         except (ssl.CertificateError,
                 http.client.RemoteDisconnected,
@@ -50,7 +54,10 @@ class NotesAssistant():
                 error.URLError,
                 error.HTTPError,
                 requests.exceptions.ConnectTimeout,
-                socket.gaierror):
+                socket.gaierror,
+                urllib3.exceptions.NameResolutionError,
+                urllib3.exceptions.ProtocolError,
+                requests.exceptions.ConnectionError):
             print("failed to connect to {}".format(url))
             return False, None
 
@@ -59,26 +66,62 @@ class NotesAssistant():
 
     def pre_populate(self):
         # get all urls
-        notes = Note.objects.filter(url__isnull=False)
+        notes = Note.objects.all().exclude(url__isnull=True).exclude(url__exact='')
         for note in notes:
+            print(note.url)
             self.add_note(note.url)
 
     def add_note(self, url):
-        success, splits = self.load_url(url)
-        if success:
-            self.vs.add_documents(splits)
+        note = Note.objects.get(url=url)
+        if not note.assistant_loaded:
+            print("Adding: {}".format(url))
+            success, splits = self.load_url(url)
+            if success:
+                self.vs.add_documents(splits)
+                print("added")
+                note.assistant_loaded = True
+                note.save()
+        else:
+            print("Already added {}".format(url))
 
     def get_prompt_template(self, template):
-        with os.open("./prompttemplates/"+ template + ".txt") as file:
-            return file.read_lines()
+        template_file = os.path.join(BASE_DIR,'prompttemplates/') + template + ".txt"
+        with open(template_file, 'r') as file:
+            return file.read()
 
-    def format_docs(docs):
+    def format_docs(self, docs):
+        print(len(docs))
+        #print("\n\n".join(doc.page_content for doc in docs))
         return "\n\n".join(doc.page_content for doc in docs)
 
     def query(self, question, template='recommend'):
+
         rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
-        retriever = self.vs.as_retriever(search_type="similarity")
-        retrieved_docs = retriever.invoke(question)
+
+        results = self.vs.similarity_search(question, k=10)
+        context_text = "\n\n - -\n\n".join([doc.page_content for doc in results])
+
+        prompt = rag_prompt.format(context=context_text, question=question)
+        response_text = self.llm.invoke(prompt)
+
+        # Get sources of the matching documents
+        sources = [doc.metadata.get("source", None) for doc in results]
+
+        # Format and return response including generated text and sources
+        formatted_response = f"Response: {response_text}\nSources: {sources}"
+        print(sources)
+
+        return response_text
+
+    def query_old(self, question, template='recommend'):
+
+        rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
+
+        retriever = self.vs.as_retriever(search_kwargs={"k": 10})
+        retriever.invoke(question)
+        docs = retriever.invoke(question)
+
+        #docs = retriever.invoke(question)
 
         rag_chain = (
                 {"context": retriever | self.format_docs, "question": RunnablePassthrough()}

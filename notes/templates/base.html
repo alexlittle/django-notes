@@ -21,7 +21,13 @@
 		<link href="{% static "notes/style.css" %}" rel="stylesheet">
 
 		<meta name="theme-color" content="#ffffff">
-		
+
+		{% block extra_styles %}
+		{% endblock extra_styles %}
+
+		{% block extra_scripts %}
+		{% endblock extra_scripts %}
+
 	</head>
 	<body>
 	
