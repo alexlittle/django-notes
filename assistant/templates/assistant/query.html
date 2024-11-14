@@ -33,8 +33,10 @@
             defer
             data-userimage="{% static 'assistant/human.png' %}"
             data-posturl="{% url 'assistant:home' %}"
+            data-introposturl="{% url 'assistant:chatintro' %}"
             data-botimage="{% static 'assistant/bot_logo.png' %}"
-            data-errorimage="{% static 'assistant/error.png' %}">
+            data-errorimage="{% static 'assistant/error.png' %}"
+            data-intromessage="Please introduce yourself">
     </script>
     <!--end Javascript to call the language model-->
 

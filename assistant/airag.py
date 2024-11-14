@@ -106,3 +106,7 @@ class NotesAssistant():
         )
 
         return rag_chain.invoke(question)
+
+    def intro(self, question):
+
+        return self.llm.invoke(question)

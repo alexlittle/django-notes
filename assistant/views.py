@@ -31,6 +31,18 @@ class HomeView(TemplateView):
 
         return HttpResponse(response)
 
+class ChatIntroView(TemplateView):
+
+    def post(self, request):
+        body = json.loads(request.body)
+        question = body['question']
+        na = NotesAssistant()
+        na.init_chat()
+        response = na.intro(question)
+        print(f"the response is {response}")
+
+        return HttpResponse(response)
+
 class HistoryView(TemplateView):
     def get(self, request):
         return render(request,
