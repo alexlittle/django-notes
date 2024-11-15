@@ -28,8 +28,8 @@ class NotesAssistant():
     collection_name = "notes"
     embedding_model = "sentence-transformers/all-mpnet-base-v2"
     vs_data_dir = os.path.join(BASE_DIR, "vs-data")
-    chunk_size = 1000
-    chunk_overlap = 200
+    chunk_size = 5000
+    chunk_overlap = 1250
 
     def __init__(self):
         self.vs = Chroma(
@@ -63,6 +63,9 @@ class NotesAssistant():
 
     def init_chat(self):
         self.llm = OllamaLLM(model=self.llm_model, temperature=0)
+
+    def get_vs(self):
+        return self.vs
 
     def pre_populate(self):
         # get all urls

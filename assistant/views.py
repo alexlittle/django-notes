@@ -22,7 +22,6 @@ class HomeView(TemplateView):
         na = NotesAssistant()
         na.init_chat()
         response = na.query(question)
-        print(f"the response is {response}")
         log = ChatLog()
         log.user = request.user
         log.query = question
@@ -39,7 +38,6 @@ class ChatIntroView(TemplateView):
         na = NotesAssistant()
         na.init_chat()
         response = na.intro(question)
-        print(f"the response is {response}")
 
         return HttpResponse(response)
 

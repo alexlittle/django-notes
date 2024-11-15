@@ -8,6 +8,7 @@ class ChatLog(models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     query = models.TextField(blank=False, null=False, default=None)
     response = models.TextField(blank=False, null=False, default=None)
+    thread = models.TextField(blank=True, null=True, default=None)
 
     class Meta:
         verbose_name = _('Chat Log')
