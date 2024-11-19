@@ -8,6 +8,13 @@ class Command(BaseCommand):
     errors = []
 
     def handle(self, *args, **options):
+        '''
+        from langchain import hub
+        prompt = hub.pull("rlm/rag-prompt")
+        print(prompt)
+        return
+        '''
+
         query = input("Enter your query: ")
 
         print(f"your query was: '{query}'")
@@ -15,5 +22,5 @@ class Command(BaseCommand):
         na = NotesAssistant()
         na.init_chat()
 
-        response = na.query(query)
-        print(response)
+        for chunk in na.query_stream(query):
+            print(chunk)

@@ -9,11 +9,17 @@ import urllib3
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain_core.runnables import RunnablePassthrough
 from langchain_chroma import Chroma
+from langchain_ollama import ChatOllama
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.output_parsers import StrOutputParser
+from langchain.chains import SequentialChain
 from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain.callbacks.manager import CallbackManager
+from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from langchain_core.runnables import Runnable
+from langchain.chains import LLMChain
 
 from notes.models import Note
 
@@ -62,7 +68,11 @@ class NotesAssistant():
             return False, None
 
     def init_chat(self):
-        self.llm = OllamaLLM(model=self.llm_model, temperature=0)
+
+        self.llm = ChatOllama(model=self.llm_model,
+                             temperature=0,
+                             callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
+                             stream=True)
 
     def get_vs(self):
         return self.vs
@@ -93,22 +103,39 @@ class NotesAssistant():
             return file.read()
 
     def format_docs(self, docs):
+        print("Retrieved {} docs".format(len(docs)))
         return "\n\n".join(doc.page_content for doc in docs)
 
     def query(self, question, template='recommend'):
 
         rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
 
-        retriever = self.vs.as_retriever(search_kwargs={"k": 10})
+        retriever = self.vs.as_retriever(search_kwargs={"k": 4})
 
-        rag_chain = (
+        chain_generate_prompt = (
                 {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
                 | rag_prompt
-                | self.llm
-                | StrOutputParser()
+        )
+        #formatted_prompt = chain_generate_prompt.invoke(question)
+
+        chain_respond = (
+            chain_generate_prompt
+            | self.llm
+            | StrOutputParser()
         )
 
-        return rag_chain.invoke(question)
+        return chain_respond.invoke(question)
+
+    def query_stream(self, question, template='recommend'):
+
+        rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
+
+        retriever = self.vs.as_retriever(search_kwargs={"k": 4})
+        parser = StrOutputParser()
+        chain = rag_prompt | self.llm | parser
+
+        for chunk in chain.stream({"context": retriever | self.format_docs, "question": question}):
+            yield chunk
 
     def intro(self, question):
 

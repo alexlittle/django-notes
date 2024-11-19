@@ -1,7 +1,7 @@
 import json
 from django.views.generic import TemplateView
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 
 from assistant.forms import AskForm
 from assistant.airag import NotesAssistant
@@ -40,6 +40,19 @@ class ChatIntroView(TemplateView):
         response = na.intro(question)
 
         return HttpResponse(response)
+
+
+class TestStreamView(TemplateView):
+
+    template_name = 'assistant/stream.html'
+    def post(self, request):
+        body = json.loads(request.body)
+        question = body['question']
+        na = NotesAssistant()
+        na.init_chat()
+        response = na.query_stream(question)
+
+        return StreamingHttpResponse(response, content_type='text/plain')
 
 class HistoryView(TemplateView):
     def get(self, request):

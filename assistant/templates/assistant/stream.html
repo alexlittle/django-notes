@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+{% load crispy_forms_tags %}
+
+{% block extra_styles %}
+ <link rel="stylesheet" type="text/css" href="{% static 'assistant/css/style.css' %}">
+{% endblock extra_styles %}
+
+{% block extra_scripts %}
+
+    <script src="{% static 'assistant/chatscriptstream.js' %}"
+            defer
+            data-userimage="{% static 'assistant/human.png' %}"
+            data-posturl="{% url 'assistant:chatstream' %}"
+            data-introposturl="{% url 'assistant:chatintro' %}"
+            data-botimage="{% static 'assistant/bot_logo.png' %}"
+            data-errorimage="{% static 'assistant/error.png' %}"
+            data-intromessage="Please introduce yourself">
+    </script>
+{% endblock extra_scripts %}
+
+{% block content %}
+
+    <main>
+      <div class="chatbot">
+
+        <div class="spacer" id="messages-container"></div>
+
+        <form class="chat-form" id="message-form">
+            {% csrf_token %}
+          <textarea type="text" name="question" id="question" placeholder="Send a message..."></textarea>
+          <button type="submit">➤</button>
+        </form>
+      </div>
+    </main>
+{% endblock content %}
