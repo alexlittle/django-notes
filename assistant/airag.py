@@ -116,14 +116,9 @@ class NotesAssistant():
 
         retriever = self.vs.as_retriever(search_kwargs={"k": 4})
 
-        chain_generate_prompt = (
-                {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
-                | rag_prompt
-        )
-        #formatted_prompt = chain_generate_prompt.invoke(question)
-
         chain_respond = (
-            chain_generate_prompt
+            {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
+            | rag_prompt
             | self.llm
             | StrOutputParser()
         )
