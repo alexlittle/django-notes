@@ -21,7 +21,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_core.runnables import Runnable
 from langchain.chains import LLMChain
 
-from notes.models import Note
+
 
 os.environ['USER_AGENT'] = 'Alex Laptop'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -75,13 +75,13 @@ class NotesAssistant():
 
         self.llm = ChatOllama(model=self.llm_model,
                              temperature=0,
-                             callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
                              stream=True)
 
     def get_vs(self):
         return self.vs
 
     def pre_populate(self):
+        from notes.models import Note
         # get all urls
         notes = Note.objects.all().exclude(url__isnull=True).exclude(url__exact='')
         for note in notes:
@@ -89,6 +89,7 @@ class NotesAssistant():
             self.add_note(note.url)
 
     def add_note(self, url):
+        from notes.models import Note
         note = Note.objects.get(url=url)
         if not note.assistant_loaded:
             print("Adding: {}".format(url))
@@ -132,9 +133,12 @@ class NotesAssistant():
         retriever = self.vs.as_retriever(search_kwargs={"k": 4})
         parser = StrOutputParser()
         chain = (
-            rag_prompt | self.llm | parser
+                {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
+                | rag_prompt
+                | self.llm
+                | parser
         )
-        for chunk in chain.stream({"context": retriever | self.format_docs, "question": question}):
+        for chunk in chain.stream(question):
             yield chunk
 
     def intro(self, question):

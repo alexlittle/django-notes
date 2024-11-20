@@ -13,3 +13,5 @@
 /static/
 /assistant/vs-data/
 /assistant/static/assistant/human.svg
+/assistant/test.py
+/assistant/alextest*.py
