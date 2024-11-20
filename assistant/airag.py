@@ -69,6 +69,10 @@ class NotesAssistant():
 
     def init_chat(self):
 
+        self.llm = OllamaLLM(model=self.llm_model, temperature=0)
+
+    def init_stream_chat(self):
+
         self.llm = ChatOllama(model=self.llm_model,
                              temperature=0,
                              callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]),
@@ -132,11 +136,16 @@ class NotesAssistant():
 
         retriever = self.vs.as_retriever(search_kwargs={"k": 4})
         parser = StrOutputParser()
-        chain = rag_prompt | self.llm | parser
-
+        chain = (
+            rag_prompt | self.llm | parser
+        )
         for chunk in chain.stream({"context": retriever | self.format_docs, "question": question}):
             yield chunk
 
     def intro(self, question):
-
         return self.llm.invoke(question)
+
+    def intro_stream(self, question):
+        for chunk in self.llm.stream(question):
+            yield chunk.content
+

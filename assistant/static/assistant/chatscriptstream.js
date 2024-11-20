@@ -59,6 +59,9 @@ const prepForStream = (role, imgSrc) => {
 const sendMessage = async (message, intro=false) => {
   if (!intro){
     addMessage(message, 'user', userImage);
+    url = postUrl;
+  } else {
+    url = introPostUrl;
   }
   const loadingElement = document.createElement('div');
   const loadingtextElement = document.createElement('p');
@@ -73,7 +76,7 @@ const sendMessage = async (message, intro=false) => {
   try {
     const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-    const response = await fetch(postUrl, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

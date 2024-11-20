@@ -14,16 +14,19 @@
             defer
             data-userimage="{% static 'assistant/human.png' %}"
             data-posturl="{% url 'assistant:chatstream' %}"
-            data-introposturl="{% url 'assistant:chatintro' %}"
+            data-introposturl="{% url 'assistant:chatintrostream' %}"
             data-botimage="{% static 'assistant/bot_logo.png' %}"
             data-errorimage="{% static 'assistant/error.png' %}"
-            data-intromessage="Please introduce yourself">
+            data-intromessage="Please introduce yourself in 2 sentences">
     </script>
 {% endblock extra_scripts %}
 
 {% block content %}
 
-    <main>
+<h1>{% trans 'Assistant' %}</h1>
+
+
+<main>
       <div class="chatbot">
 
         <div class="spacer" id="messages-container"></div>
@@ -34,5 +37,6 @@
           <button type="submit">➤</button>
         </form>
       </div>
-    </main>
+</main>
 {% endblock content %}
+

@@ -37,8 +37,13 @@ const addMessage = (message, role, imgSrc) => {
 
 
 //Section: Calling the model
-const sendMessage = async (message) => {
-  addMessage(message, 'user', userImage);
+const sendMessage = async (message, intro=false) => {
+  if (!intro){
+    addMessage(message, 'user', userImage);
+    url = postUrl;
+  } else {
+    url = introPostUrl;
+  }
   // Loading animation
   const loadingElement = document.createElement('div');
   const loadingtextElement = document.createElement('p');
@@ -56,7 +61,7 @@ const sendMessage = async (message) => {
     console.log(JSON.stringify(requestBody));
     try {
       const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-      const response = await fetch(postUrl, {
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -111,66 +116,4 @@ messageForm.addEventListener('submit', async (event) => {
 });
 
 
-//Section: Calling the model
-const sendIntroMessage = async (message) => {
-  // Loading animation
-  const loadingElement = document.createElement('div');
-  const loadingtextElement = document.createElement('p');
-  loadingElement.className = `loading-animation`;
-  loadingtextElement.className = `loading-text`;
-  loadingtextElement.innerText = 'Loading....Please wait';
-  messagesContainer.appendChild(loadingElement);
-  messagesContainer.appendChild(loadingtextElement);
-
-  async function makeIntroPostRequest(msg) {
-    const requestBody = {
-      question: msg
-    };
-
-    console.log(JSON.stringify(requestBody));
-    try {
-      const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-      const response = await fetch(introPostUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrftoken
-        },
-        body: JSON.stringify(requestBody)
-      });
-
-      const resp_data = await response.text();
-      // Handle the response data here
-      console.log(resp_data);
-      return resp_data;
-    } catch (error) {
-      // Handle any errors that occurred during the request
-      console.error('Error:', error);
-      return error
-    }
-  }
-
-  var res = await makeIntroPostRequest(message);
-
-   console.log(res)
-  resp_data = {"response": res};
-
-  // Deleting the loading animation
-  const loadanimation = document.querySelector('.loading-animation');
-  const loadtxt = document.querySelector('.loading-text');
-  loadanimation.remove();
-  loadtxt.remove();
-
-  if (resp_data.error) {
-    // Handle the error here
-    const errorMessage = JSON.stringify(resp_data);
-    addMessage(errorMessage, 'error', errorImage);
-  } else {
-    // Process the normal response here
-    const responseMessage = resp_data['response'];
-    addMessage(responseMessage, 'aibot', botImage);
-  }
-
-};
-
-sendIntroMessage(introMessage);
+sendMessage(introMessage, true);

@@ -4,8 +4,9 @@ from assistant import views
 
 app_name = 'assistant'
 urlpatterns = [
-    path('', views.HomeView.as_view(), name="home"),
+    path('', views.ChatView.as_view(), name="home"),
+    path('stream', views.ChatStreamView.as_view(), name="chatstream"),
     path('intro', views.ChatIntroView.as_view(), name="chatintro"),
-    path('stream', views.TestStreamView.as_view(), name="chatstream"),
+    path('stream/intro', views.ChatIntroStreamView.as_view(), name="chatintrostream"),
     path('history/', views.HistoryView.as_view(), name="history")
     ]
