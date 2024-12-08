@@ -19,6 +19,7 @@ coloredlogs==15.0.1
 crispy-bootstrap4==2024.10
 dataclasses-json==0.6.7
 Deprecated==1.2.14
+distro==1.9.0
 Django==5.1.4
 django-autoslug==1.9.9
 django-crispy-forms==2.3
@@ -46,6 +47,7 @@ importlib_metadata==8.5.0
 importlib_resources==6.4.5
 iniconfig==2.0.0
 Jinja2==3.1.4
+jiter==0.7.1
 joblib==1.4.2
 jsonpatch==1.33
 jsonpointer==3.0.0
@@ -53,9 +55,10 @@ kubernetes==31.0.0
 langchain==0.3.7
 langchain-chroma==0.1.4
 langchain-community==0.3.6
-langchain-core==0.3.16
+langchain-core==0.3.18
 langchain-huggingface==0.1.2
 langchain-ollama==0.2.0
+langchain-openai==0.2.8
 langchain-text-splitters==0.3.2
 langsmith==0.1.142
 markdown-it-py==3.0.0
@@ -86,6 +89,7 @@ nvidia-nvtx-cu12==12.4.127
 oauthlib==3.2.2
 ollama==0.3.3
 onnxruntime==1.20.0
+openai==1.54.4
 opentelemetry-api==1.28.1
 opentelemetry-exporter-otlp-proto-common==1.28.1
 opentelemetry-exporter-otlp-proto-grpc==1.28.1
@@ -140,6 +144,7 @@ starlette==0.41.2
 sympy==1.13.1
 tenacity==9.0.0
 threadpoolctl==3.5.0
+tiktoken==0.8.0
 tokenizers==0.20.3
 toml==0.10.2
 torch==2.5.1

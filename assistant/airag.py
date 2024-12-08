@@ -12,15 +12,9 @@ from langchain_chroma import Chroma
 from langchain_ollama import ChatOllama
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.output_parsers import StrOutputParser
-from langchain.chains import SequentialChain
 from langchain.prompts import PromptTemplate
 from langchain_community.document_loaders import WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.callbacks.manager import CallbackManager
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_core.runnables import Runnable
-from langchain.chains import LLMChain
-
 
 
 os.environ['USER_AGENT'] = 'Alex Laptop'
@@ -115,7 +109,7 @@ class NotesAssistant():
 
         rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
 
-        retriever = self.vs.as_retriever(search_kwargs={"k": 4})
+        retriever = self.vs.as_retriever(search_kwargs={"k": 10})
 
         chain_respond = (
             {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
@@ -130,7 +124,7 @@ class NotesAssistant():
 
         rag_prompt = PromptTemplate.from_template(self.get_prompt_template(template))
 
-        retriever = self.vs.as_retriever(search_kwargs={"k": 4})
+        retriever = self.vs.as_retriever(search_kwargs={"k": 10})
         parser = StrOutputParser()
         chain = (
                 {"context": retriever | self.format_docs, "question": RunnablePassthrough()}
