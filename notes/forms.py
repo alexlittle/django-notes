@@ -7,11 +7,15 @@ from crispy_forms.bootstrap import FieldWithButtons
 
 from tinymce.widgets import TinyMCE
 
-from notes.models import STATUS_OPTIONS
+from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS
 
 class NoteForm(forms.Form):
     url = forms.CharField(required=False)
     title = forms.CharField(required=True)
+    due_date = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+    )
     description = forms.CharField(widget=TinyMCE(), required=False)
     tags = forms.CharField(
                 required=True,
@@ -20,6 +24,10 @@ class NoteForm(forms.Form):
     status = forms.ChoiceField(
         choices=STATUS_OPTIONS,
         required=True,
+    )
+    priority = forms.ChoiceField(
+        choices=PRIORITY_OPTIONS,
+        required=False,
     )
     def __init__(self, *args, **kwargs):
         super(NoteForm, self).__init__(*args, **kwargs)
@@ -30,9 +38,11 @@ class NoteForm(forms.Form):
         self.helper.layout = Layout(
                 'title',
                 'url',
-                'description',
+                'due_date',
                 'tags',
                 'status',
+                'priority',
+                'description',
                 Div(
                    Submit('submit', _(u'Save'), css_class='btn btn-default'),
                    css_class='col-lg-offset-2 col-lg-4',

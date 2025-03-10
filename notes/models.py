@@ -14,6 +14,17 @@ STATUS_OPTIONS = (
         ('archived', 'Archived')
     )
 
+PRIORITY_OPTIONS = (
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'Low')
+    )
+
+HISTORY_OPTIONS = (
+        ('deferred', 'Deferred'),
+        ('updated', 'Updated')
+    )
+
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -42,6 +53,11 @@ class Note (models.Model):
     tags = models.ManyToManyField(Tag, through='NoteTag', name='tags')
     status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default='open')
     assistant_loaded = models.BooleanField(default=False)
+    due_date = models.DateField(blank=True, null=True, default=None)
+    completed_date = models.DateField(blank=True, null=True, default=None)
+    estimated_effort = models.IntegerField(default=30)
+    priority = models.CharField(max_length=15, choices=PRIORITY_OPTIONS, blank=True, null=True, default=None)
+
 
     class Meta:
         ordering = ['-create_date']
@@ -51,6 +67,12 @@ class Note (models.Model):
             return self.title
         else:
             return self.url
+
+class NoteHistory (models.Model):
+    note = models.ForeignKey(Note, on_delete=models.CASCADE)
+    update_date = models.DateTimeField(default=timezone.now)
+    action = models.CharField(max_length=15, choices=HISTORY_OPTIONS, default=None)
+
 
 
 class NoteTag(models.Model):
