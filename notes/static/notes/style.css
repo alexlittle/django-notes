@@ -105,6 +105,19 @@ a {
 	color: #04689a;
 }
 
+.striped-row:nth-child(odd) {
+    background-color: #f8f9fa; /* Light gray background for odd rows */
+}
+
+.striped-row:nth-child(even) {
+    background-color: none; /* Slightly darker background for even rows */
+}
+
+/* Padding and border styles */
+.striped-row {
+    padding: 20px;
+    border: 1px solid #ddd;
+}
 /* RESPONSIVE CSS
 -------------------------------------------------- */
 

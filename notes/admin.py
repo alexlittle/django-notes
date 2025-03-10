@@ -8,12 +8,12 @@ class NoteTagInline(admin.TabularInline):
 
 
 class NoteAdmin(admin.ModelAdmin):
-    list_display = ('url', 'title', 'link_check_date', 'link_check_result')
+    list_display = ('title',  'due_date', 'status', 'url')
     search_fields = ['url',
                      'title',
                      'description',
-                     'link_check_date',
-                     'link_check_result']
+                     'status',
+                     'priority']
     inlines = [
         NoteTagInline
     ]

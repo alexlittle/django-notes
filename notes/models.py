@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -31,9 +33,10 @@ HISTORY_OPTIONS = (
     )
 
 RECURRENCE_OPTIONS = [
-    ('none', 'One-time'),
     ('weekly', 'Weekly'),
+    ('biweekly', 'Fortnightly'),
     ('monthly', 'Monthly'),
+    ('quarterly', 'Quarterly'),
     ('annually', 'Annually'),
 ]
 
@@ -83,19 +86,23 @@ class Note (models.Model):
 
     def get_next_due_date(self):
         """Calculate the next due date based on recurrence."""
-        if self.recurrence == 'none':
+        if self.recurrence == '' or self.recurrence is None:
             return None
         elif self.recurrence == 'weekly':
             return self.due_date + timedelta(weeks=1)
+        elif self.recurrence == 'biweekly':
+            return self.due_date + timedelta(weeks=2)
         elif self.recurrence == 'monthly':
             return self.due_date + relativedelta(months=1)
+        elif self.recurrence == 'quarterly':
+            return self.due_date + relativedelta(months=3)
         elif self.recurrence == 'annually':
             return self.due_date + relativedelta(years=1)
         return self.due_date
 
     def generate_next_task(self):
         """Create a new task instance after completion."""
-        if self.recurrence == 'none':
+        if self.recurrence == '' or self.recurrence is None:
             return None
         next_due_date = self.get_next_due_date()
         note_data = model_to_dict(self)
@@ -103,6 +110,7 @@ class Note (models.Model):
         note_data.pop('tags', None)
         note_data.pop('status', None)
         note_data.pop('create_date', None)
+        note_data.pop('completed_date', None)
         note_data['due_date'] = next_due_date
 
         new_task = Note.objects.create(**note_data)
@@ -112,6 +120,7 @@ class Note (models.Model):
     def complete_task(self):
         """Mark the task as completed and create the next one if needed."""
         self.status = 'completed'
+        self.completed_date = datetime.datetime.now()
         self.save()
         next_task = self.generate_next_task()
 

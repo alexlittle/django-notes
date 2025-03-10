@@ -1,18 +1,26 @@
 {% load i18n %}
 {% load static %}
-<p>
-		<strong>{{ note.due_date }} - {{ note.title }}</strong>
-		[<a href="{% url 'notes:edit' note.id %}">{% trans 'edit' %}</a> |
-		<a href="{% url 'notes:complete_task' note.id %}">{% trans 'complete' %}</a>]<br/>
+{% load humanize %}
+<div class="col-md-2">
+		<strong>{{ note.due_date|naturalday }}</strong>
+</div>
+
+<div class="col-md-6">
+	<strong>{{ note.title }}</strong><br/>
 	{% for nt in note.tags.all %}
 		<a href="{% url 'notes:tag_view' nt.slug %}">{{ nt.name }}</a>
 	{% endfor %}
-	<small>
-	</small><br/>
 	{% if note.description %}
 		<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
 		<div id="desc-{{ note.id }}">
 			{{ note.description|safe }}
 		</div>
 	{% endif %}
+</div>
+<div class="col-md-2">
+	<a href="{% url 'notes:edit' note.id %}">{% trans 'edit' %}</a><br/>
+	<a href="{% url 'notes:complete_task' note.id %}">{% trans 'complete' %}</a>
+</div>
+
+
 </p>

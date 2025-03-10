@@ -6,9 +6,13 @@
 
 {% include "includes/pagination.html" %}
 
+<div class="container mt-5">
 {% for note in tasks %}
-	{% include "includes/task_row.html" %}
+	<div class="row striped-row">
+		{% include "includes/task_row.html" %}
+	</div>
 {% endfor %}
+</div>
 
 {% include "includes/pagination.html" %}
 

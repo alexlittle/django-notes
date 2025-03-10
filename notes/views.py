@@ -7,12 +7,10 @@ from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
 
 from notes.forms import NoteForm, SearchForm
-from notes.models import Note, Tag, NoteTag
+from notes.models import Note, Tag, NoteTag, NoteHistory
 from haystack.query import SearchQuerySet
 
 #from assistant.airag import NotesAssistant
-
-from notes.models import STATUS_OPTIONS
 
 class HomeView(ListView):
     template_name = 'notes/home.html'
@@ -70,7 +68,10 @@ class AddView(TemplateView):
                 #assistant = NotesAssistant()
                 #assistant.add_note(note.url)
                 pass
-            return HttpResponseRedirect(reverse('notes:home'))
+            if request.POST.get("action") == "save_and_add":
+                return HttpResponseRedirect(reverse('notes:add'))
+            else:
+                return HttpResponseRedirect(reverse('notes:home'))
         else:
             print(form.errors)
 
@@ -107,6 +108,7 @@ class EditView(TemplateView):
                 note_tag, created = NoteTag.objects.get_or_create(note=note, tag=tag)
 
             old_status = note.status
+            old_due_date = note.due_date
             note.title = form.cleaned_data.get("title")
             note.url = form.cleaned_data.get("url")
             note.description = form.cleaned_data.get("description")
@@ -118,13 +120,17 @@ class EditView(TemplateView):
             note.reminder_days = form.cleaned_data.get("reminder_days")
             # if completed check if recurring
             completed_status_key = 'completed'
-            print(completed_status_key)
-            print(old_status)
-            print(form.cleaned_data.get("status"))
             if old_status != completed_status_key and form.cleaned_data.get("status") == completed_status_key:
-                print("status updated")
                 note.complete_task()
             note.save()
+
+            nh = NoteHistory()
+            nh.note = note
+            if old_due_date != note.due_date:
+                nh.action = "deferred"
+            else:
+                nh.action = "updated"
+            nh.save()
         return HttpResponseRedirect(reverse('notes:home'))
 
 

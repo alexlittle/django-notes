@@ -62,7 +62,8 @@ class NoteForm(forms.ModelForm):
                 'estimated_effort',
                 'description',
                 Div(
-                   Submit('submit', _(u'Save'), css_class='btn btn-default'),
+                   Submit('action', 'save', css_class='btn btn-default', title=_("Save")),
+                    Submit('action', 'save_and_add',  css_class='btn btn-default', title=_("Save and add another")),
                    css_class='col-lg-offset-2 col-lg-4',
                 ),
             )
