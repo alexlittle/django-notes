@@ -2,6 +2,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.forms.models import model_to_dict
+
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 
 from notes.fields import AutoSlugField
 
@@ -10,6 +14,7 @@ from tinymce.models import HTMLField
 STATUS_OPTIONS = (
         ('open', 'Open'),
         ('inprogress', 'In progress'),
+        ('completed', 'Completed'),
         ('closed', 'Closed'),
         ('archived', 'Archived')
     )
@@ -24,6 +29,13 @@ HISTORY_OPTIONS = (
         ('deferred', 'Deferred'),
         ('updated', 'Updated')
     )
+
+RECURRENCE_OPTIONS = [
+    ('none', 'One-time'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+    ('annually', 'Annually'),
+]
 
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
@@ -57,7 +69,8 @@ class Note (models.Model):
     completed_date = models.DateField(blank=True, null=True, default=None)
     estimated_effort = models.IntegerField(default=30)
     priority = models.CharField(max_length=15, choices=PRIORITY_OPTIONS, blank=True, null=True, default=None)
-
+    recurrence = models.CharField(max_length=10, choices=RECURRENCE_OPTIONS, default='none')
+    reminder_days = models.IntegerField(default=None, blank=True, null=True)
 
     class Meta:
         ordering = ['-create_date']
@@ -68,11 +81,46 @@ class Note (models.Model):
         else:
             return self.url
 
+    def get_next_due_date(self):
+        """Calculate the next due date based on recurrence."""
+        if self.recurrence == 'none':
+            return None
+        elif self.recurrence == 'weekly':
+            return self.due_date + timedelta(weeks=1)
+        elif self.recurrence == 'monthly':
+            return self.due_date + relativedelta(months=1)
+        elif self.recurrence == 'annually':
+            return self.due_date + relativedelta(years=1)
+        return self.due_date
+
+    def generate_next_task(self):
+        """Create a new task instance after completion."""
+        if self.recurrence == 'none':
+            return None
+        next_due_date = self.get_next_due_date()
+        note_data = model_to_dict(self)
+        note_data.pop('id', None)
+        note_data.pop('tags', None)
+        note_data.pop('status', None)
+        note_data.pop('create_date', None)
+        note_data['due_date'] = next_due_date
+
+        new_task = Note.objects.create(**note_data)
+        new_task.tags.set(self.tags.all())
+        return new_task
+
+    def complete_task(self):
+        """Mark the task as completed and create the next one if needed."""
+        self.status = 'completed'
+        self.save()
+        next_task = self.generate_next_task()
+
+        return next_task
+
 class NoteHistory (models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
     update_date = models.DateTimeField(default=timezone.now)
     action = models.CharField(max_length=15, choices=HISTORY_OPTIONS, default=None)
-
 
 
 class NoteTag(models.Model):

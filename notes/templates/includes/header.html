@@ -8,17 +8,18 @@
   </button>
   
   <a class="navbar-brand" href="{% url 'notes:home' %}">
-    {% trans 'Notes/Ideas' %}
+    {% trans 'Notes/Tasks' %}
   </a>
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-		  		<li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add Note' %}</a></li>
-		  		<li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
-		  		<li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'Favourites' %}</a></li>
-		  		<li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
-                <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
-                <li class="nav-item"><a href="{% url 'assistant:home' %}" class="nav-link">{% trans 'Assistant' %}</a></li>
-		    </ul>
+        <li class="nav-item"><a href="{% url 'notes:notes' %}" class="nav-link">{% trans 'Notes' %}</a></li>
+        <li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add Note' %}</a></li>
+        <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
+        <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'Favourites' %}</a></li>
+        <li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
+        <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
+        <li class="nav-item"><a href="{% url 'assistant:home' %}" class="nav-link">{% trans 'Assistant' %}</a></li>
+    </ul>
 
   </div>
 </nav>

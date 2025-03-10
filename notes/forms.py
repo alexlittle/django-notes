@@ -7,16 +7,25 @@ from crispy_forms.bootstrap import FieldWithButtons
 
 from tinymce.widgets import TinyMCE
 
-from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS
+from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS, RECURRENCE_OPTIONS, Note
 
-class NoteForm(forms.Form):
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        exclude = ['create_date', 'link_check_date', 'user']
+
     url = forms.CharField(required=False)
     title = forms.CharField(required=True)
     due_date = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
-    description = forms.CharField(widget=TinyMCE(), required=False)
+    description = forms.CharField(widget=TinyMCE(attrs={
+                                      'cols': 80,  # Width in terms of character columns
+                                      'rows': 10,  # Height in terms of text rows
+                                      'style': 'width: 100%; height: 100px;'  # Custom width & height
+                                  }),
+                                  required=False)
     tags = forms.CharField(
                 required=True,
                 error_messages={'required':
@@ -26,9 +35,15 @@ class NoteForm(forms.Form):
         required=True,
     )
     priority = forms.ChoiceField(
-        choices=PRIORITY_OPTIONS,
+        choices=[('', 'Select an option')] + list(PRIORITY_OPTIONS),
         required=False,
     )
+    recurrence = forms.ChoiceField(
+        choices=[('', 'Select an option')] + list(RECURRENCE_OPTIONS),
+        required=False,
+    )
+    reminder_days = forms.IntegerField(required=False)
+
     def __init__(self, *args, **kwargs):
         super(NoteForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -42,6 +57,9 @@ class NoteForm(forms.Form):
                 'tags',
                 'status',
                 'priority',
+                'recurrence',
+                'reminder_days',
+                'estimated_effort',
                 'description',
                 Div(
                    Submit('submit', _(u'Save'), css_class='btn btn-default'),

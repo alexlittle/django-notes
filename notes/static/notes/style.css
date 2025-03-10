@@ -27,6 +27,10 @@ body {
   font-family: 'Ubuntu', sans-serif;
 }
 
+.container {
+    margin-top: 50px;
+}
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -95,73 +99,6 @@ h1 {
 h2 {
 	color: #04689a;
 	font-size: 130%;
-}
-
-
-
-.content-text {
-    font-size: 120%;
-}
-
-.content-text p {
-	margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-/* page styles */
-.cv-row, .al-row{
-	margin-bottom:20px;
-}
-.contact-type {
-	font-weight:bold;
-}
-
-.cv-date {
-	font-weight:normal;
-}
-
-.cv-title, .cv-p-title {
-	font-weight:bold;
-}
-
-.cv-organisation {
-	font-weight:normal;
-}
-
-.cv-description {
-	margin-top:10px;
-}
-
-.project-row  {
-	margin-top:30px;
-}
-
-.project-row h2 {
-	margin-top:10px;
-}
-
-.project-row img {
-	border: none ;
-}
-
-.blog-row  {
-	margin: 0 0 30px 0;
-}
-
-img.blog-single-image  {
-	margin: 50px 0 30px 0;
-}
-
-h3.blog {
-	margin-top: 0;
-	color: #ff66c4;
-	font-size: 120%;
-}
-
-p.company-reg {
-	padding-bottom: 20px;
-	text-align: center;
-	
 }
 
 a {

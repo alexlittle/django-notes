@@ -12,9 +12,19 @@ from haystack.query import SearchQuerySet
 
 #from assistant.airag import NotesAssistant
 
+from notes.models import STATUS_OPTIONS
 
 class HomeView(ListView):
     template_name = 'notes/home.html'
+    paginate_by = 50
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        return Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress']).order_by('due_date')
+
+
+class NotesView(ListView):
+    template_name = 'notes/notes.html'
     paginate_by = 50
     context_object_name = 'notes'
 
@@ -22,7 +32,16 @@ class HomeView(ListView):
         return Note.objects.all().order_by('-create_date')
 
 
+class CompleteTaskView(TemplateView):
+
+    def get(self, request, note_id):
+        note = Note.objects.get(pk=note_id)
+        note.complete_task()
+        return HttpResponseRedirect(reverse('notes:home'))
+
+
 class AddView(TemplateView):
+
     def get(self, request):
         form = NoteForm()
         return render(request,
@@ -36,6 +55,11 @@ class AddView(TemplateView):
             note.title = form.cleaned_data.get("title")
             note.description = form.cleaned_data.get("description")
             note.url = form.cleaned_data.get("url")
+            note.due_date = form.cleaned_data.get("due_date")
+            note.estimated_effort = form.cleaned_data.get("estimated_effort")
+            note.priority = form.cleaned_data.get("priority")
+            note.recurrence = form.cleaned_data.get("recurrence")
+            note.reminder_days = form.cleaned_data.get("reminder_days")
             note.save()
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(',')]
@@ -46,10 +70,12 @@ class AddView(TemplateView):
                 #assistant = NotesAssistant()
                 #assistant.add_note(note.url)
                 pass
-        return HttpResponseRedirect(reverse('notes:home'))
-
+            return HttpResponseRedirect(reverse('notes:home'))
+        else:
+            print(form.errors)
 
 class EditView(TemplateView):
+
     def get(self, request, note_id):
         note = Note.objects.get(pk=note_id)
         tags = Tag.objects.filter(notetag__note=note).values_list('name', flat=True)
@@ -59,6 +85,11 @@ class EditView(TemplateView):
         data['description'] = note.description
         data['url'] = note.url
         data['status'] = note.status
+        data['due_date'] = note.due_date
+        data['estimated_effort'] = note.estimated_effort
+        data['priority'] = note.priority
+        data['recurrence'] = note.recurrence
+        data['reminder_days'] = note.reminder_days
         form = NoteForm(initial=data)
         return render(request,
                       'notes/form.html',
@@ -74,10 +105,25 @@ class EditView(TemplateView):
             for t in tags:
                 tag, created = Tag.objects.get_or_create(name=t)
                 note_tag, created = NoteTag.objects.get_or_create(note=note, tag=tag)
+
+            old_status = note.status
             note.title = form.cleaned_data.get("title")
             note.url = form.cleaned_data.get("url")
             note.description = form.cleaned_data.get("description")
             note.status = form.cleaned_data.get("status")
+            note.due_date = form.cleaned_data.get("due_date")
+            note.estimated_effort = form.cleaned_data.get("estimated_effort")
+            note.priority = form.cleaned_data.get("priority")
+            note.recurrence = form.cleaned_data.get("recurrence")
+            note.reminder_days = form.cleaned_data.get("reminder_days")
+            # if completed check if recurring
+            completed_status_key = 'completed'
+            print(completed_status_key)
+            print(old_status)
+            print(form.cleaned_data.get("status"))
+            if old_status != completed_status_key and form.cleaned_data.get("status") == completed_status_key:
+                print("status updated")
+                note.complete_task()
             note.save()
         return HttpResponseRedirect(reverse('notes:home'))
 

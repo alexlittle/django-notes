@@ -5,6 +5,8 @@ from notes import views as note_views
 app_name = 'notes'
 urlpatterns = [
     path('', note_views.HomeView.as_view(), name="home"),
+    path('notes/', note_views.NotesView.as_view(), name="notes"),
+    path('task/<int:note_id>/complete', note_views.CompleteTaskView.as_view(), name="complete_task"),
     path('add/', note_views.AddView.as_view(), name="add"),
     path('edit/<int:note_id>/',
          note_views.EditView.as_view(),
