@@ -47,8 +47,7 @@ INSTALLED_APPS = [
     'haystack',
     'notes',
     'tinymce',
-    'crispy_bootstrap4',
-    'assistant'
+    'crispy_bootstrap4'
 ]
 
 

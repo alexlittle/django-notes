@@ -10,7 +10,6 @@ from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory
 from haystack.query import SearchQuerySet
 
-#from assistant.airag import NotesAssistant
 
 class HomeView(ListView):
     template_name = 'notes/home.html'
@@ -64,10 +63,7 @@ class AddView(TemplateView):
             for t in tags:
                 tag, created = Tag.objects.get_or_create(name=t)
                 NoteTag.objects.get_or_create(note=note, tag=tag)
-            if settings.NOTES_ASSISTANT_ENABLED and note.url is not None:
-                #assistant = NotesAssistant()
-                #assistant.add_note(note.url)
-                pass
+
             if request.POST.get("action") == "save_and_add":
                 return HttpResponseRedirect(reverse('notes:add'))
             else:

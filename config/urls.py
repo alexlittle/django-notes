@@ -5,6 +5,5 @@ from django.contrib import admin
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tinymce/', include('tinymce.urls')),
-    path('', include('notes.urls')),
-    path('assistant/', include('assistant.urls')),
+    path('', include('notes.urls'))
 ]
