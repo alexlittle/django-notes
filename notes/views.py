@@ -79,7 +79,7 @@ class TagTasksView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
-        return Note.objects.filter(notetag__tag__slug=slug, url='')
+        return Note.objects.filter(notetag__tag__slug=slug, url='', status__in=['open', 'inprogress'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -102,7 +102,12 @@ class CompleteTaskView(TemplateView):
     def get(self, request, note_id):
         note = Note.objects.get(pk=note_id)
         note.complete_task()
-        return HttpResponseRedirect(reverse('notes:home'))
+        referer = request.META.get('HTTP_REFERER')
+
+        if referer:
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('notes:home'))
 
 
 class AddView(TemplateView):

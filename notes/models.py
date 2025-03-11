@@ -73,7 +73,7 @@ class Note (models.Model):
     completed_date = models.DateField(blank=True, null=True, default=None)
     estimated_effort = models.IntegerField(default=30)
     priority = models.CharField(max_length=15, choices=PRIORITY_OPTIONS, blank=True, null=True, default=None)
-    recurrence = models.CharField(max_length=10, choices=RECURRENCE_OPTIONS, default='none')
+    recurrence = models.CharField(max_length=10, choices=RECURRENCE_OPTIONS, blank=True, null=True, default=None)
     reminder_days = models.IntegerField(default=None, blank=True, null=True)
 
     class Meta:
@@ -87,7 +87,7 @@ class Note (models.Model):
 
     def get_next_due_date(self):
         """Calculate the next due date based on recurrence."""
-        if self.recurrence == '' or self.recurrence is None:
+        if self.recurrence == 'none' or self.recurrence is None:
             return None
         elif self.recurrence == 'weekly':
             return self.due_date + timedelta(weeks=1)
@@ -103,7 +103,7 @@ class Note (models.Model):
 
     def generate_next_task(self):
         """Create a new task instance after completion."""
-        if self.recurrence == '' or self.recurrence is None:
+        if self.recurrence == 'none' or self.recurrence is None:
             return None
         next_due_date = self.get_next_due_date()
         note_data = model_to_dict(self)
