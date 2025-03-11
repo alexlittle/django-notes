@@ -9,7 +9,7 @@
 <a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
 
 {% if overdue %}
-	<h2>{% trans "Overdue" %}</h2>
+	<h2>{% trans "Overdue" %} ({{ overdue|length }})</h2>
 	<div class="container mt-5">
 	{% for note in overdue %}
 		<div class="row striped-row">
@@ -20,7 +20,7 @@
 {% endif %}
 
 {% if today %}
-	<h2>{% trans "Today" %}</h2>
+	<h2>{% trans "Today" %} ({{ today|length }})</h2>
 	<div class="container mt-5">
 	{% for note in today %}
 		<div class="row striped-row">
@@ -31,7 +31,7 @@
 {% endif %}
 
 {% if reminder %}
-	<h2>{% trans "Reminder" %}</h2>
+	<h2>{% trans "Reminder" %} ({{ reminder|length }})</h2>
 	<div class="container mt-5">
 	{% for note in reminder %}
 		<div class="row striped-row">
@@ -42,7 +42,7 @@
 {% endif %}
 
 {% if tomorrow %}
-	<h2>{% trans "Tomorrow" %}</h2>
+	<h2>{% trans "Tomorrow" %} ({{ tomorrow|length }})</h2>
 	<div class="container mt-5">
 	{% for note in tomorrow %}
 		<div class="row striped-row">
@@ -53,7 +53,7 @@
 {% endif %}
 
 {% if next_week %}
-	<h2>{% trans "Next week" %}</h2>
+	<h2>{% trans "Next week" %} ({{ next_week|length }})</h2>
 	<div class="container mt-5">
 	{% for note in next_week %}
 		<div class="row striped-row">
@@ -64,7 +64,7 @@
 {% endif %}
 
 {% if future %}
-	<h2>{% trans "Future" %}</h2>
+	<h2>{% trans "Future" %} ({{ future|length }})</h2>
 	<div class="container mt-5">
 	{% for note in future %}
 		<div class="row striped-row">
