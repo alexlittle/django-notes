@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+
+{% if tag %}<h2>{{ tag.name }}</h2>{% endif %}
+
+{% include "includes/pagination.html" %}
+
+<div class="container mt-5">
+{% for note in tasks %}
+	<div class="row striped-row">
+		{% include "includes/task_row.html" %}
+	</div>
+{% endfor %}
+</div>
+
+{% include "includes/pagination.html" %}
+
+{% endblock %}

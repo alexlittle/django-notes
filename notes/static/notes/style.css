@@ -28,7 +28,11 @@ body {
 }
 
 .container {
-    margin-top: 50px;
+    margin-top: 20px;
+}
+
+.mt-5 {
+    margin-top: 10px !important;
 }
 
 .footer {
@@ -85,8 +89,8 @@ body {
 -------------------------------------------------- */
 
 .h1, .h2, .h3, h1, h2, h3 {
-    margin-top: 50px;
-    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
 
 h1 {
@@ -115,9 +119,24 @@ a {
 
 /* Padding and border styles */
 .striped-row {
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #ddd;
 }
+
+.task-container {
+  display: flex;
+  align-items: center; /* Vertically align items */
+}
+
+.task-container svg {
+  margin-right: 20px; /* Add some space between the icon and text */
+}
+
+.task-text {
+  flex-grow: 1; /* Allow text to take up remaining space */
+  word-wrap: break-word; /* Ensure wrapping on long words */
+}
+
 /* RESPONSIVE CSS
 -------------------------------------------------- */
 

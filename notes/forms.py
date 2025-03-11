@@ -20,11 +20,10 @@ class NoteForm(forms.ModelForm):
         required=False,
         widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
     )
-    description = forms.CharField(widget=TinyMCE(attrs={
-                                      'cols': 80,  # Width in terms of character columns
-                                      'rows': 10,  # Height in terms of text rows
-                                      'style': 'width: 100%; height: 100px;'  # Custom width & height
-                                  }),
+    description = forms.CharField(widget=TinyMCE(
+                                mce_attrs={
+                                    'content_style': 'body { width: 100%; height: 50px; }',
+                                }),
                                   required=False)
     tags = forms.CharField(
                 required=True,

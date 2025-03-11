@@ -4,16 +4,75 @@
 
 {% block content %}
 
-{% include "includes/pagination.html" %}
+<a href="{% url 'notes:add' %}" class="btn btn-primary">Add Task</a>
 
-<div class="container mt-5">
-{% for note in tasks %}
-	<div class="row striped-row">
-		{% include "includes/task_row.html" %}
+<a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
+
+{% if overdue %}
+	<h2>{% trans "Overdue" %}</h2>
+	<div class="container mt-5">
+	{% for note in overdue %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
 	</div>
-{% endfor %}
-</div>
+{% endif %}
 
-{% include "includes/pagination.html" %}
+{% if today %}
+	<h2>{% trans "Today" %}</h2>
+	<div class="container mt-5">
+	{% for note in today %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if reminder %}
+	<h2>{% trans "Reminder" %}</h2>
+	<div class="container mt-5">
+	{% for note in reminder %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if tomorrow %}
+	<h2>{% trans "Tomorrow" %}</h2>
+	<div class="container mt-5">
+	{% for note in tomorrow %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if next_week %}
+	<h2>{% trans "Next week" %}</h2>
+	<div class="container mt-5">
+	{% for note in next_week %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+
+{% if future %}
+	<h2>{% trans "Future" %}</h2>
+	<div class="container mt-5">
+	{% for note in future %}
+		<div class="row striped-row">
+			{% include "includes/task_row.html" %}
+		</div>
+	{% endfor %}
+	</div>
+{% endif %}
+
 
 {% endblock %}

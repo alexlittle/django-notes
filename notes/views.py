@@ -1,23 +1,91 @@
-from django.conf import settings
+
 from django.urls import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.db.models import Count
+from django.db.models import Count, Case, When, Value, DateField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
+
+from datetime import datetime
+from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory
 from haystack.query import SearchQuerySet
 
 
-class HomeView(ListView):
+class HomeView(TemplateView):
     template_name = 'notes/home.html'
+
+    def _filter_for_reminders(self, base_query):
+        reminder_items = []
+        for item in base_query.filter(reminder_days__gt=0):
+            due_threshold = item.due_date - timedelta(days=item.reminder_days)
+            if datetime.now().date() >= due_threshold:
+                reminder_items.append(item)
+        return reminder_items
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        base_query_dated = Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress'])
+
+        context["overdue"] = base_query_dated.filter(due_date__lt=datetime.now()).order_by("due_date")
+        context["reminder"] = self._filter_for_reminders(base_query_dated)
+        context["today"] = base_query_dated.filter(due_date=datetime.now())
+        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1))
+        context["next_week"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=1),
+                                                       due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date")
+        context["future"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=7)).order_by("due_date")
+        return context
+
+
+class TasksView(ListView):
+    template_name = 'notes/tasks.html'
     paginate_by = 50
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress']).order_by('due_date')
+        return Note.objects.filter(url='', status__in=['open', 'inprogress']).annotate(
+                    has_date=Case(
+                        When(due_date__isnull=False, then=Value(1)),
+                        default=Value(0),
+                        output_field=DateField(),
+                    )
+                ).order_by('-has_date', 'due_date')
+
+class TasksTagsView(TemplateView):
+    template_name = 'notes/tasks_tags.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        base_query_dated = Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress'])
+        base_query_undated = Note.objects.filter(due_date__isnull=True, url='', status__in=['open', 'inprogress'])
+        context["tags_dated"] = Tag.objects.filter(notetag__note__in=base_query_dated) \
+            .distinct() \
+            .annotate(note_count=Count("notetag__note")) \
+            .order_by("name")
+        context["tags_undated"] = Tag.objects.filter(notetag__note__in=base_query_undated) \
+            .distinct() \
+            .annotate(note_count=Count("notetag__note")) \
+            .order_by("name")
+        return context
+
+
+class TagTasksView(ListView):
+    template_name = 'notes/tasks.html'
+    paginate_by = 50
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        slug = self.kwargs['tag_slug']
+        return Note.objects.filter(notetag__tag__slug=slug, url='')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        slug = self.kwargs['tag_slug']
+        context["tag"] = Tag.objects.get(slug=slug)
+        return context
 
 
 class NotesView(ListView):
@@ -26,7 +94,7 @@ class NotesView(ListView):
     context_object_name = 'notes'
 
     def get_queryset(self):
-        return Note.objects.all().order_by('-create_date')
+        return Note.objects.exclude(url='').order_by('-create_date')
 
 
 class CompleteTaskView(TemplateView):

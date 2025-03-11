@@ -40,6 +40,7 @@ RECURRENCE_OPTIONS = [
     ('annually', 'Annually'),
 ]
 
+
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     name = models.CharField(max_length=100, blank=False, null=False)
@@ -125,6 +126,7 @@ class Note (models.Model):
         next_task = self.generate_next_task()
 
         return next_task
+
 
 class NoteHistory (models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)

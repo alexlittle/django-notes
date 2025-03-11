@@ -15,14 +15,14 @@ class Command(BaseCommand):
     errors = []
 
     def handle(self, *args, **options):
-        tags = Tag.objects.filter(favourite=False).annotate(bmcount=Count("bookmarktag"))
+        tags = Tag.objects.filter(favourite=False).annotate(note_count=Count("notetag"))
 
-        unused_tags = tags.filter(bmcount=0)
+        unused_tags = tags.filter(note_count=0)
         for tag in unused_tags:
             print(tag.name + ": deleted")
             tag.delete()
         print("--------------------------")
-        used_once_tags = tags.filter(bmcount=1).order_by("name")
+        used_once_tags = tags.filter(note_count=1).order_by("name")
         for idx, tag in enumerate(used_once_tags):
             url = "http://localhost:9030" + reverse('notes:tag_view', args=[tag.slug])
             print("%d/%d %s: only 1 use : %s" % (idx, used_once_tags.count(), tag.name, url))
