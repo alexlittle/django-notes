@@ -126,7 +126,12 @@ class CompleteTaskView(TemplateView):
 class AddView(TemplateView):
 
     def get(self, request):
-        form = NoteForm()
+        form_type = request.GET.get('type')
+        initial_data = {}
+        if form_type == 'birthday':
+            initial_data = {'type': 'task', 'tags': 'birthdays', 'recurrence': 'annually', 'reminder_days': 14}
+
+        form = NoteForm(initial=initial_data)
         return render(request,
                       'notes/form.html',
                       {'form': form})
