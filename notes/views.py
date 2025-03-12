@@ -130,6 +130,12 @@ class AddView(TemplateView):
         initial_data = {}
         if form_type == 'birthday':
             initial_data = {'type': 'task', 'tags': 'birthdays', 'recurrence': 'annually', 'reminder_days': 14}
+        elif form_type == 'task':
+            initial_data = {'type': 'task'}
+        elif form_type == 'idea':
+            initial_data = {'type': 'idea'}
+        elif form_type == 'bookmark':
+            initial_data = {'type': 'bookmark'}
 
         form = NoteForm(initial=initial_data)
         return render(request,
