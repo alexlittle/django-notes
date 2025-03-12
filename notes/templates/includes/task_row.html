@@ -21,6 +21,16 @@
 					| {{ note.due_date|naturalday }}
 				{% endif %}
 			{% endwith %}
+			{% if note.recurrence %}
+				<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+				  <circle cx="12" cy="12" r="10" fill="darkgrey" />
+				  <path d="M12 4.5a7.5 7.5 0 0 1 7.5 7.5c0 1.2-.3 2.4-.9 3.5l-2 2a5.2 5.2 0 1 0-7.4-7.4l2-2A7.4 7.4 0 0 1 12 4.5z"
+						fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+				  <path d="M12 19.5a7.5 7.5 0 0 1-7.5-7.5c0-1.2.3-2.4.9-3.5l2-2a5.2 5.2 0 1 0 7.4 7.4l-2 2A7.4 7.4 0 0 1 12 19.5z"
+						fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+				</svg>
+				</svg>
+			{% endif %}
 		{% endif %}
 		{% if note.description %}
 			<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
