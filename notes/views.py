@@ -144,6 +144,7 @@ class AddView(TemplateView):
 
     def post(self, request):
         form = NoteForm(request.POST)
+        form_type = request.POST.get('type')
         if form.is_valid():
             note = Note()
             note.user = request.user
@@ -164,7 +165,10 @@ class AddView(TemplateView):
                 NoteTag.objects.get_or_create(note=note, tag=tag)
 
             if request.POST.get("action") == "save_and_add":
-                return HttpResponseRedirect(reverse('notes:add'))
+                redirect_url = reverse('notes:add')
+                if form_type:
+                    redirect_url += f'?type={form_type}'
+                return HttpResponseRedirect(redirect_url)
             else:
                 return HttpResponseRedirect(reverse('notes:home'))
         else:
