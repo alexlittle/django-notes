@@ -121,7 +121,7 @@ class Note (models.Model):
         note_data.pop('create_date', None)
         note_data.pop('completed_date', None)
         note_data['due_date'] = next_due_date
-
+        note_data['user'] = self.user
         new_task = Note.objects.create(**note_data)
         new_task.tags.set(self.tags.all())
         return new_task
