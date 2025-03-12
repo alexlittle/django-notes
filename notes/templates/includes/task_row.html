@@ -13,7 +13,15 @@
 		{% for nt in note.tags.all %}
 			<a href="{% url 'notes:tag_tasks' nt.slug %}">{{ nt.name }}</a>
 		{% endfor %}
-		{% if note.due_date %} | {{ note.due_date|naturalday }}{% endif %}
+		{% if note.due_date %}
+			{% with note.due_date|naturalday as natural_day %}
+				{% if natural_day not in "yesterday,today,tomorrow" %}
+					| {{ note.due_date|date:"l" }} {{ note.due_date|naturalday }}
+				{% else %}
+					| {{ note.due_date|naturalday }}
+				{% endif %}
+			{% endwith %}
+		{% endif %}
 		{% if note.description %}
 			<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
 			<div id="desc-{{ note.id }}">

@@ -4,7 +4,11 @@
 
 {% block content %}
 
-{% if tag %}<h2>{{ tag.name }}</h2>{% endif %}
+<a href="{% url 'notes:add' %}" class="btn btn-primary">Add</a>
+
+<a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
+
+<h2>{% trans "Tasks" %} {% if tag %}- {{ tag.name }}{% endif %}</h2>
 
 {% include "includes/pagination.html" %}
 

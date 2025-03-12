@@ -4,6 +4,8 @@
 
 {% block content %}
 
+<a href="{% url 'notes:add' %}" class="btn btn-primary">Add</a>
+
 <h2>{% trans "Tags dated" %}</h2>
 <ul>
 {% for tag in tags_dated %}

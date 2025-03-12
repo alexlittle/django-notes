@@ -79,7 +79,13 @@ class TagTasksView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
-        return Note.objects.filter(notetag__tag__slug=slug, type="task", status__in=['open', 'inprogress'])
+        return Note.objects.filter(notetag__tag__slug=slug, type="task", status__in=['open', 'inprogress']).annotate(
+                    has_date=Case(
+                        When(due_date__isnull=False, then=Value(1)),
+                        default=Value(0),
+                        output_field=DateField(),
+                    )
+                ).order_by('-has_date', 'due_date')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -88,14 +94,21 @@ class TagTasksView(ListView):
         return context
 
 
-class NotesView(ListView):
-    template_name = 'notes/notes.html'
+class BookmarksView(ListView):
+    template_name = 'notes/bookmarks.html'
     paginate_by = 50
     context_object_name = 'notes'
 
     def get_queryset(self):
         return Note.objects.filter(type="bookmark").order_by('-create_date')
 
+class IdeasView(ListView):
+    template_name = 'notes/ideas.html'
+    paginate_by = 50
+    context_object_name = 'notes'
+
+    def get_queryset(self):
+        return Note.objects.filter(type="idea").order_by('-create_date')
 
 class CompleteTaskView(TemplateView):
 

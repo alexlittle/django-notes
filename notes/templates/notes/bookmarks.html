@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load humanize %}
+
+{% block content %}
+
+<h2>{% trans "Bookmarks" %}</h2>
+
+{% include "includes/pagination.html" %}
+
+{% for note in notes %}
+	{% include "includes/note_row.html" %}
+{% endfor %}
+
+{% include "includes/pagination.html" %}
+
+{% endblock %}
