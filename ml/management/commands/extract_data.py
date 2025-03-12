@@ -81,6 +81,7 @@ class Command(BaseCommand):
 
         if date:
             return self.extract_date_parts(date, date_part)
+        return -1
 
     def generated_output_fields(self, current_date, task, field_name):
         if field_name == "days_to_show_reminder":
@@ -94,7 +95,7 @@ class Command(BaseCommand):
             if task.completed_date:
                 delta = task.due_date - task.completed_date
                 return delta.days
-        return None
+        return -1
 
 
     def handle(self, *args, **options):
@@ -122,7 +123,16 @@ class Command(BaseCommand):
                         date_field, _, date_part = field_name.split('_')
                         row[field_name] = self.extract_date_parts(current_date, date_part)
                     for field_name in self.input_fields_from_db:
-                        row[field_name] = getattr(task, field_name)
+                        if getattr(task, field_name) == "" or getattr(task, field_name) is None :
+                            if field_name == "priority":
+                                value = "medium"
+                            elif field_name == "recurrence":
+                                value = "none"
+                            elif field_name == "reminder_days":
+                                value = -1
+                        else:
+                            value = getattr(task, field_name)
+                        row[field_name] = value
                     for field_name in self.input_fields_to_generate:
                         row[field_name] = self.generated_input_field(task, field_name)
                     for field_name in self.output_fields:
