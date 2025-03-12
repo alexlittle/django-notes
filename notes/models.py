@@ -13,6 +13,13 @@ from notes.fields import AutoSlugField
 
 from tinymce.models import HTMLField
 
+TYPE_OPTIONS = (
+        ('bookmark', 'Bookmark'),
+        ('task', 'Task'),
+        ('idea', 'Idea'),
+    )
+
+
 STATUS_OPTIONS = (
         ('open', 'Open'),
         ('inprogress', 'In progress'),
@@ -60,6 +67,7 @@ class Tag (models.Model):
 class Note (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    type = models.CharField(max_length=15, choices=TYPE_OPTIONS, default='bookmark')
     url = models.TextField(blank=True, null=True)
     title = models.TextField(blank=False, null=False, default=None)
     description = HTMLField(blank=True, null=True)

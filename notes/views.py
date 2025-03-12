@@ -28,7 +28,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        base_query_dated = Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress'])
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
 
         context["overdue"] = base_query_dated.filter(due_date__lt=datetime.now()).order_by("due_date")
         context["reminder"] = self._filter_for_reminders(base_query_dated)
@@ -46,7 +46,7 @@ class TasksView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Note.objects.filter(url='', status__in=['open', 'inprogress']).annotate(
+        return Note.objects.filter(type="task", status__in=['open', 'inprogress']).annotate(
                     has_date=Case(
                         When(due_date__isnull=False, then=Value(1)),
                         default=Value(0),
@@ -59,8 +59,8 @@ class TasksTagsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_query_dated = Note.objects.filter(due_date__isnull=False, status__in=['open', 'inprogress'])
-        base_query_undated = Note.objects.filter(due_date__isnull=True, url='', status__in=['open', 'inprogress'])
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
+        base_query_undated = Note.objects.filter(due_date__isnull=True, type="task", status__in=['open', 'inprogress'])
         context["tags_dated"] = Tag.objects.filter(notetag__note__in=base_query_dated) \
             .distinct() \
             .annotate(note_count=Count("notetag__note")) \
@@ -79,7 +79,7 @@ class TagTasksView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
-        return Note.objects.filter(notetag__tag__slug=slug, url='', status__in=['open', 'inprogress'])
+        return Note.objects.filter(notetag__tag__slug=slug, type="task", status__in=['open', 'inprogress'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -94,7 +94,7 @@ class NotesView(ListView):
     context_object_name = 'notes'
 
     def get_queryset(self):
-        return Note.objects.exclude(url='').order_by('-create_date')
+        return Note.objects.filter(type="bookmark").order_by('-create_date')
 
 
 class CompleteTaskView(TemplateView):
@@ -122,6 +122,8 @@ class AddView(TemplateView):
         form = NoteForm(request.POST)
         if form.is_valid():
             note = Note()
+            note.user = request.user
+            note.type = form.cleaned_data.get("type")
             note.title = form.cleaned_data.get("title")
             note.description = form.cleaned_data.get("description")
             note.url = form.cleaned_data.get("url")
@@ -151,6 +153,7 @@ class EditView(TemplateView):
         tags = Tag.objects.filter(notetag__note=note).values_list('name', flat=True)
         data = {}
         data['tags'] = ", ".join(tags)
+        data['type'] = note.type
         data['title'] = note.title
         data['description'] = note.description
         data['url'] = note.url
@@ -178,6 +181,8 @@ class EditView(TemplateView):
 
             old_status = note.status
             old_due_date = note.due_date
+            note.user = request.user
+            note.type = form.cleaned_data.get("type")
             note.title = form.cleaned_data.get("title")
             note.url = form.cleaned_data.get("url")
             note.description = form.cleaned_data.get("description")

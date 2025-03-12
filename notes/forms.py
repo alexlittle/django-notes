@@ -7,13 +7,17 @@ from crispy_forms.bootstrap import FieldWithButtons
 
 from tinymce.widgets import TinyMCE
 
-from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS, RECURRENCE_OPTIONS, Note
+from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS, RECURRENCE_OPTIONS, TYPE_OPTIONS, Note
 
 class NoteForm(forms.ModelForm):
     class Meta:
         model = Note
         exclude = ['create_date', 'link_check_date', 'user']
 
+    type = forms.ChoiceField(
+        choices=TYPE_OPTIONS,
+        required=True,
+    )
     url = forms.CharField(required=False)
     title = forms.CharField(required=True)
     due_date = forms.DateField(
@@ -50,6 +54,7 @@ class NoteForm(forms.ModelForm):
         self.helper.label_class = 'col-lg-2'
         self.helper.field_class = 'col-lg-4'
         self.helper.layout = Layout(
+                'type',
                 'title',
                 'url',
                 'due_date',
