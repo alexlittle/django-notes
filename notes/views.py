@@ -36,7 +36,18 @@ class HomeView(TemplateView):
         context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1))
         context["next_week"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=1),
                                                        due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date")
-        context["future"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=7)).order_by("due_date")
+        context["next_month"] = base_query_dated.filter(due_date__gt=datetime.now() + timedelta(days=7),
+                                                       due_date__lte=datetime.now() + timedelta(days=31)).order_by("due_date")
+        return context
+
+class FutureTasksView(TemplateView):
+    template_name = 'notes/tasks_future.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
+        context["future"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=31)).order_by("due_date")
         return context
 
 

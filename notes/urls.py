@@ -7,6 +7,7 @@ urlpatterns = [
     path('', note_views.HomeView.as_view(), name="home"),
     path('tasks/', note_views.TasksView.as_view(), name="tasks"),
     path('tasks/tags/', note_views.TasksTagsView.as_view(), name="tasks_tags_home"),
+    path('tasks/future/', note_views.FutureTasksView.as_view(), name="tasks_future"),
     path('tasks/tags/<tag_slug>/', note_views.TagTasksView.as_view(), name="tag_tasks"),
     path('bookmarks/', note_views.BookmarksView.as_view(), name="bookmarks"),
     path('ideas/', note_views.IdeasView.as_view(), name="ideas"),
