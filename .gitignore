@@ -17,3 +17,5 @@
 /assistant/alextest*.py
 /ml/output/
 /ml/notes_model.pt
+/ml/lr/output/
+/ml/rnn/output/
