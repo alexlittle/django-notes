@@ -13,7 +13,8 @@ class Command(BaseCommand):
                           "current_date_m",
                           "current_date_doy"]
 
-    input_fields_from_db = ["title",
+    input_fields_from_db = ["id",
+                        "title",
                       "status",
                       "priority",
                       "recurrence",
@@ -35,9 +36,8 @@ class Command(BaseCommand):
                           "completed_date_m",
                           "completed_date_doy"]
 
-    output_fields = [ "days_to_show_reminder",
-                      "days_until_due",
-                      "due_date_completion_offset"] # positive for completed early, negative for late
+    output_fields = [ "due",
+                      "show_reminder"] # positive for completed early, negative for late
 
     def days_between_dates_ignore_year(self, current_date, due_date):
         """
@@ -84,18 +84,26 @@ class Command(BaseCommand):
         return -1
 
     def generated_output_fields(self, current_date, task, field_name):
-        if field_name == "days_to_show_reminder":
+        if field_name == "show_reminder":
             if task.reminder_days:
                 if self.days_between_dates_ignore_year(current_date, task.due_date) < task.reminder_days:
-                    return task.reminder_days
-        if field_name == "days_until_due":
+                    return 1
+            return 0
+        if field_name == "due":
             if task.status in ["open", "inprogress"]:
-                return self.days_between_dates_ignore_year(current_date, task.due_date)
-        if field_name == "due_date_completion_offset":
-            if task.completed_date:
-                delta = task.due_date - task.completed_date
-                return delta.days
-        return -1
+                delta = self.days_between_dates_ignore_year(current_date, task.due_date)
+                if delta < 0:
+                    return "overdue"
+                if delta == 0:
+                    return "today"
+                if delta == 1:
+                    return "tomorrow"
+                if 7 >= delta > 1:
+                    return "nextweek"
+                if delta > 7:
+                    return "future"
+            else:
+                return "completed"
 
 
     def handle(self, *args, **options):

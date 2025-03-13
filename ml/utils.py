@@ -6,22 +6,16 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sentence_transformers import SentenceTransformer
 
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-import torchtext
-
 # create train/dev/test
 def get_data(input_file):
-    print(f"PyTorch version: {torch.__version__}")
-    print(f"TorchText version: {torchtext.__version__}")
+
 
     base_dir = os.path.dirname(os.path.abspath(__file__))
     input_file_path = os.path.join(base_dir, 'output', input_file)
     df = pd.read_csv(input_file_path)
 
     # Numerical features (scaling)
-    numerical_features = ['current_date_dow', 'current_date_dom', 'current_date_m', 'current_date_doy', 'reminder_days',
-                          'days_until_due', 'due_date_completion_offset']
+    numerical_features = ['current_date_dow', 'current_date_dom', 'current_date_m', 'current_date_doy', 'reminder_days']
     scaler = MinMaxScaler()
     df[numerical_features] = scaler.fit_transform(df[numerical_features])
 
@@ -33,68 +27,62 @@ def get_data(input_file):
                                           columns=encoder.get_feature_names_out(categorical_features))
     df = pd.concat([df, encoded_categorical_df], axis=1).drop(categorical_features, axis=1)
 
-    # Textual features (PyTorch Tokenization and Vocab)
-    tokenizer = get_tokenizer('basic_english')  # Or another tokenizer
+    unique_task_ids = df["id"].unique()
+    train_ids, test_ids = train_test_split(unique_task_ids, test_size=0.2, random_state=42)
+    test_df = df[df["id"].isin(test_ids)]
 
-    def yield_tokens(data_iter):
-        for text in data_iter:
-            yield tokenizer(text)
+    train_ids, dev_ids = train_test_split(train_ids, test_size=0.1,  random_state=42)  # 0.1111 is 1/9
+    train_df = df[df["id"].isin(train_ids)]
+    dev_df = df[df["id"].isin(dev_ids)]
 
-    # Build vocab for title
-    vocab_title = build_vocab_from_iterator(yield_tokens(df['title']), specials=["<unk>"])
-    vocab_title.set_default_index(vocab_title["<unk>"])
+    # Sentence Embeddings
+    t_model = SentenceTransformer('all-MiniLM-L6-v2')
+    train_title_embeddings = t_model.encode(train_df['title'].tolist())
+    train_tags_embeddings = t_model.encode(train_df['tags'].tolist())
+    dev_title_embeddings = t_model.encode(dev_df['title'].tolist())
+    dev_tags_embeddings = t_model.encode(dev_df['tags'].tolist())
+    test_title_embeddings = t_model.encode(test_df['title'].tolist())
+    test_tags_embeddings = t_model.encode(test_df['tags'].tolist())
 
-    # Build vocab for tags
-    vocab_tags = build_vocab_from_iterator(yield_tokens(df['tags']), specials=["<unk>"])
-    vocab_tags.set_default_index(vocab_tags["<unk>"])
+    # One-hot encode 'due'
+    due_encoder = OneHotEncoder(sparse_output=False)
+    encoded_due_train = due_encoder.fit_transform(train_df[['due']])
+    encoded_due_dev = due_encoder.transform(dev_df[['due']])
+    encoded_due_test = due_encoder.transform(test_df[['due']])
 
-    def text_pipeline_title(text):
-        return vocab_title(tokenizer(text))
+    # Concatenate features for train
+    X_numerical_train = train_df[numerical_features].values
+    X_categorical_train = encoded_categorical_df.loc[train_df.index].values
+    X_title_train = np.array(train_title_embeddings)
+    X_tags_train = np.array(train_tags_embeddings)
+    X_train = np.concatenate((X_numerical_train, X_categorical_train, X_title_train, X_tags_train), axis=1)
 
-    def text_pipeline_tags(text):
-        return vocab_tags(tokenizer(text))
+    # Concatenate features for dev
+    X_numerical_dev = dev_df[numerical_features].values
+    X_categorical_dev = encoded_categorical_df.loc[dev_df.index].values
+    X_title_dev = np.array(dev_title_embeddings)
+    X_tags_dev = np.array(dev_tags_embeddings)
+    X_dev = np.concatenate((X_numerical_dev, X_categorical_dev, X_title_dev, X_tags_dev), axis=1)
 
-    title_sequences = [text_pipeline_title(title) for title in df['title']]
-    tags_sequences = [text_pipeline_tags(tags) for tags in df['tags']]
-
-    max_len_title = max(len(seq) for seq in title_sequences)
-    max_len_tags = max(len(seq) for seq in tags_sequences)
-
-    padded_title_sequences = [seq + [0] * (max_len_title - len(seq)) for seq in title_sequences]
-    padded_tags_sequences = [seq + [0] * (max_len_tags - len(seq)) for seq in tags_sequences]
-
-    # Concatenate features
-    X_numerical = df[numerical_features].values
-    X_categorical = encoded_categorical_df.values
-    X_title = np.array(padded_title_sequences)
-    X_tags = np.array(padded_tags_sequences)
-    X = np.concatenate((X_numerical, X_categorical, X_title, X_tags), axis=1)
+    # Concatenate features for test
+    X_numerical_test = test_df[numerical_features].values
+    X_categorical_test = encoded_categorical_df.loc[test_df.index].values
+    X_title_test = np.array(test_title_embeddings)
+    X_tags_test = np.array(test_tags_embeddings)
+    X_test = np.concatenate((X_numerical_test, X_categorical_test, X_title_test, X_tags_test), axis=1)
 
     # Target variables
-    y = df[['days_to_show_reminder', 'days_until_due', 'due_date_completion_offset']].values
+    y_due_train = encoded_due_train
+    y_show_reminder_train = train_df[['show_reminder']].values.astype(np.float32)
+    y_due_dev = encoded_due_dev
+    y_show_reminder_dev = dev_df[['show_reminder']].values.astype(np.float32)
+    y_due_test = encoded_due_test
+    y_show_reminder_test = test_df[['show_reminder']].values.astype(np.float32)
 
-    print(f"NaN values in X: {np.isnan(X).any()}")
-    print(f"Inf values in X: {np.isinf(X).any()}")
-    print(f"NaN values in y: {np.isnan(y).any()}")
-    print(f"Inf values in y: {np.isinf(y).any()}")
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    return X_train, y_due_train, y_show_reminder_train, X_test, y_due_test, y_show_reminder_test, X_dev, y_due_dev, y_show_reminder_dev
 
 
-    # Split into train and dev
-    dev_split_index = int(9 * len(X_train) / 10)
-    X_dev = X_train[dev_split_index:]
-    y_dev = y_train[dev_split_index:]
-    X_train = X_train[:dev_split_index]
-    y_train = y_train[:dev_split_index]
-
-    permutation = np.random.permutation(len(X_train))
-    X_train = X_train[permutation]
-    y_train = y_train[permutation]
-
-    return X_train, y_train, X_dev, y_dev, X_test, y_test
-
-def batchify_data(x_data, y_data, batch_size):
+def batchify_data(x_data, y_due, y_show_reminder, batch_size):
     """Takes a set of data points and labels and groups them into batches."""
     # Only take batch_size chunks (i.e. drop the remainder)
     N = int(len(x_data) / batch_size) * batch_size
@@ -102,11 +90,23 @@ def batchify_data(x_data, y_data, batch_size):
     for i in range(0, N, batch_size):
         batches.append({
             'x': torch.tensor(x_data[i:i + batch_size], dtype=torch.float32),
-            'y': torch.tensor(y_data[i:i + batch_size], dtype=torch.long
-                              )})
+            'y_due': torch.tensor(y_due[i:i + batch_size], dtype=torch.float32),  # y_due is one hot encoded, so float.
+            'y_show_reminder': torch.tensor(y_show_reminder[i:i + batch_size], dtype=torch.float32)
+            # show_reminder is binary, so float.
+                              })
     return batches
 
 def compute_accuracy(predictions, y):
     """Computes the accuracy of predictions against the gold labels, y."""
     #return np.mean(np.equal(predictions.detach().numpy(), y.detach().numpy()))
     return torch.mean(torch.abs(predictions - y)).item()
+
+def compute_accuracy_show_reminder(pred, target):
+    pred = torch.sigmoid(pred) > 0.5
+    target = target.bool()
+    return (pred == target).float().mean().item()
+
+def compute_accuracy_due(pred, target):
+    pred_classes = torch.argmax(pred, dim=1)
+    target_classes = torch.argmax(target, dim=1)
+    return (pred_classes == target_classes).float().mean().item()

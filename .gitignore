@@ -16,3 +16,4 @@
 /assistant/test.py
 /assistant/alextest*.py
 /ml/output/
+/ml/notes_model.pt
