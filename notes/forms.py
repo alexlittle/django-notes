@@ -46,6 +46,7 @@ class NoteForm(forms.ModelForm):
         required=False,
     )
     reminder_days = forms.IntegerField(required=False)
+    referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super(NoteForm, self).__init__(*args, **kwargs)
@@ -65,6 +66,7 @@ class NoteForm(forms.ModelForm):
                 'reminder_days',
                 'estimated_effort',
                 'description',
+                'referer',
                 Div(
                    Submit('action', 'save', css_class='btn btn-default', title=_("Save")),
                     Submit('action', 'save_and_add',  css_class='btn btn-default', title=_("Save and add another")),
