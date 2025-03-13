@@ -28,15 +28,15 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress', 'completed'])
 
-        context["overdue"] = base_query_dated.filter(due_date__lt=datetime.now()).order_by("due_date")
-        context["reminder"] = self._filter_for_reminders(base_query_dated)
+        context["overdue"] = base_query_dated.exclude(status="completed").filter(due_date__lt=datetime.now()).order_by("due_date")
+        context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status="completed"))
         context["today"] = base_query_dated.filter(due_date=datetime.now())
-        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1))
-        context["next_week"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=1),
+        context["tomorrow"] = base_query_dated.exclude(status="completed").filter(due_date=datetime.now()+timedelta(days=1))
+        context["next_week"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now()+timedelta(days=1),
                                                        due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date")
-        context["next_month"] = base_query_dated.filter(due_date__gt=datetime.now() + timedelta(days=7),
+        context["next_month"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now() + timedelta(days=7),
                                                        due_date__lte=datetime.now() + timedelta(days=31)).order_by("due_date")
         return context
 
@@ -191,6 +191,8 @@ class AddView(TemplateView):
                     return HttpResponseRedirect(reverse('notes:home'))
         else:
             print(form.errors)
+            context = {'form': form, 'form_type': form_type}
+            return render(request, 'notes/form.html', context)
 
 class EditView(TemplateView):
 

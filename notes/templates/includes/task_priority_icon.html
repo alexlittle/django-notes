@@ -1,0 +1,18 @@
+{% load i18n %}
+{% load static %}
+
+{% if note.priority == "high" %}
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="8" fill="#bb3333cc" />
+</svg>
+{% endif %}
+{% if note.priority == "medium" %}
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="8" fill="#33339999" />
+</svg>
+{% endif %}
+{% if note.priority == "low" %}
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="8" fill="#66666699" />
+</svg>
+{% endif %}

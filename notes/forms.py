@@ -45,6 +45,7 @@ class NoteForm(forms.ModelForm):
         choices=[('', 'Select an option')] + list(RECURRENCE_OPTIONS),
         required=False,
     )
+    estimated_effort = forms.IntegerField(required=False)
     reminder_days = forms.IntegerField(required=False)
     referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
@@ -74,6 +75,19 @@ class NoteForm(forms.ModelForm):
                 ),
             )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        type = cleaned_data.get('type')
+        priority = cleaned_data.get('priority')
+        url = cleaned_data.get('url')
+        estimated_effort = cleaned_data.get('estimated_effort')
+        if type == "task" and not priority:
+            raise forms.ValidationError("A task must have a priority")
+        if type == "task" and not estimated_effort:
+            raise forms.ValidationError("A task must have an estimated effort")
+        if type == "bookmark" and not url:
+            raise forms.ValidationError("A bookmark must have a url")
+        return cleaned_data
 
 class SearchForm(forms.Form):
     q = forms.CharField(
