@@ -138,15 +138,18 @@ class AddView(TemplateView):
 
     def get(self, request):
         form_type = request.GET.get('type')
-        initial_data = {}
+        initial_data = {'referer': request.META.get('HTTP_REFERER')}
         if form_type == 'birthday':
-            initial_data = {'type': 'task', 'tags': 'birthdays', 'recurrence': 'annually', 'reminder_days': 14}
+            initial_data['type'] = 'task'
+            initial_data['tags'] = 'birthdays'
+            initial_data['recurrence'] = 'annually'
+            initial_data['reminder_days'] = 14
         elif form_type == 'task':
-            initial_data = {'type': 'task'}
+            initial_data['type'] = 'task'
         elif form_type == 'idea':
-            initial_data = {'type': 'idea'}
+            initial_data['type'] = 'idea'
         elif form_type == 'bookmark':
-            initial_data = {'type': 'bookmark'}
+            initial_data['type'] = 'bookmark'
 
         form = NoteForm(initial=initial_data)
         return render(request,
@@ -181,7 +184,11 @@ class AddView(TemplateView):
                     redirect_url += f'?type={form_type}'
                 return HttpResponseRedirect(redirect_url)
             else:
-                return HttpResponseRedirect(reverse('notes:home'))
+                referer = form.cleaned_data.get("referer")
+                if referer:
+                    return HttpResponseRedirect(referer)
+                else:
+                    return HttpResponseRedirect(reverse('notes:home'))
         else:
             print(form.errors)
 
