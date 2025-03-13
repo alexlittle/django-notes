@@ -1,17 +1,17 @@
 
 from tqdm import tqdm
+import os
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
-from utils import get_data, compute_accuracy, batchify_data, compute_accuracy_due, compute_accuracy_show_reminder
+from utils import get_data, batchify_data, compute_accuracy_due, compute_accuracy_show_reminder
 from ffnn import FFNN
 
 
 input_file = "tasks.csv"
 
-def train_model(train_data, dev_data, model, lr=0.001, n_epochs=50):
+def train_model(train_data, dev_data, model, lr=0.001, n_epochs=100):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     for epoch in range(1, n_epochs):
@@ -26,7 +26,7 @@ def train_model(train_data, dev_data, model, lr=0.001, n_epochs=50):
         print('Show Reminder: Val loss:   {:.6f} | Val accuracy:   {:.6f}'.format(val_loss_show_reminder, val_acc_show_reminder))
         print('Due: Val loss:   {:.6f} | Val accuracy:   {:.6f}'.format(val_loss_due, val_acc_due))
         # Save model
-        torch.save(model, 'notes_model.pt')
+        torch.save(model.state_dict(), os.path.join('output', 'notes_model.pt'))
 
 
 def run_epoch(data, model, optimizer):
@@ -93,7 +93,7 @@ def main():
 
     print("input size: %d" % input_size)
     model = FFNN(input_size, output_size)
-    lr = 0.001  # 0.1
+    lr = 0.001
 
     train_model(train_batches, dev_batches, model, lr=lr )
 

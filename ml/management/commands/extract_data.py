@@ -2,6 +2,11 @@ import csv
 import datetime
 import os
 from django.core.management.base import BaseCommand
+
+import random
+from datetime import date, timedelta
+from collections import defaultdict
+
 from notes.models import Note, Tag
 
 class Command(BaseCommand):
@@ -108,6 +113,49 @@ class Command(BaseCommand):
                 return "completed"
 
 
+    def balance_task_due_dates_temp(self, task_qs, current_date):
+        """
+        Balances the due dates of tasks in a temporary copy.
+        """
+
+        tasks = list(task_qs)
+        random.shuffle(tasks)
+        categories = ["overdue", "today", "tomorrow", "nextweek", "nextmonth", "future"]
+        total_tasks = len(tasks)
+        target_count = total_tasks // len(categories)
+        remainder = total_tasks % len(categories)
+
+        # Distribute tasks randomly and adjust due dates
+        balanced_tasks = []
+        task_index = 0
+        for i, category in enumerate(categories):
+            current_target = target_count + (1 if i < remainder else 0)
+            for _ in range(current_target):
+                if task_index < total_tasks:
+                    task = tasks[task_index]
+                    task_index += 1
+
+                    # Adjust due_date based on category
+                    if category == "overdue":
+                        task.due_date = current_date - timedelta(days=random.randint(1, 365))
+                    elif category == "today":
+                        task.due_date = current_date
+                    elif category == "tomorrow":
+                        task.due_date = current_date + timedelta(days=1)
+                    elif category == "nextweek":
+                        task.due_date = current_date + timedelta(days=random.randint(2, 7))
+                    elif category == "nextmonth":
+                        task.due_date = current_date + timedelta(days=random.randint(8, 31))
+                    elif category == "future":
+                        task.due_date = current_date + timedelta(days=random.randint(32, 365))
+
+                    balanced_tasks.append(task)
+                else:
+                    # Handle case where there are not enough tasks
+                    break
+
+        return balanced_tasks
+
     def handle(self, *args, **options):
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -116,7 +164,7 @@ class Command(BaseCommand):
         os.makedirs(output_dir, exist_ok=True)
         output_file = os.path.join(output_dir, 'tasks.csv')
 
-        tasks = Note.objects.filter(type="task", due_date__isnull=False)
+        tasks_qs = Note.objects.filter(type="task", due_date__isnull=False)
 
         with open(output_file, 'w', newline='', encoding='utf-8') as csvfile:
             fieldnames = self.current_date_fields + self.input_fields_from_db + self.input_fields_to_generate + self.output_fields
@@ -126,7 +174,8 @@ class Command(BaseCommand):
             writer.writeheader()
             current_date = datetime.datetime.now()
 
-            for i in range(0, 366):
+            for i in range(0, 300):
+                tasks = self.balance_task_due_dates_temp(tasks_qs, current_date)
                 for task in tasks:
                     row = {}
                     for field_name in self.current_date_fields:

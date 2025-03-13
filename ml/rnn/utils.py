@@ -2,30 +2,33 @@ import os
 import torch
 import numpy as np
 import pandas as pd
+import joblib
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sentence_transformers import SentenceTransformer
 
+NUMERICAL_FEATURES = ['current_date_dow', 'current_date_dom', 'current_date_m', 'current_date_doy', 'reminder_days']
+CATEGORICAL_FEATURES = ['status', 'priority', 'recurrence']
+
 # create train/dev/test
 def get_data(input_file):
 
-
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    input_file_path = os.path.join(base_dir, 'output', input_file)
-    df = pd.read_csv(input_file_path)
+    output_dir = os.path.join(base_dir, 'output')
+    df = pd.read_csv(os.path.join(output_dir, input_file))
 
     # Numerical features (scaling)
-    numerical_features = ['current_date_dow', 'current_date_dom', 'current_date_m', 'current_date_doy', 'reminder_days']
     scaler = MinMaxScaler()
-    df[numerical_features] = scaler.fit_transform(df[numerical_features])
+    df[NUMERICAL_FEATURES] = scaler.fit_transform(df[NUMERICAL_FEATURES])
+    joblib.dump(scaler, os.path.join(output_dir,'minmax_scaler.joblib'))
 
     # Categorical features (one-hot encoding)
-    categorical_features = ['status', 'priority', 'recurrence']
     encoder = OneHotEncoder(sparse_output=False)
-    encoded_categorical = encoder.fit_transform(df[categorical_features])
+    encoded_categorical = encoder.fit_transform(df[CATEGORICAL_FEATURES])
     encoded_categorical_df = pd.DataFrame(encoded_categorical,
-                                          columns=encoder.get_feature_names_out(categorical_features))
-    df = pd.concat([df, encoded_categorical_df], axis=1).drop(categorical_features, axis=1)
+                                          columns=encoder.get_feature_names_out(CATEGORICAL_FEATURES))
+    df = pd.concat([df, encoded_categorical_df], axis=1).drop(CATEGORICAL_FEATURES, axis=1)
+    joblib.dump(encoder, os.path.join(output_dir,'cat_encoder.joblib'))
 
     unique_task_ids = df["id"].unique()
     train_ids, test_ids = train_test_split(unique_task_ids, test_size=0.2, random_state=42)
@@ -36,7 +39,7 @@ def get_data(input_file):
     dev_df = df[df["id"].isin(dev_ids)]
 
     # Sentence Embeddings
-    t_model = SentenceTransformer('all-MiniLM-L6-v2')
+    t_model = get_sentence_embedding_model(output_dir)
     train_title_embeddings = t_model.encode(train_df['title'].tolist())
     train_tags_embeddings = t_model.encode(train_df['tags'].tolist())
     dev_title_embeddings = t_model.encode(dev_df['title'].tolist())
@@ -49,23 +52,24 @@ def get_data(input_file):
     encoded_due_train = due_encoder.fit_transform(train_df[['due']])
     encoded_due_dev = due_encoder.transform(dev_df[['due']])
     encoded_due_test = due_encoder.transform(test_df[['due']])
+    joblib.dump(due_encoder, os.path.join(output_dir, 'due_encoder.joblib'))
 
     # Concatenate features for train
-    X_numerical_train = train_df[numerical_features].values
+    X_numerical_train = train_df[NUMERICAL_FEATURES].values
     X_categorical_train = encoded_categorical_df.loc[train_df.index].values
     X_title_train = np.array(train_title_embeddings)
     X_tags_train = np.array(train_tags_embeddings)
     X_train = np.concatenate((X_numerical_train, X_categorical_train, X_title_train, X_tags_train), axis=1)
 
     # Concatenate features for dev
-    X_numerical_dev = dev_df[numerical_features].values
+    X_numerical_dev = dev_df[NUMERICAL_FEATURES].values
     X_categorical_dev = encoded_categorical_df.loc[dev_df.index].values
     X_title_dev = np.array(dev_title_embeddings)
     X_tags_dev = np.array(dev_tags_embeddings)
     X_dev = np.concatenate((X_numerical_dev, X_categorical_dev, X_title_dev, X_tags_dev), axis=1)
 
     # Concatenate features for test
-    X_numerical_test = test_df[numerical_features].values
+    X_numerical_test = test_df[NUMERICAL_FEATURES].values
     X_categorical_test = encoded_categorical_df.loc[test_df.index].values
     X_title_test = np.array(test_title_embeddings)
     X_tags_test = np.array(test_tags_embeddings)
@@ -81,6 +85,18 @@ def get_data(input_file):
 
     return X_train, y_due_train, y_show_reminder_train, X_test, y_due_test, y_show_reminder_test, X_dev, y_due_dev, y_show_reminder_dev
 
+def get_sentence_embedding_model(output_dir):
+    """Loads a Sentence Transformer model if it exists, otherwise creates and saves it."""
+    model_path = os.path.join(output_dir, 'sentence_transformer_model')
+
+    if os.path.exists(model_path):
+        print("Loading existing Sentence Transformer model...")
+        t_model = SentenceTransformer(model_path)
+    else:
+        print("Creating and saving new Sentence Transformer model...")
+        t_model = SentenceTransformer('all-MiniLM-L6-v2')
+        t_model.save(model_path)
+    return t_model
 
 def batchify_data(x_data, y_due, y_show_reminder, batch_size):
     """Takes a set of data points and labels and groups them into batches."""
@@ -91,9 +107,8 @@ def batchify_data(x_data, y_due, y_show_reminder, batch_size):
         batches.append({
             'x': torch.tensor(x_data[i:i + batch_size], dtype=torch.float32),
             'y_due': torch.tensor(y_due[i:i + batch_size], dtype=torch.float32),  # y_due is one hot encoded, so float.
-            'y_show_reminder': torch.tensor(y_show_reminder[i:i + batch_size], dtype=torch.float32)
-            # show_reminder is binary, so float.
-                              })
+            'y_show_reminder': torch.tensor(y_show_reminder[i:i + batch_size], dtype=torch.float32) # show_reminder is binary, so float.
+            })
     return batches
 
 def compute_accuracy(predictions, y):
