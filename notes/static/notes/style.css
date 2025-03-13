@@ -119,17 +119,19 @@ a {
 
 /* Padding and border styles */
 .striped-row {
-    padding: 10px;
+    padding: 8px;
     border: 1px solid #ddd;
 }
 
 .task-container {
   display: flex;
   align-items: center; /* Vertically align items */
+  padding-left: 0;
 }
 
 .task-container svg {
-  margin-right: 20px; /* Add some space between the icon and text */
+  margin-right: 12px; /* Add some space between the icon and text */
+  min-width: 24px;
 }
 
 .task-text {
