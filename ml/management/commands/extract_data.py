@@ -100,7 +100,9 @@ class Command(BaseCommand):
                     return "tomorrow"
                 if 7 >= delta > 1:
                     return "nextweek"
-                if delta > 7:
+                if 31 >= delta > 7:
+                    return "nextmonth"
+                if delta > 31:
                     return "future"
             else:
                 return "completed"
