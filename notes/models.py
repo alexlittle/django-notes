@@ -79,7 +79,7 @@ class Note (models.Model):
     assistant_loaded = models.BooleanField(default=False)
     due_date = models.DateField(blank=True, null=True, default=None)
     completed_date = models.DateField(blank=True, null=True, default=None)
-    estimated_effort = models.IntegerField(default=30)
+    estimated_effort = models.IntegerField(blank=True, null=True, default=None)
     priority = models.CharField(max_length=15, choices=PRIORITY_OPTIONS, blank=True, null=True, default=None)
     recurrence = models.CharField(max_length=10, choices=RECURRENCE_OPTIONS, blank=True, null=True, default=None)
     reminder_days = models.IntegerField(default=None, blank=True, null=True)
