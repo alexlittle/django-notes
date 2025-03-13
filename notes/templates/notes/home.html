@@ -63,10 +63,10 @@
 	</div>
 {% endif %}
 
-{% if future %}
-	<h2>{% trans "Future" %} ({{ future|length }})</h2>
+{% if next_month %}
+	<h2>{% trans "Next month" %} ({{ next_month|length }})</h2>
 	<div class="container mt-5">
-	{% for note in future %}
+	{% for note in next_month %}
 		<div class="row striped-row">
 			{% include "includes/task_row.html" %}
 		</div>
@@ -74,5 +74,8 @@
 	</div>
 {% endif %}
 
+<div class="container mt-5">
+<a href="{% url 'notes:tasks_future' %}" class="btn btn-primary">{% trans "Future" %}</a>
+</div>
 
 {% endblock %}
