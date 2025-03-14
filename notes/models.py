@@ -156,6 +156,13 @@ class Note (models.Model):
 
         return next_task
 
+    def uncomplete_task(self):
+        """Mark the task as completed and create the next one if needed."""
+        self.status = 'open'
+        self.completed_date = None
+        self.save()
+        return
+
 
 class NoteHistory (models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
