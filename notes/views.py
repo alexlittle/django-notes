@@ -284,9 +284,8 @@ class SearchView(TemplateView):
         else:
             search_ids = []
 
-        print(search_ids)
         search_results = Note.objects.filter(pk__in=search_ids)
-        print(search_results)
+
         data = {}
         data['q'] = search_query
         form = SearchForm(initial=data)
