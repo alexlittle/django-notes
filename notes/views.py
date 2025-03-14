@@ -150,7 +150,8 @@ class AddView(TemplateView):
             initial_data['type'] = 'idea'
         elif form_type == 'bookmark':
             initial_data['type'] = 'bookmark'
-
+        if request.GET.get('tags'):
+            initial_data['tags'] = request.GET.get('tags')
         form = NoteForm(initial=initial_data)
         return render(request,
                       'notes/form.html',
