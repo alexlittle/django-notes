@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, connection
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.forms.models import model_to_dict
@@ -46,6 +46,27 @@ RECURRENCE_OPTIONS = [
     ('quarterly', 'Quarterly'),
     ('annually', 'Annually'),
 ]
+
+class CombinedSearchManager(models.Manager):
+    def combined_search(self, query):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                   DISTINCT note.id
+                FROM
+                    notes_note note
+                INNER JOIN notes_notetag nt ON note.id = nt.note_id
+                INNER JOIN notes_tag t ON t.id = nt.tag_id
+                WHERE
+                    MATCH(note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
+                OR
+                    MATCH (t.name, t.slug) AGAINST (%s IN NATURAL LANGUAGE MODE)
+
+                ;
+            """, [query, query])
+
+            results = [{'id': row[0]} for row in cursor.fetchall()]
+        return results
 
 
 class Tag (models.Model):
@@ -149,3 +170,6 @@ class NoteTag(models.Model):
     class Meta:
         verbose_name = _('Note Tag')
         verbose_name_plural = _('Note Tags')
+
+class CombinedSearch(models.Model):
+    objects = CombinedSearchManager()

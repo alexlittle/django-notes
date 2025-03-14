@@ -4,7 +4,9 @@
 
 {% block content %}
 
-<a href="{% url 'notes:add' %}?type=task" class="btn btn-primary">Add</a>
+<a href="{% url 'notes:home' %}" class="btn btn-primary">Home</a>
+
+<a href="{% url 'notes:add' %}?type=task&tags={{ tag.name }}" class="btn btn-primary">Add</a>
 
 <a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
 
