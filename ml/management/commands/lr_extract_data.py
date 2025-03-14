@@ -2,7 +2,7 @@ import csv
 import datetime
 import os
 from django.core.management.base import BaseCommand
-
+from django.forms.models import model_to_dict
 import random
 from datetime import date, timedelta
 from collections import defaultdict
@@ -19,7 +19,8 @@ class Command(BaseCommand):
                           "current_date_doy"]
 
     input_fields_from_db = ["status",
-                            "priority"]
+                            "priority",
+                            "recurrence"]
 
     input_fields_to_generate = ["tags",
                                 "days_until_due",
@@ -67,11 +68,11 @@ class Command(BaseCommand):
 
     def generated_input_field(self, current_date, task, field_name):
         if field_name == "tags":
-            tags = Tag.objects.filter(notetag__note=task).values_list('name', flat=True)
+            tags = Tag.objects.filter(notetag__note=task['id']).values_list('name', flat=True)
             return ", ".join(tags)
 
         if field_name == "days_until_due":
-            return self.days_between_dates_ignore_year(current_date, task.due_date)
+            return self.days_between_dates_ignore_year(current_date, task['due_date'])
 
         date_field, _ ,date_part = field_name.split('_')  # Split into date and part (dow, dom, etc.)
         date = getattr(task, date_field + "_date", None)  # Get the date attribute
@@ -80,23 +81,34 @@ class Command(BaseCommand):
             return self.extract_date_parts(date, date_part)
         return -1
 
+    def include_task(self, task, current_date, start_date):
+        if current_date == start_date:
+            return True
+
+        if task['due_date'] is None:
+            return False
+
+        if self.days_between_dates_ignore_year(current_date, task['due_date']) > 7:
+            return False
+
+        return True
+
+
     def generated_output_fields(self, current_date, task, field_name):
-        if task.due_date is None:
+        if task['due_date'] is None:
             return 0
-        if field_name == "due_today" and self.days_between_dates_ignore_year(current_date, task.due_date) == 0:
+        if field_name == "due_today" and self.days_between_dates_ignore_year(current_date, task['due_date']) == 0:
             return 1
-        elif field_name == "due_tomorrow" and self.days_between_dates_ignore_year(current_date, task.due_date) == 1:
+        elif field_name == "due_tomorrow" and self.days_between_dates_ignore_year(current_date, task['due_date']) == 1:
             return 1
-        elif field_name == "due_next_week" and 7 >= self.days_between_dates_ignore_year(current_date, task.due_date) > 1:
+        elif field_name == "due_next_week" and 7 >= self.days_between_dates_ignore_year(current_date, task['due_date']) > 1:
             return 1
-        elif field_name == "due_next_month" and 31 >= self.days_between_dates_ignore_year(current_date, task.due_date) > 7:
+        elif field_name == "due_next_month" and 31 >= self.days_between_dates_ignore_year(current_date, task['due_date']) > 7:
             return 1
-        elif field_name == "due_later" and self.days_between_dates_ignore_year(current_date, task.due_date) > 31:
+        elif field_name == "due_later" and self.days_between_dates_ignore_year(current_date, task['due_date']) > 31:
             return 1
         else:
             return 0
-
-
 
 
     def handle(self, *args, **options):
@@ -115,29 +127,33 @@ class Command(BaseCommand):
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
-            current_date = datetime.datetime.now()
+            current_date = start_date = datetime.datetime.now()
 
-            for task in tasks:
-                row = {}
-                for field_name in self.current_date_fields:
-                    date_field, _, date_part = field_name.split('_')
-                    row[field_name] = self.extract_date_parts(current_date, date_part)
-                for field_name in self.input_fields_from_db:
-                    if getattr(task, field_name) == "" or getattr(task, field_name) is None :
-                        if field_name == "priority":
-                            value = "medium"
-                        elif field_name == "recurrence":
-                            value = "none"
-                        elif field_name == "reminder_days":
-                            value = -1
-                    else:
-                        value = getattr(task, field_name)
-                    row[field_name] = value
-                for field_name in self.input_fields_to_generate:
-                    row[field_name] = self.generated_input_field(current_date, task, field_name)
-                for field_name in self.output_fields:
-                    row[field_name] = self.generated_output_fields(current_date, task, field_name)
-                writer.writerow(row)
+            for i in range(0, 365):
+                tasks_dict = [model_to_dict(obj, exclude=[]) for obj in tasks]
+                for task in tasks_dict:
+                    if self.include_task(task, current_date, start_date):
+                        row = {}
+                        for field_name in self.current_date_fields:
+                            date_field, _, date_part = field_name.split('_')
+                            row[field_name] = self.extract_date_parts(current_date, date_part)
+                        for field_name in self.input_fields_from_db:
+                            if task[field_name] == "" or task[field_name] is None :
+                                if field_name == "priority":
+                                    value = "medium"
+                                elif field_name == "recurrence":
+                                    value = "none"
+                                elif field_name == "reminder_days":
+                                    value = -1
+                            else:
+                                value = task[field_name]
+                            row[field_name] = value
+                        for field_name in self.input_fields_to_generate:
+                            row[field_name] = self.generated_input_field(current_date, task, field_name)
+                        for field_name in self.output_fields:
+                            row[field_name] = self.generated_output_fields(current_date, task, field_name)
+                        writer.writerow(row)
+                current_date = current_date + datetime.timedelta(days=1)
 
         self.stdout.write(self.style.SUCCESS(f'Successfully exported Task data to {output_file}'))
 

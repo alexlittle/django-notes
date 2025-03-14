@@ -7,19 +7,18 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder, MultiLabelBinarizer
 
-from utils import one_hot_encode_tags, smote_multi_output
+from utils import one_hot_encode_tags
 
 NUMERICAL_FEATURES = ['current_date_dow',
                       'current_date_dom',
                       'current_date_m',
                       'current_date_doy',
-                      #'days_until_due',
                       "completed_date_dow",
                       "completed_date_dom",
                       "completed_date_m",
                       "completed_date_doy"
                       ]
-CATEGORICAL_FEATURES = ['status', 'priority']
+CATEGORICAL_FEATURES = ['status', 'priority','recurrence']
 OUTPUT_FIELDS = [ "due_today" , "due_tomorrow", "due_next_week", "due_next_month", "due_later" ]
 
 
@@ -52,18 +51,10 @@ y = df[OUTPUT_FIELDS]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 print(y_train.isnull().sum())
 
-X_train_smote, y_train_smote = smote_multi_output(X_train, y_train)
 
-print("Before SMOTE:")
-print(y_train.dtypes)
-
-print("\nAfter SMOTE:")
-print(y_train_smote.dtypes)
-
-print(y_train_smote.isnull().sum())
 # Create and train the logistic regression model
 model = MultiOutputClassifier(LogisticRegression(random_state=42)) #sets a random state to produce the same results each time.
-model.fit(X_train_smote, y_train_smote)
+model.fit(X_train, y_train)
 
 # Make predictions
 y_pred = model.predict(X_test)
