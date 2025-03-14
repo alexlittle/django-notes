@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'crispy_forms',
-    'haystack',
     'notes',
     'tinymce',
     'crispy_bootstrap4',

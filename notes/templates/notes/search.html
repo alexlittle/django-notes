@@ -19,7 +19,7 @@
         {% endif %}
         
         {% for result in page.object_list %}
-        	{% with note=result.object %}
+        	{% with note=result %}
         		{% include "includes/note_row.html" %}
         	{% endwith %}
         {% empty %}

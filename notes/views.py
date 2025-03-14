@@ -10,8 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
-from notes.models import Note, Tag, NoteTag, NoteHistory
-from haystack.query import SearchQuerySet
+from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
 
 
 class HomeView(TemplateView):
@@ -280,10 +279,14 @@ class SearchView(TemplateView):
         search_query = request.GET.get('q', '')
 
         if search_query:
-            search_results = SearchQuerySet().filter(content=search_query)
+            search_id_results = CombinedSearch.objects.combined_search(search_query)
+            search_ids = [result['id'] for result in search_id_results]
         else:
-            search_results = []
+            search_ids = []
 
+        print(search_ids)
+        search_results = Note.objects.filter(pk__in=search_ids)
+        print(search_results)
         data = {}
         data['q'] = search_query
         form = SearchForm(initial=data)
