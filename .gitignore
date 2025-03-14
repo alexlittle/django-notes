@@ -15,7 +15,6 @@
 /assistant/static/assistant/human.svg
 /assistant/test.py
 /assistant/alextest*.py
-/ml/rnn/output/
 /ml/notes_model.pt
-/ml/rnn/output/
 /ml/lr/output/
+/ml/rnn/output/
