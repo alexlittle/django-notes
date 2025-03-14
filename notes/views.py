@@ -32,8 +32,8 @@ class HomeView(TemplateView):
 
         context["overdue"] = base_query_dated.exclude(status="completed").filter(due_date__lt=datetime.now()).order_by("due_date")
         context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status="completed"))
-        context["today"] = base_query_dated.filter(due_date=datetime.now())
-        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1))
+        context["today"] = base_query_dated.filter(due_date=datetime.now()).order_by("-status")
+        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1)).order_by("-status")
         context["next_week"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now()+timedelta(days=1),
                                                        due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date")
         context["next_month"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now() + timedelta(days=7),
