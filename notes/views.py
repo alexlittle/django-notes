@@ -260,8 +260,10 @@ class EditView(TemplateView):
 
             nh = NoteHistory()
             nh.note = note
-            if old_due_date != note.due_date:
+            if old_due_date <= note.due_date:
                 nh.action = "deferred"
+            elif old_due_date > note.due_date:
+                nh.action = "promoted"
             else:
                 nh.action = "updated"
             nh.save()

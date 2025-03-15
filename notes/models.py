@@ -36,7 +36,8 @@ PRIORITY_OPTIONS = (
 
 HISTORY_OPTIONS = (
         ('deferred', 'Deferred'),
-        ('updated', 'Updated')
+        ('updated', 'Updated'),
+        ('promoted', 'Promoted')
     )
 
 RECURRENCE_OPTIONS = [
@@ -157,7 +158,7 @@ class Note (models.Model):
         return next_task
 
     def uncomplete_task(self):
-        """Mark the task as completed and create the next one if needed."""
+        """Mark the task as not completed"""
         self.status = 'open'
         self.completed_date = None
         self.save()
