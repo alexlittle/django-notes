@@ -1,7 +1,7 @@
 
 from django.urls import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.db.models import Count, Case, When, Value, DateField
+from django.db.models import Count, Case, When, Value, DateField, IntegerField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
@@ -27,16 +27,35 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress', 'completed'])
+        base_query_dated = Note.objects.filter(due_date__isnull=False,
+                                               type="task",
+                                               status__in=['open', 'inprogress', 'completed']) \
+                                        .annotate(
+                                            priority_order=Case(
+                                                When(priority='high', then=Value(1)),
+                                                When(priority='medium', then=Value(2)),
+                                                When(priority='low', then=Value(3)),
+                                                default=Value(4),
+                                                output_field=IntegerField()
+                                            )
+                                        ) \
+                                        .annotate(
+                                            status_order=Case(
+                                                When(status='completed', then=Value(0)),
+                                                default=Value(1),
+                                                output_field=IntegerField()
+                                            )
+                                        )
 
-        context["overdue"] = base_query_dated.exclude(status="completed").filter(due_date__lt=datetime.now()).order_by("due_date")
-        context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status="completed"))
-        context["today"] = base_query_dated.filter(due_date=datetime.now()).order_by("-status")
-        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1)).order_by("-status")
+
+        context["overdue"] = base_query_dated.exclude(status="completed").filter(due_date__lt=datetime.now()).order_by("priority_order", "due_date")
+        context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status="completed").order_by("due_date"))
+        context["today"] = base_query_dated.filter(due_date=datetime.now()).order_by("-status_order", "priority_order")
+        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1)).order_by("-status_order", "priority_order")
         context["next_week"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now()+timedelta(days=1),
-                                                       due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date")
+                                                       due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date", "priority_order")
         context["next_month"] = base_query_dated.exclude(status="completed").filter(due_date__gt=datetime.now() + timedelta(days=7),
-                                                       due_date__lte=datetime.now() + timedelta(days=31)).order_by("due_date")
+                                                       due_date__lte=datetime.now() + timedelta(days=31)).order_by("due_date", "priority_order")
         return context
 
 class FutureTasksView(TemplateView):
@@ -125,6 +144,18 @@ class CompleteTaskView(TemplateView):
     def get(self, request, note_id):
         note = Note.objects.get(pk=note_id)
         note.complete_task()
+        referer = request.META.get('HTTP_REFERER')
+
+        if referer:
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('notes:home'))
+
+class UnCompleteTaskView(TemplateView):
+
+    def get(self, request, note_id):
+        note = Note.objects.get(pk=note_id)
+        note.uncomplete_task()
         referer = request.META.get('HTTP_REFERER')
 
         if referer:
@@ -248,8 +279,11 @@ class EditView(TemplateView):
 
             nh = NoteHistory()
             nh.note = note
-            if old_due_date != note.due_date:
-                nh.action = "deferred"
+            if old_due_date:
+                if old_due_date <= note.due_date:
+                    nh.action = "deferred"
+                else:
+                    nh.action = "promoted"
             else:
                 nh.action = "updated"
             nh.save()
@@ -284,9 +318,8 @@ class SearchView(TemplateView):
         else:
             search_ids = []
 
-        print(search_ids)
         search_results = Note.objects.filter(pk__in=search_ids)
-        print(search_results)
+
         data = {}
         data['q'] = search_query
         form = SearchForm(initial=data)

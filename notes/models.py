@@ -36,7 +36,8 @@ PRIORITY_OPTIONS = (
 
 HISTORY_OPTIONS = (
         ('deferred', 'Deferred'),
-        ('updated', 'Updated')
+        ('updated', 'Updated'),
+        ('promoted', 'Promoted')
     )
 
 RECURRENCE_OPTIONS = [
@@ -58,7 +59,7 @@ class CombinedSearchManager(models.Manager):
                 INNER JOIN notes_notetag nt ON note.id = nt.note_id
                 INNER JOIN notes_tag t ON t.id = nt.tag_id
                 WHERE
-                    MATCH(note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
+                    MATCH(note.type, note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
                 OR
                     MATCH (t.name, t.slug) AGAINST (%s IN NATURAL LANGUAGE MODE)
 
@@ -155,6 +156,13 @@ class Note (models.Model):
         next_task = self.generate_next_task()
 
         return next_task
+
+    def uncomplete_task(self):
+        """Mark the task as not completed"""
+        self.status = 'open'
+        self.completed_date = None
+        self.save()
+        return
 
 
 class NoteHistory (models.Model):
