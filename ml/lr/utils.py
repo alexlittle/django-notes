@@ -4,7 +4,7 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.preprocessing import OneHotEncoder
 
 
-def one_hot_encode_tags(df_train, df_test, tags_column):
+def one_hot_encode_tags(df_train, df_test, tags_column, prefix="tag_"):
     """One-hot encodes comma-separated tags in a DataFrame."""
 
     def preprocess_tags(tags_list):
@@ -20,13 +20,26 @@ def one_hot_encode_tags(df_train, df_test, tags_column):
     # Transform train data
     encoded_train_tags = mlb.transform(train_tags)
     encoded_train_df = pd.DataFrame(encoded_train_tags, columns=mlb.classes_, index=df_train.index)
+    encoded_train_df.columns = [f"{prefix}{col}" for col in encoded_train_df.columns]
     df_train = df_train.join(encoded_train_df)
 
     # Transform test data
-    test_tags = df_test[tags_column].fillna('').apply(lambda x: x.split(', ') if x else [])
+    test_tags = df_test[tags_column].fillna('').apply(lambda x: preprocess_tags(x.split(',')) if x else [])
     encoded_test_tags = mlb.transform(test_tags)
     encoded_test_df = pd.DataFrame(encoded_test_tags, columns=mlb.classes_, index=df_test.index)
+    encoded_test_df.columns = [f"{prefix}{col}" for col in encoded_test_df.columns]
     df_test = df_test.join(encoded_test_df)
+
+    # Store train columns
+    train_columns = encoded_train_df.columns
+
+    # Add missing columns to the test data
+    for col in train_columns:
+        if col not in df_test.columns:
+            df_test[col] = 0
+
+    # Ensure test data has the same columns as train data
+    #df_test = df_test[train_columns]
 
     return df_train, df_test
 

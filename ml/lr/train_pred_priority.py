@@ -5,9 +5,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder, MultiLabelBinarizer
+from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, StandardScaler
 
-from utils import one_hot_encode_tags, handle_missing_due_dates, one_hot_encode_column, datetime_to_features
+from utils import one_hot_encode_tags, handle_missing_due_dates, datetime_to_features
 
 X_DROP = ['id', 'create_date', 'due_date', 'title']
 
@@ -44,8 +44,6 @@ encoder = OneHotEncoder(sparse_output=False)
 encoded_categorical = encoder.fit_transform(df[X_CATEGORICAL_FEATURES])
 encoded_categorical_df = pd.DataFrame(encoded_categorical,
                                       columns=encoder.get_feature_names_out(X_CATEGORICAL_FEATURES))
-df = df.reset_index(drop=True)
-encoded_categorical_df = encoded_categorical_df.reset_index(drop=True)
 df = pd.concat([df, encoded_categorical_df], axis=1).drop(X_CATEGORICAL_FEATURES, axis=1)
 
 # categorise Ys
@@ -53,16 +51,14 @@ encoder = OneHotEncoder(sparse_output=False)
 encoded_categorical = encoder.fit_transform(df[Y_CATEGORICAL_FEATURES])
 encoded_categorical_df = pd.DataFrame(encoded_categorical,
                                       columns=encoder.get_feature_names_out(Y_CATEGORICAL_FEATURES))
-df = df.reset_index(drop=True)
-encoded_categorical_df = encoded_categorical_df.reset_index(drop=True)
 df = pd.concat([df, encoded_categorical_df], axis=1).drop(Y_CATEGORICAL_FEATURES, axis=1)
 
 
-
-y = df[[col for col in df.columns if col.startswith('priority_')]]
+pred_columns = [col for col in df.columns if col.startswith('priority_')]
+y = df[pred_columns]
 X = df.drop(X_DROP, axis=1)
-columns_to_drop = [col for col in df.columns if col.startswith('priority_')]
-X = X.drop(columns=columns_to_drop, axis=1)
+
+X = X.drop(columns=pred_columns, axis=1)
 
 X.to_csv(os.path.join(output_dir, "tasks_pred_priority_x.csv"))
 y.to_csv(os.path.join(output_dir, "tasks_pred_priority_y.csv"))
@@ -71,7 +67,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 
 # 1-hot encode tags
-X_train, X_test = one_hot_encode_tags(X_train, X_test, 'tags')
+X_train, X_test = one_hot_encode_tags(X_train,X_test,'tags')
 
 X_train = X_train.drop("tags", axis=1)
 X_test = X_test.drop("tags", axis=1)
@@ -83,7 +79,7 @@ X_test[COLUMNS_TO_SCALE] = scaler.transform(X_test[COLUMNS_TO_SCALE])
 
 print(X_train.info())
 print(X_test.info())
-model = MultiOutputClassifier(LogisticRegression(random_state=42))
+model = MultiOutputClassifier(LogisticRegression(random_state=1))
 model.fit(X_train, y_train)
 
 # Make predictions
@@ -93,6 +89,28 @@ for i in range(y_test.shape[1]):
     print(f"Label {i+1} Accuracy:", accuracy_score(y_test.iloc[:, i], y_pred[:, i]))
     print(f"Label {i+1} Classification Report:\n", classification_report(y_test.iloc[:, i], y_pred[:, i]))
 
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+
+# Get the coefficients from the multioutput model.
+coefficients = []
+for estimator in model.estimators_:
+    coefficients.append(estimator.coef_.flatten())
+
+# Create a DataFrame to display coefficients
+coef_df = pd.DataFrame(coefficients, columns=X_train.columns)
+
+# Print the coefficients
+print("Coefficients:")
+print(coef_df)
+
+# Print the absolute value of the coefficients, to see the magnitude of the impact.
+print("\nAbsolute Coefficients:")
+print(coef_df.abs())
+
+# Print the mean of the absolute coefficients, to see the average impact of each column.
+print("\nMean Absolute Coefficients:")
+print(coef_df.abs().mean())
 
 #To use the model to predict new data.
 #Example new data.
