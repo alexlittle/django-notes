@@ -18,7 +18,7 @@ NUMERICAL_FEATURES = ['current_date_dow',
                       "completed_date_m",
                       "completed_date_doy"
                       ]
-CATEGORICAL_FEATURES = ['status', 'priority','recurrence']
+CATEGORICAL_FEATURES = ['status', 'priority', 'recurrence']
 OUTPUT_FIELDS = [ "due_today" , "due_tomorrow", "due_next_week", "due_next_month", "due_later" ]
 
 
@@ -27,6 +27,15 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 output_dir = os.path.join(base_dir, 'output')
 df = pd.read_csv(os.path.join(output_dir, "tasks.csv"))
 
+print(df['priority'].unique())
+print(df['status'].unique())
+print(df['recurrence'].unique())
+
+print(df['due_today'].unique())
+print(df['due_tomorrow'].unique())
+print(df['due_next_week'].unique())
+print(df['due_next_month'].unique())
+print(df['due_later'].unique())
 
 scaler = MinMaxScaler()
 df[NUMERICAL_FEATURES] = scaler.fit_transform(df[NUMERICAL_FEATURES])
@@ -45,10 +54,14 @@ df = one_hot_encode_tags(df, 'tags')
 X = df.drop(OUTPUT_FIELDS, axis=1)
 #X = X.drop("tags", axis=1)
 X = X.drop("days_until_due", axis=1)
+X = X.drop("title", axis=1)
 y = df[OUTPUT_FIELDS]
 
+
+
+print(X.shape)
 # Split data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=42)
 print(y_train.isnull().sum())
 
 

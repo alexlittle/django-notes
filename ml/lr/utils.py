@@ -1,40 +1,61 @@
 import pandas as pd
-import numpy as np
 
-from imblearn.pipeline import Pipeline
 from sklearn.preprocessing import MultiLabelBinarizer
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.impute import SimpleImputer
-from imblearn.over_sampling import SMOTE
+from sklearn.preprocessing import OneHotEncoder
 
 
-def one_hot_encode_tags(df, tags_column):
-    """
-    One-hot encodes comma-separated tags in a DataFrame.
+def one_hot_encode_tags(df_train, df_test, tags_column):
+    """One-hot encodes comma-separated tags in a DataFrame."""
 
-    Args:
-        df (pd.DataFrame): The DataFrame containing the tags.
-        tags_column (str): The name of the column containing the tags.
+    def preprocess_tags(tags_list):
+        """Removes spaces from individual tags."""
+        return [tag.strip().replace(' ', '_') for tag in tags_list]
 
-    Returns:
-        pd.DataFrame: The DataFrame with one-hot encoded tags.
-    """
-    # Split the comma-separated strings into lists of tags
-    df[tags_column] = df[tags_column].str.split(', ')
+    # Fit MultiLabelBinarizer on training data only
+    train_tags = df_train[tags_column].fillna('').apply(lambda x: preprocess_tags(x.split(',')) if x else [])
 
-    # Create a MultiLabelBinarizer object
     mlb = MultiLabelBinarizer()
+    mlb.fit(train_tags)
 
-    # Fit and transform the tags column
-    encoded_tags = mlb.fit_transform(df.pop(tags_column))
+    # Transform train data
+    encoded_train_tags = mlb.transform(train_tags)
+    encoded_train_df = pd.DataFrame(encoded_train_tags, columns=mlb.classes_, index=df_train.index)
+    df_train = df_train.join(encoded_train_df)
 
-    # Create a DataFrame with the one-hot encoded tags
-    encoded_df = pd.DataFrame(encoded_tags, columns=mlb.classes_, index=df.index)
+    # Transform test data
+    test_tags = df_test[tags_column].fillna('').apply(lambda x: x.split(', ') if x else [])
+    encoded_test_tags = mlb.transform(test_tags)
+    encoded_test_df = pd.DataFrame(encoded_test_tags, columns=mlb.classes_, index=df_test.index)
+    df_test = df_test.join(encoded_test_df)
 
-    # Concatenate the encoded tags with the original DataFrame
-    df = df.join(encoded_df)
+    return df_train, df_test
 
+
+def one_hot_encode_column(df, column_name):
+    """One-hot encodes a column."""
+    encoder = OneHotEncoder(sparse_output=False, drop=None)
+    encoded_values = encoder.fit_transform(df[column_name].values.reshape(-1, 1))
+    encoded_df = pd.DataFrame(encoded_values, columns=encoder.get_feature_names_out([column_name]))
+    df = pd.concat([df, encoded_df], axis=1).drop(column_name, axis=1)
+    return df
+
+
+def datetime_to_features(dt_series, prefix=''):
+    """Transforms datetime objects into numerical features."""
+    df_features = pd.DataFrame({
+        f'{prefix}year': dt_series.dt.year,
+        f'{prefix}month': dt_series.dt.month,
+        f'{prefix}day': dt_series.dt.day
+    })
+    return df_features
+
+
+def handle_missing_due_dates(df, imputation_date='2025-12-31'):
+    """Handles missing due_dates."""
+    df['due_date_missing'] = df['due_date'].isnull().astype(int)
+    imputation_value = pd.to_datetime(imputation_date)
+    df['due_date'] = df['due_date'].fillna(imputation_value)
+    df['due_date'] = pd.to_datetime(df['due_date'])
     return df
 
 

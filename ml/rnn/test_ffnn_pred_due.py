@@ -15,7 +15,6 @@ output_dir = os.path.join(base_dir, 'output')
 t_model = get_sentence_embedding_model(output_dir)
 loaded_scaler = joblib.load(os.path.join(output_dir, 'minmax_scaler.joblib'))
 cat_encoder = joblib.load(os.path.join(output_dir, 'cat_encoder.joblib'))
-due_encoder = joblib.load(os.path.join(output_dir, 'due_encoder.joblib'))
 
 input_data = {
     'current_date': datetime.datetime.now(),
@@ -24,7 +23,11 @@ input_data = {
     'priority': "medium",
     'recurrence': "none",
     'reminder_days': -1 ,
-    'tags': "personal"
+    'tags': "personal, email",
+    'completed_date_dow': -1 ,
+    'completed_date_dom': -1 ,
+    'completed_date_m': -1 ,
+    'completed_date_doy': -1
 }
 
 input_df = pd.DataFrame([input_data])
@@ -36,6 +39,8 @@ input_df['current_date_m'] = input_df['current_date'].dt.month
 input_df['current_date_doy'] = input_df['current_date'].dt.dayofyear
 
 numerical_input_df = input_df[NUMERICAL_FEATURES] #keep as a dataframe.
+
+
 # Scale numerical features
 scaled_numerical_input = loaded_scaler.transform(numerical_input_df)
 
@@ -56,7 +61,7 @@ model_input_tensor = torch.tensor(model_input, dtype=torch.float32)
 
 print(model_input_tensor.shape)
 input_size = model_input_tensor.shape[1]
-num_categories = len(due_encoder.categories_[0])
+num_categories = 5
 loaded_model = FFNN(input_size, num_categories) #create an instance of the model.
 loaded_model.load_state_dict(torch.load(os.path.join(output_dir,'notes_model.pt')))
 loaded_model.eval() #set to evaluation mode.
