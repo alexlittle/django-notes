@@ -75,13 +75,18 @@ class TasksView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        return Note.objects.filter(type="task", status__in=['open', 'inprogress']).annotate(
-                    has_date=Case(
-                        When(due_date__isnull=False, then=Value(1)),
-                        default=Value(0),
-                        output_field=DateField(),
-                    )
-                ).order_by('-has_date', 'due_date')
+        show_completed_str = self.request.GET.get('completed', 'false')
+        qs = Note.objects.filter(type="task").annotate(
+            has_date=Case(
+                When(due_date__isnull=False, then=Value(1)),
+                default=Value(0),
+                output_field=DateField(),
+            )
+        )
+        if show_completed_str.lower() == 'false':
+            qs = qs.filter(status__in=['open', 'inprogress'])
+
+        return qs.order_by('-has_date', 'due_date')
 
 class TasksTagsView(TemplateView):
     template_name = 'notes/tasks_tags.html'
