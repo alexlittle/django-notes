@@ -41,6 +41,7 @@ HISTORY_OPTIONS = (
     )
 
 RECURRENCE_OPTIONS = [
+    ('daily', 'Daily'),
     ('weekly', 'Weekly'),
     ('biweekly', 'Fortnightly'),
     ('monthly', 'Monthly'),
@@ -119,6 +120,8 @@ class Note (models.Model):
         """Calculate the next due date based on recurrence."""
         if self.recurrence == 'none' or self.recurrence == '' or self.recurrence is None:
             return None
+        elif self.recurrence == 'daily':
+            return self.due_date + timedelta(days=1)
         elif self.recurrence == 'weekly':
             return self.due_date + timedelta(weeks=1)
         elif self.recurrence == 'biweekly':
