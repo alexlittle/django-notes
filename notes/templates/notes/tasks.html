@@ -4,13 +4,16 @@
 
 {% block content %}
 
-<a href="{% url 'notes:home' %}" class="btn btn-primary">Home</a>
+<a href="{% url 'notes:home' %}" class="btn btn-primary">{% trans 'Home' %}</a>
 
-<a href="{% url 'notes:add' %}?type=task&tags={{ tag.name }}" class="btn btn-primary">Add</a>
+<a href="{% url 'notes:add' %}?type=task&tags={{ tag.name }}" class="btn btn-primary">{% trans 'Add' %}</a>
 
-<a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
+<a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">{% trans 'Task Tags' %}</a>
 
 <h2>{% trans "Tasks" %} {% if tag %}- {{ tag.name }}{% endif %}</h2>
+
+<a href="?completed=true" class="btn btn-primary">{% trans 'Show Completed' %}</a>
+<a href="?completed=false" class="btn btn-primary">{% trans 'Hide Completed' %}</a>
 
 {% include "includes/pagination.html" %}
 
