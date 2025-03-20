@@ -9,7 +9,7 @@ from sklearn.preprocessing import MinMaxScaler, OneHotEncoder, StandardScaler
 
 from utils import one_hot_encode_tags, handle_missing_due_dates, datetime_to_features
 
-X_DROP = ['id', 'create_date', 'due_date', 'title']
+X_DROP = ['id', 'create_date', 'due_date', 'title', 'completed_date']
 
 X_CATEGORICAL_FEATURES = ['status', 'recurrence']
 Y_CATEGORICAL_FEATURES = ['priority']
@@ -21,6 +21,12 @@ COLUMNS_TO_SCALE = [
     'due_year',
     'due_month',
     'due_day',
+    'completed_year',
+    'completed_month',
+    'completed_day',
+    'num_updated',
+    'num_deferred',
+    'num_promoted'
 ]
 
 
@@ -34,10 +40,14 @@ df = handle_missing_due_dates(df)
 # dates to datetimeformat
 df['create_date'] = pd.to_datetime(df['create_date'], errors='coerce')
 df['due_date'] = pd.to_datetime(df['due_date'], errors='coerce')
+df['completed_date'] = pd.to_datetime(df['completed_date'], errors='coerce')
 
 # split dates
 df = pd.concat([df, datetime_to_features(df['create_date'], prefix='create_')], axis=1)
 df = pd.concat([df, datetime_to_features(df['due_date'], prefix='due_')], axis=1)
+df = pd.concat([df, datetime_to_features(df['completed_date'], prefix='completed_')], axis=1)
+
+df[["completed_day", "completed_month", "completed_year"]] = df[["completed_day", "completed_month", "completed_year"]].fillna(0)
 
 # categorise Xs
 encoder = OneHotEncoder(sparse_output=False)
@@ -63,7 +73,7 @@ X = X.drop(columns=pred_columns, axis=1)
 X.to_csv(os.path.join(output_dir, "tasks_pred_priority_x.csv"))
 y.to_csv(os.path.join(output_dir, "tasks_pred_priority_y.csv"))
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=99)
 
 
 # 1-hot encode tags
@@ -79,7 +89,7 @@ X_test[COLUMNS_TO_SCALE] = scaler.transform(X_test[COLUMNS_TO_SCALE])
 
 print(X_train.info())
 print(X_test.info())
-model = MultiOutputClassifier(LogisticRegression(random_state=1))
+model = MultiOutputClassifier(LogisticRegression(random_state=99))
 model.fit(X_train, y_train)
 
 # Make predictions
@@ -108,9 +118,25 @@ print(coef_df)
 print("\nAbsolute Coefficients:")
 print(coef_df.abs())
 
+mean_abs_coef = coef_df.abs().mean()
 # Print the mean of the absolute coefficients, to see the average impact of each column.
 print("\nMean Absolute Coefficients:")
-print(coef_df.abs().mean())
+print(mean_abs_coef)
+
+sorted_coef = mean_abs_coef.sort_values(ascending=False)
+
+# Get the top 10 coefficients
+top_10_coef = sorted_coef.head(10)
+
+# Print the top 10 coefficients
+print("Top 10 Coefficients Influencing Categorization:")
+print(top_10_coef)
+
+# If you want to see the actual coefficient values, not just the mean absolute:
+print("\nTop 10 Columns and their Coefficients:")
+for col_name in top_10_coef.index:
+    print(f"\n{col_name}:")
+    print(coef_df[col_name])
 
 #To use the model to predict new data.
 #Example new data.

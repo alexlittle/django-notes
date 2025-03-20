@@ -5,7 +5,8 @@ from django.core.management.base import BaseCommand
 from django.db.models import DateTimeField
 from datetime import date
 
-from notes.models import Note, Tag
+from notes.models import Note, Tag, NoteHistory
+
 
 class Command(BaseCommand):
     help = 'Exports Task data to a CSV file.'
@@ -14,17 +15,41 @@ class Command(BaseCommand):
                             "title",
                             "create_date",
                             "due_date",
+                            "completed_date",
                             "status",
                             "priority",
                             "recurrence"]
 
-    input_fields_to_generate = ["tags"]
+    input_fields_to_generate = ["tags",
+                                "completed_before",
+                                "completed_on_due",
+                                "completed_late",
+                                "num_updated",
+                                "num_deferred",
+                                "num_promoted"]
 
     def generated_input_field(self, task, field_name):
         if field_name == "tags":
             tags = Tag.objects.filter(notetag__note=task.id).values_list('name', flat=True)
             return ", ".join(tags)
-        return None
+        if field_name.startswith("completed_") and task.due_date is not None and task.completed_date is not None:
+            if field_name == "completed_before" and task.due_date > task.completed_date:
+                return 1
+            if field_name == "completed_on_due" and task.due_date == task.completed_date:
+                return 1
+            if field_name == "completed_before" and task.due_date < task.completed_date:
+                return 1
+            return 0
+        if field_name == "num_updated":
+            num_updated = NoteHistory.objects.filter(note=task, action="updated").count()
+            return num_updated
+        if field_name == "num_deferred":
+            num_deferred = NoteHistory.objects.filter(note=task, action="deferred").count()
+            return num_deferred
+        if field_name == "num_promoted":
+            num_promoted = NoteHistory.objects.filter(note=task, action="promoted").count()
+            return num_promoted
+        return 0
 
 
     def handle(self, *args, **options):
