@@ -15,18 +15,26 @@ X_CATEGORICAL_FEATURES = ['status', 'recurrence']
 Y_CATEGORICAL_FEATURES = ['priority']
 
 COLUMNS_TO_SCALE = [
-    'create_year',
+    #'create_year',
     'create_month',
     'create_day',
-    'due_year',
+    'create_dow',
+    'create_doy',
+    #'due_year',
     'due_month',
     'due_day',
-    'completed_year',
+    'due_dow',
+    'due_doy',
+    #'completed_year',
     'completed_month',
     'completed_day',
+    'completed_dow',
+    'completed_doy',
     'num_updated',
     'num_deferred',
-    'num_promoted'
+    'num_promoted',
+    'reminder_days',
+    'estimated_effort'
 ]
 
 
@@ -47,7 +55,7 @@ df = pd.concat([df, datetime_to_features(df['create_date'], prefix='create_')], 
 df = pd.concat([df, datetime_to_features(df['due_date'], prefix='due_')], axis=1)
 df = pd.concat([df, datetime_to_features(df['completed_date'], prefix='completed_')], axis=1)
 
-df[["completed_day", "completed_month", "completed_year"]] = df[["completed_day", "completed_month", "completed_year"]].fillna(0)
+df[["completed_day", "completed_month", "completed_dow", "completed_doy"]] = df[["completed_day", "completed_month", "completed_dow", "completed_doy"]].fillna(0)
 
 # categorise Xs
 encoder = OneHotEncoder(sparse_output=False)
@@ -135,6 +143,21 @@ print(top_10_coef)
 # If you want to see the actual coefficient values, not just the mean absolute:
 print("\nTop 10 Columns and their Coefficients:")
 for col_name in top_10_coef.index:
+    print(f"\n{col_name}:")
+    print(coef_df[col_name])
+
+sorted_coef = mean_abs_coef.sort_values(ascending=True)
+
+# Get the top 10 coefficients
+bottom_10_coef = sorted_coef.head(10)
+
+# Print the top 10 coefficients
+print("Bottom 10 Coefficients Influencing Categorization:")
+print(bottom_10_coef)
+
+# If you want to see the actual coefficient values, not just the mean absolute:
+print("\nBottom 10 Columns and their Coefficients:")
+for col_name in bottom_10_coef.index:
     print(f"\n{col_name}:")
     print(coef_df[col_name])
 

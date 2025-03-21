@@ -56,9 +56,11 @@ def one_hot_encode_column(df, column_name):
 def datetime_to_features(dt_series, prefix=''):
     """Transforms datetime objects into numerical features."""
     df_features = pd.DataFrame({
-        f'{prefix}year': dt_series.dt.year,
+        #f'{prefix}year': dt_series.dt.year,
         f'{prefix}month': dt_series.dt.month,
-        f'{prefix}day': dt_series.dt.day
+        f'{prefix}day': dt_series.dt.day,
+        f'{prefix}dow': dt_series.dt.dayofweek + 1,
+        f'{prefix}doy': dt_series.dt.dayofyear
     })
     return df_features
 

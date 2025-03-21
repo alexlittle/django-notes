@@ -18,7 +18,9 @@ class Command(BaseCommand):
                             "completed_date",
                             "status",
                             "priority",
-                            "recurrence"]
+                            "recurrence",
+                            "reminder_days",
+                            "estimated_effort"]
 
     input_fields_to_generate = ["tags",
                                 "completed_before",
@@ -85,7 +87,7 @@ class Command(BaseCommand):
                         elif field_name == "recurrence":
                             value = "none"
                         elif field_name == "reminder_days":
-                            value = -1
+                            value = 0
 
                     row[field_name] = value
                 for field_name in self.input_fields_to_generate:
