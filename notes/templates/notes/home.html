@@ -12,9 +12,7 @@
 	<h2>{% trans "Overdue" %} ({{ overdue|length }})</h2>
 	<div class="container mt-5">
 	{% for note in overdue %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}
@@ -23,9 +21,7 @@
 	<h2>{% trans "Today" %} ({{ today|length }})</h2>
 	<div class="container mt-5">
 	{% for note in today %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}
@@ -34,9 +30,7 @@
 	<h2>{% trans "Reminder" %} ({{ reminder|length }})</h2>
 	<div class="container mt-5">
 	{% for note in reminder %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}
@@ -45,9 +39,7 @@
 	<h2>{% trans "Tomorrow" %} ({{ tomorrow|length }})</h2>
 	<div class="container mt-5">
 	{% for note in tomorrow %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}
@@ -56,9 +48,7 @@
 	<h2>{% trans "Next week" %} ({{ next_week|length }})</h2>
 	<div class="container mt-5">
 	{% for note in next_week %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}
@@ -67,9 +57,7 @@
 	<h2>{% trans "Next month" %} ({{ next_month|length }})</h2>
 	<div class="container mt-5">
 	{% for note in next_month %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}

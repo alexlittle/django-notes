@@ -6,8 +6,10 @@
 
 <h2>{% for t in tags %}{{ t.name }}&nbsp;{% endfor %}</h2>
 
+<div class="container mt-5">
 {% for note in notes %}
 	{% include "includes/note_row.html" %}
 {% endfor %}
+</div>
 
 {% endblock %}

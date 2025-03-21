@@ -14,9 +14,7 @@
 	<h2>{% trans "Future" %} ({{ future|length }})</h2>
 	<div class="container mt-5">
 	{% for note in future %}
-		<div class="row striped-row">
-			{% include "includes/task_row.html" %}
-		</div>
+		{% include "includes/note_row.html" %}
 	{% endfor %}
 	</div>
 {% endif %}

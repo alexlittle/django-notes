@@ -1,7 +1,6 @@
 {% load i18n %}
 {% load query_string %}
 
-{% with page_obj as page %}
 {% if page.has_previous or page.has_next %}
 <nav>
   <ul class="pagination justify-content-center">
@@ -40,4 +39,3 @@
   </ul>
 </nav>
 {% endif %}
-{% endwith %}

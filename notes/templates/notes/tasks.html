@@ -19,9 +19,7 @@
 
 <div class="container mt-5">
 {% for note in tasks %}
-	<div class="row striped-row">
-		{% include "includes/task_row.html" %}
-	</div>
+	{% include "includes/note_row.html" %}
 {% endfor %}
 </div>
 

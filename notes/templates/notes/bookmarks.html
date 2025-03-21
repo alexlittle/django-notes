@@ -8,9 +8,11 @@
 
 {% include "includes/pagination.html" %}
 
+<div class="container mt-5">
 {% for note in notes %}
 	{% include "includes/note_row.html" %}
 {% endfor %}
+</div>
 
 {% include "includes/pagination.html" %}
 

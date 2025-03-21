@@ -2,10 +2,10 @@
 {% load static %}
 {% load humanize %}
 
-<div class="task-container">
+<div class="note-container">
 	{% include "includes/task_completed_icon.html" %}
 	{% include "includes/task_priority_icon.html" %}
-	<div class="task-text">
+	<div class="note-text">
 		<strong><a href="{% url 'notes:edit' note.id %}">{{ note.title }}</a></strong><br/>
 		{% for nt in note.tags.all %}
 			<a href="{% url 'notes:tag_tasks' nt.slug %}">{{ nt.name }}</a>
@@ -27,7 +27,6 @@
 						fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
 				  <path d="M12 19.5a7.5 7.5 0 0 1-7.5-7.5c0-1.2.3-2.4.9-3.5l2-2a5.2 5.2 0 1 0 7.4 7.4l-2 2A7.4 7.4 0 0 1 12 19.5z"
 						fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
-				</svg>
 				</svg>
 			{% endif %}
 		{% endif %}
