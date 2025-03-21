@@ -10,14 +10,9 @@
     {% if query %}
         <h3>{% trans 'Results' %}</h3>
 
-		{% if page.has_previous or page.has_next %}
-            <div>
-                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
-                |
-                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
-            </div>
-        {% endif %}
-        
+		{% include "includes/pagination.html" %}
+
+        <div class="container mt-5">
         {% for result in page.object_list %}
         	{% with note=result %}
         		{% include "includes/note_row.html" %}
@@ -25,14 +20,9 @@
         {% empty %}
             <p>{% trans 'No results found.' %}</p>
         {% endfor %}
+        </div>
 
-        {% if page.has_previous or page.has_next %}
-            <div style="clear:both;">
-                {% if page.has_previous %}<a href="?q={{ query }}&amp;page={{ page.previous_page_number }}">{% endif %}&laquo; Previous{% if page.has_previous %}</a>{% endif %}
-                |
-                {% if page.has_next %}<a href="?q={{ query }}&amp;page={{ page.next_page_number }}">{% endif %}Next &raquo;{% if page.has_next %}</a>{% endif %}
-            </div>
-        {% endif %}
+        {% include "includes/pagination.html" %}
     {% else %}
         {# Show some example queries to run, maybe query syntax, something else? #}
     {% endif %}
