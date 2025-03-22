@@ -96,8 +96,14 @@ class TasksTagsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
-        base_query_undated = Note.objects.filter(due_date__isnull=True, type="task", status__in=['open', 'inprogress'])
+        show_all_str = self.request.GET.get('all', 'false')
+        context["show_all"] = show_all_str.lower() == 'true'
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task")
+        base_query_undated = Note.objects.filter(due_date__isnull=True, type="task")
+        if show_all_str.lower() == 'false':
+            base_query_dated = base_query_dated.filter(status__in=['open', 'inprogress'])
+            base_query_undated = base_query_undated.filter(status__in=['open', 'inprogress'])
+
         context["tags_dated"] = Tag.objects.filter(notetag__note__in=base_query_dated) \
             .distinct() \
             .annotate(note_count=Count("notetag__note")) \
@@ -116,7 +122,11 @@ class TagTasksView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
-        return Note.objects.filter(notetag__tag__slug=slug, type="task", status__in=['open', 'inprogress']).annotate(
+        show_all_str = self.request.GET.get('all', 'false')
+        notes = Note.objects.filter(notetag__tag__slug=slug, type="task")
+        if show_all_str.lower() == 'false':
+            notes = notes.filter(status__in=['open', 'inprogress'])
+        return notes.annotate(
                     has_date=Case(
                         When(due_date__isnull=False, then=Value(1)),
                         default=Value(0),
