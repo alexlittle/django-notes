@@ -9,17 +9,17 @@
 <a href="{% url 'notes:add' %}?type=task" class="btn btn-primary">Add</a>
 
 <h2>{% trans "Tags dated" %}</h2>
-<ul>
+<ol>
 {% for tag in tags_dated %}
-	<li><a href="{% url 'notes:tag_tasks' tag.slug %}">{{ tag.name }}</a> ({{tag.note_count }})</li>
+	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?all={{ show_all }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
 {% endfor %}
-</ul>
+</ol>
 
 <h2>{% trans "Tags undated" %}</h2>
-<ul>
+<ol>
 {% for tag in tags_undated %}
-	<li><a href="{% url 'notes:tag_tasks' tag.slug %}">{{ tag.name }}</a> ({{tag.note_count }})</li>
+	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?all={{ show_all }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
 {% endfor %}
-</ul>
+</ol>
 
 {% endblock %}
