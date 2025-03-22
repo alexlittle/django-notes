@@ -73,4 +73,32 @@ def handle_missing_due_dates(df, imputation_date='2025-12-31'):
     df['due_date'] = pd.to_datetime(df['due_date'])
     return df
 
+def priority_to_numeric(df, priority_column='priority'):
+    """
+    Converts string priority values to numerical (0, 1, 2).
+
+    Args:
+        df (pd.DataFrame): The DataFrame containing the priority column.
+        priority_column (str): The name of the priority column.
+
+    Returns:
+        pd.DataFrame: The DataFrame with the priority column converted to numeric.
+    """
+
+    priority_mapping = {
+        'low': 0,
+        'medium': 1,
+        'high': 2,
+        'Low': 0, # incase of different capitalization
+        'Medium': 1,
+        'High': 2,
+    }
+
+    df[priority_column] = df[priority_column].map(priority_mapping)
+
+    # Handle cases where priority values are not in the mapping (e.g., NaN)
+    df[priority_column] = pd.to_numeric(df[priority_column], errors='coerce').fillna(-1).astype(int) # -1 is a placeholder for missing values
+
+    return df
+
 
