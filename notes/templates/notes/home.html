@@ -8,6 +8,9 @@
 
 <a href="{% url 'notes:tasks_tags_home' %}" class="btn btn-primary">Task Tags</a>
 
+<a href="?completed=true" class="btn btn-primary">{% trans 'Show Completed' %}</a>
+<a href="?completed=false" class="btn btn-primary">{% trans 'Hide Completed' %}</a>
+
 {% if overdue %}
 	<h2>{% trans "Overdue" %} ({{ overdue|length }})</h2>
 	<div class="container mt-5">
