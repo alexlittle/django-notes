@@ -11,7 +11,7 @@ from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
-
+from notes.utils import get_user_aware_datetime
 
 class HomeView(TemplateView):
     template_name = 'notes/home.html'
@@ -28,6 +28,8 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         show_completed_str = self.request.GET.get('completed', 'false')
+        user_aware_now = get_user_aware_datetime(self.request.user)
+        print(user_aware_now)
 
         base_query_dated = Note.objects.filter(due_date__isnull=False,
                                                type="task",
@@ -51,14 +53,14 @@ class HomeView(TemplateView):
         if show_completed_str.lower() == 'false':
             base_query_dated = base_query_dated.exclude(status='completed')
 
-        context["overdue"] = base_query_dated.exclude(status='completed').filter(due_date__lt=datetime.now()).order_by("priority_order", "due_date")
+        context["overdue"] = base_query_dated.exclude(status='completed').filter(due_date__lt=user_aware_now).order_by("priority_order", "due_date")
         context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status='completed').order_by("due_date"))
-        context["today"] = base_query_dated.filter(due_date=datetime.now()).order_by("-status_order", "priority_order")
-        context["tomorrow"] = base_query_dated.filter(due_date=datetime.now()+timedelta(days=1)).order_by("-status_order", "priority_order")
-        context["next_week"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=1),
-                                                       due_date__lte=datetime.now()+timedelta(days=7)).order_by("due_date", "priority_order")
-        context["next_month"] = base_query_dated.filter(due_date__gt=datetime.now() + timedelta(days=7),
-                                                       due_date__lte=datetime.now() + timedelta(days=31)).order_by("due_date", "priority_order")
+        context["today"] = base_query_dated.filter(due_date=user_aware_now).order_by("-status_order", "priority_order")
+        context["tomorrow"] = base_query_dated.filter(due_date=user_aware_now+timedelta(days=1)).order_by("-status_order", "priority_order")
+        context["next_week"] = base_query_dated.filter(due_date__gt=user_aware_now+timedelta(days=1),
+                                                       due_date__lte=user_aware_now+timedelta(days=7)).order_by("due_date", "priority_order")
+        context["next_month"] = base_query_dated.filter(due_date__gt=user_aware_now + timedelta(days=7),
+                                                       due_date__lte=user_aware_now + timedelta(days=31)).order_by("due_date", "priority_order")
         return context
 
 class FutureTasksView(TemplateView):
@@ -66,9 +68,9 @@ class FutureTasksView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        user_aware_now = get_user_aware_datetime(self.request.user)
         base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
-        context["future"] = base_query_dated.filter(due_date__gt=datetime.now()+timedelta(days=31)).order_by("due_date")
+        context["future"] = base_query_dated.filter(due_date__gt=user_aware_now+timedelta(days=31)).order_by("due_date")
         return context
 
 
