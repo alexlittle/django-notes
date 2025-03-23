@@ -8,6 +8,11 @@ from preprocess import preprocess_data
 
 X_train, y_train, X_test, y_test = preprocess_data(y_output="multiclass")
 
+comp_columns = [col for col in X_train.columns if col.startswith('completed_')]
+X_train = X_train.drop(columns=comp_columns, axis=1)
+X_test = X_test.drop(columns=comp_columns, axis=1)
+
+
 param_grid = {
     'n_estimators': [50, 100, 200],
     'max_depth': [None, 10, 20, 30],
