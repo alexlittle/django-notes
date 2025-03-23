@@ -1,5 +1,5 @@
 import datetime
-
+import pytz
 from django.contrib.auth.models import User
 from django.db import models, connection
 from django.utils import timezone
@@ -12,6 +12,8 @@ from dateutil.relativedelta import relativedelta
 from notes.fields import AutoSlugField
 
 from tinymce.models import HTMLField
+
+TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
 TYPE_OPTIONS = (
         ('bookmark', 'Bookmark'),
@@ -48,6 +50,11 @@ RECURRENCE_OPTIONS = [
     ('quarterly', 'Quarterly'),
     ('annually', 'Annually'),
 ]
+
+class NotesProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    timezone = models.CharField(max_length=100, blank=True, null=True, choices=TIMEZONES, default='UTC')
+
 
 class CombinedSearchManager(models.Manager):
     def combined_search(self, query):
