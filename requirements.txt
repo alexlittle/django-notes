@@ -45,7 +45,6 @@ pytest==8.3.5
 pytest-django==4.10.0
 mysqlclient==2.2.7
 python-dateutil==2.9.0.post0
-pytz==2025.1
 PyYAML==6.0.2
 regex==2024.11.6
 requests==2.32.3

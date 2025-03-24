@@ -3,8 +3,6 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix, classification_report
 from preprocess import preprocess_data
 
-# Assuming X_train_scaled, X_test_scaled, y_train, y_test are defined
-
 
 X_train, y_train, X_test, y_test = preprocess_data(y_output="multiclass")
 
