@@ -11,7 +11,7 @@ from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
-from notes.utils import get_user_aware_datetime
+from notes.utils import get_user_aware_datetime, is_showall
 
 class HomeView(TemplateView):
     template_name = 'notes/home.html'
@@ -27,9 +27,9 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        show_completed_str = self.request.GET.get('completed', 'false')
         user_aware_now = get_user_aware_datetime(self.request.user)
-        print(user_aware_now)
+
+        showall = is_showall(self.request)
 
         base_query_dated = Note.objects.filter(due_date__isnull=False,
                                                type="task",
@@ -50,7 +50,7 @@ class HomeView(TemplateView):
                                                 output_field=IntegerField()
                                             )
                                         )
-        if show_completed_str.lower() == 'false':
+        if not showall:
             base_query_dated = base_query_dated.exclude(status='completed')
 
         context["overdue"] = base_query_dated.exclude(status='completed').filter(due_date__lt=user_aware_now).order_by("priority_order", "due_date")
@@ -61,16 +61,27 @@ class HomeView(TemplateView):
                                                        due_date__lte=user_aware_now+timedelta(days=7)).order_by("due_date", "priority_order")
         context["next_month"] = base_query_dated.filter(due_date__gt=user_aware_now + timedelta(days=7),
                                                        due_date__lte=user_aware_now + timedelta(days=31)).order_by("due_date", "priority_order")
+        context["showall"] = showall
         return context
+
 
 class FutureTasksView(TemplateView):
     template_name = 'notes/tasks_future.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         user_aware_now = get_user_aware_datetime(self.request.user)
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress'])
+        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress', 'completed'])
+
+        showall = is_showall(self.request)
+        if not showall:
+            base_query_dated = base_query_dated.exclude(status='completed')
         context["future"] = base_query_dated.filter(due_date__gt=user_aware_now+timedelta(days=31)).order_by("due_date")
+
+        showall = is_showall(self.request)
+        context["showall"] = showall
+
         return context
 
 
@@ -80,7 +91,7 @@ class TasksView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        show_completed_str = self.request.GET.get('completed', 'false')
+        showall = is_showall(self.request)
         qs = Note.objects.filter(type="task").annotate(
             has_date=Case(
                 When(due_date__isnull=False, then=Value(1)),
@@ -88,7 +99,7 @@ class TasksView(ListView):
                 output_field=DateField(),
             )
         )
-        if show_completed_str.lower() == 'false':
+        if not showall:
             qs = qs.filter(status__in=['open', 'inprogress'])
 
         return qs.order_by('-has_date', 'due_date')
@@ -98,11 +109,13 @@ class TasksTagsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        show_all_str = self.request.GET.get('all', 'false')
-        context["show_all"] = show_all_str.lower() == 'true'
+
+        showall = is_showall(self.request)
+        context["showall"] = showall
+
         base_query_dated = Note.objects.filter(due_date__isnull=False, type="task")
         base_query_undated = Note.objects.filter(due_date__isnull=True, type="task")
-        if show_all_str.lower() == 'false':
+        if not showall:
             base_query_dated = base_query_dated.filter(status__in=['open', 'inprogress'])
             base_query_undated = base_query_undated.filter(status__in=['open', 'inprogress'])
 
@@ -124,9 +137,9 @@ class TagTasksView(ListView):
 
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
-        show_all_str = self.request.GET.get('all', 'false')
+        showall = is_showall(self.request)
         notes = Note.objects.filter(notetag__tag__slug=slug, type="task")
-        if show_all_str.lower() == 'false':
+        if not showall:
             notes = notes.filter(status__in=['open', 'inprogress'])
         return notes.annotate(
                     has_date=Case(
@@ -140,6 +153,10 @@ class TagTasksView(ListView):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs['tag_slug']
         context["tag"] = Tag.objects.get(slug=slug)
+
+        showall = is_showall(self.request)
+        context["showall"] = showall
+
         return context
 
 

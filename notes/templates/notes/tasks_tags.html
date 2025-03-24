@@ -4,21 +4,19 @@
 
 {% block content %}
 
-<a href="{% url 'notes:home' %}" class="btn btn-primary">Home</a>
-
-<a href="{% url 'notes:add' %}?type=task" class="btn btn-primary">Add</a>
+{% include "includes/task_header.html" %}
 
 <h2>{% trans "Tags dated" %}</h2>
 <ol>
 {% for tag in tags_dated %}
-	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?all={{ show_all }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
+	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?showall={{ showall }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
 {% endfor %}
 </ol>
 
 <h2>{% trans "Tags undated" %}</h2>
 <ol>
 {% for tag in tags_undated %}
-	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?all={{ show_all }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
+	<li><a href="{% url 'notes:tag_tasks' tag.slug %}?showall={{ showall }}">{{ tag.name }}</a> ({{tag.note_count }})</li>
 {% endfor %}
 </ol>
 

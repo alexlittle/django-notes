@@ -29,3 +29,11 @@ def get_user_aware_datetime(user):
             return timezone.now()
         else:
             return datetime.datetime.now()
+
+
+def is_showall(request):
+    showall_str = request.GET.get('showall', 'false').lower()
+    if showall_str == 'false':
+        return False
+    else:
+        return True

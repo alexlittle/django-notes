@@ -1,0 +1,15 @@
+{% load i18n %}
+
+<a href="{% url 'notes:home' %}?showall={{ showall }}" class="btn btn-primary">{% trans 'Home' %}</a>
+
+<a href="{% url 'notes:add' %}?type=task&tags={{ tag.name }}&showall={{ showall }}" class="btn btn-primary">{% trans 'Add' %}</a>
+
+<a href="{% url 'notes:tasks_tags_home' %}?showall={{ showall }}" class="btn btn-primary">{% trans 'Task Tags' %}</a>
+
+<a href="{% url 'notes:tasks_future' %}?showall={{ showall }}" class="btn btn-primary">{% trans "Future" %}</a>
+
+{% if showall %}
+	<a href="?showall=false" class="btn btn-primary">{% trans 'Hide Completed' %}</a>
+{% else %}
+	<a href="?showall=true" class="btn btn-primary">{% trans 'Show Completed' %}</a>
+{% endif %}
