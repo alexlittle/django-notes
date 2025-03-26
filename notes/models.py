@@ -174,6 +174,13 @@ class Note (models.Model):
         self.save()
         return
 
+    def close_task(self):
+        """Mark the task as not completed"""
+        self.status = 'closed'
+        self.completed_date = None
+        self.save()
+        return
+
 
 class NoteHistory (models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)

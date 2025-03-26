@@ -13,6 +13,7 @@ urlpatterns = [
     path('ideas/', note_views.IdeasView.as_view(), name="ideas"),
     path('task/<int:note_id>/complete', note_views.CompleteTaskView.as_view(), name="complete_task"),
     path('task/<int:note_id>/uncomplete', note_views.UnCompleteTaskView.as_view(), name="uncomplete_task"),
+    path('task/<int:note_id>/close', note_views.CloseTaskView.as_view(), name="close_task"),
     path('add/', note_views.AddView.as_view(), name="add"),
     path('edit/<int:note_id>/', note_views.EditView.as_view(), name="edit"),
     path('tags/', note_views.TagsView.as_view(), name="tags"),

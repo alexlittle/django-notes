@@ -1,0 +1,11 @@
+{% load i18n %}
+{% load static %}
+
+{% if note.status != "closed" %}
+    <a href="{% url 'notes:close_task' note.id %}">
+        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" fill="#99999999" />
+          <path d="M7 7L17 17M17 7L7 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="miter" fill="none"/>
+        </svg>
+    </a>
+{% endif %}

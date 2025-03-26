@@ -200,6 +200,18 @@ class UnCompleteTaskView(TemplateView):
         else:
             return HttpResponseRedirect(reverse('notes:home'))
 
+class CloseTaskView(TemplateView):
+
+    def get(self, request, note_id):
+        note = Note.objects.get(pk=note_id)
+        note.close_task()
+        referer = request.META.get('HTTP_REFERER')
+
+        if referer:
+            return HttpResponseRedirect(referer)
+        else:
+            return HttpResponseRedirect(reverse('notes:home'))
+
 
 class AddView(TemplateView):
 
