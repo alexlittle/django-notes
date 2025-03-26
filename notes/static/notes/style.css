@@ -25,6 +25,13 @@ body {
   color: #5a5a5a;
   margin-bottom: 60px;
   font-family: 'Ubuntu', sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+    flex: 1;
 }
 
 .container {
@@ -36,8 +43,6 @@ body {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
   width: 100%;
   background-repeat: repeat ;
   border-top: 1px solid #04689a;

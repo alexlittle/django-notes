@@ -18,7 +18,7 @@
 		<script src="{% static 'notes/jquery-3.7.1.min.js' %}"></script>
 		<script src="{% static 'notes/notes.js' %}"></script>
 
-		<link href="{% static "notes/style.css" %}" rel="stylesheet">
+		<link href="{% static 'notes/style.css' %}" rel="stylesheet">
 
 		<meta name="theme-color" content="#ffffff">
 
@@ -37,10 +37,10 @@
 			DEBUG MODE IS ENABLED
 		</div>
 	{% endif %}
-	 <div class="container">      
+	 <main class="container">
 	{% block content %}
 	{% endblock content %}
-	</div> <!--  end container -->
+	</main> <!--  end container -->
 
 
 <footer class="footer">
