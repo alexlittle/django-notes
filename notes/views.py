@@ -8,6 +8,7 @@ from django.views.generic import TemplateView, ListView
 
 from datetime import datetime
 from datetime import timedelta
+import dateutil.parser
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
@@ -28,7 +29,6 @@ class HomeView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         user_aware_now = get_user_aware_datetime(self.request.user)
-
         showall = is_showall(self.request)
 
         base_query_dated = Note.objects.filter(due_date__isnull=False,
@@ -55,7 +55,8 @@ class HomeView(TemplateView):
 
         context["overdue"] = base_query_dated.exclude(status='completed').filter(due_date__lt=user_aware_now).order_by("priority_order", "due_date")
         context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status='completed').order_by("due_date"))
-        context["today"] = base_query_dated.filter(due_date=user_aware_now).order_by("-status_order", "priority_order")
+        queryset = base_query_dated.filter(due_date=user_aware_now).order_by("-status_order", "priority_order")
+        context["today"] = queryset
         context["tomorrow"] = base_query_dated.filter(due_date=user_aware_now+timedelta(days=1)).order_by("-status_order", "priority_order")
         context["next_week"] = base_query_dated.filter(due_date__gt=user_aware_now+timedelta(days=1),
                                                        due_date__lte=user_aware_now+timedelta(days=7)).order_by("due_date", "priority_order")

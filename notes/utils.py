@@ -15,20 +15,22 @@ def get_user_aware_datetime(user):
     """
 
     if not user.is_authenticated:
-        return timezone.now()
+        return timezone.now().date()
 
     try:
         user_timezone = user.profile.timezone
         if isinstance(user_timezone, str):
             user_timezone = pytz.timezone(user_timezone)
-        return datetime.datetime.now(user_timezone)
+        user_time = datetime.datetime.now(user_timezone)
+        utc_time = user_time.astimezone(pytz.utc)
+        return utc_time.date()
 
     except (AttributeError, pytz.exceptions.UnknownTimeZoneError):
 
         if settings.USE_TZ:
-            return timezone.now()
+            return timezone.now().date()
         else:
-            return datetime.datetime.now()
+            return datetime.datetime.now().date()
 
 
 def is_showall(request):
