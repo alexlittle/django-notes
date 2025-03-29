@@ -46,7 +46,7 @@ def get_user_aware_datetime(user):
         return timezone.now()
 
     try:
-        user_timezone = "Europe/Helsinki" #user.profile.timezone
+        user_timezone = user.profile.timezone
         if isinstance(user_timezone, str):
             user_timezone = pytz.timezone(user_timezone)
         user_time = datetime.datetime.now(user_timezone)
