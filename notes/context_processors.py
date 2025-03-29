@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.utils import timezone
-from notes.utils import get_user_aware_datetime, get_user_aware_date
+from notes.utils import get_user_aware_datetime
 
 
 def debug_mode(request):
