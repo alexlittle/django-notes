@@ -8,11 +8,10 @@ from django.views.generic import TemplateView, ListView
 
 from datetime import datetime
 from datetime import timedelta
-import dateutil.parser
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
-from notes.utils import get_user_aware_datetime, is_showall
+from notes.utils import get_user_aware_date, is_showall
 
 class HomeView(TemplateView):
     template_name = 'notes/home.html'
@@ -28,7 +27,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        user_aware_now = get_user_aware_datetime(self.request.user)
+        user_aware_now = get_user_aware_date(self.request.user)
         showall = is_showall(self.request)
 
         base_query_dated = Note.objects.filter(due_date__isnull=False,
@@ -72,7 +71,7 @@ class FutureTasksView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        user_aware_now = get_user_aware_datetime(self.request.user)
+        user_aware_now = get_user_aware_date(self.request.user)
         base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress', 'completed'])
 
         showall = is_showall(self.request)
