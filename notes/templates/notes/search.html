@@ -13,10 +13,8 @@
 		{% include "includes/pagination.html" %}
 
         <div class="container mt-5">
-        {% for result in page.object_list %}
-        	{% with note=result %}
-        		{% include "includes/note_row.html" %}
-        	{% endwith %}
+        {% for note in notes %}
+            {% include "includes/note_row.html" %}
         {% empty %}
             <p>{% trans 'No results found.' %}</p>
         {% endfor %}

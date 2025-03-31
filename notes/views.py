@@ -361,40 +361,32 @@ class TagView(ListView):
         return context
 
 
-class SearchView(TemplateView):
-    def get(self, request):
-        search_query = request.GET.get('q', '')
+class SearchView(ListView):
+    template_name = 'notes/search.html'
+    context_object_name = 'notes'
+    paginate_by = 50
+
+    def get_queryset(self):
+        search_query = self.request.GET.get('q', '')
 
         if search_query:
-            search_id_results = CombinedSearch.objects.combined_search(request.user.id, search_query)
+            search_id_results = CombinedSearch.objects.combined_search(self.request.user.id, search_query)
             search_ids = [result['id'] for result in search_id_results]
         else:
             search_ids = []
 
-        search_results = Note.objects.filter(pk__in=search_ids)
+        return Note.objects.filter(pk__in=search_ids)
 
-        data = {}
-        data['q'] = search_query
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_query = self.request.GET.get('q', '')
+        data = {'q': search_query}
         form = SearchForm(initial=data)
 
-        paginator = Paginator(search_results, 50)
-        # Make sure page request is an int. If not, deliver first page.
-        try:
-            page = int(request.GET.get('page', '1'))
-        except ValueError:
-            page = 1
-
-        try:
-            results = paginator.page(page)
-        except (EmptyPage, InvalidPage):
-            results = paginator.page(paginator.num_pages)
-
-        return render(request, 'notes/search.html', {
-            'form': form,
-            'query': search_query,
-            'page': results,
-            'total_results': paginator.count,
-        })
+        context['form'] = form
+        context['query'] = search_query
+        context['total_results'] = self.get_queryset().count() #add total count of results.
+        return context
 
 
 class FavouritesView(ListView):
