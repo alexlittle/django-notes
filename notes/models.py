@@ -57,7 +57,7 @@ class NotesProfile(models.Model):
 
 
 class CombinedSearchManager(models.Manager):
-    def combined_search(self, query):
+    def combined_search(self, user_id, query):
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT
@@ -67,12 +67,14 @@ class CombinedSearchManager(models.Manager):
                 INNER JOIN notes_notetag nt ON note.id = nt.note_id
                 INNER JOIN notes_tag t ON t.id = nt.tag_id
                 WHERE
-                    MATCH(note.type, note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
+                    note.user_id = %s
+                AND
+                    (MATCH(note.type, note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
                 OR
-                    MATCH (t.name, t.slug) AGAINST (%s IN NATURAL LANGUAGE MODE)
+                    MATCH (t.name, t.slug) AGAINST (%s IN NATURAL LANGUAGE MODE))
 
                 ;
-            """, [query, query])
+            """, [user_id, query, query])
 
             results = [{'id': row[0]} for row in cursor.fetchall()]
         return results
@@ -80,6 +82,7 @@ class CombinedSearchManager(models.Manager):
 
 class Tag (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=False, null=False)
     slug = AutoSlugField(populate_from='name',
                          max_length=100,
@@ -96,7 +99,7 @@ class Tag (models.Model):
 
 class Note (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=15, choices=TYPE_OPTIONS, default='bookmark')
     url = models.TextField(blank=True, null=True)
     title = models.TextField(blank=False, null=False, default=None)

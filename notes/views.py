@@ -30,7 +30,8 @@ class HomeView(TemplateView):
         user_aware_now = get_user_aware_date(self.request.user)
         showall = is_showall(self.request)
 
-        base_query_dated = Note.objects.filter(due_date__isnull=False,
+        base_query_dated = Note.objects.filter(user=self.request.user,
+                                               due_date__isnull=False,
                                                type="task",
                                                status__in=['open', 'inprogress', 'completed']) \
                                         .annotate(
@@ -72,7 +73,10 @@ class FutureTasksView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         user_aware_now = get_user_aware_date(self.request.user)
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task", status__in=['open', 'inprogress', 'completed'])
+        base_query_dated = Note.objects.filter(user=self.request.user,
+                                               due_date__isnull=False,
+                                               type="task",
+                                               status__in=['open', 'inprogress', 'completed'])
 
         showall = is_showall(self.request)
         if not showall:
@@ -92,7 +96,7 @@ class TasksView(ListView):
 
     def get_queryset(self):
         showall = is_showall(self.request)
-        qs = Note.objects.filter(type="task").annotate(
+        qs = Note.objects.filter(user=self.request.user, type="task").annotate(
             has_date=Case(
                 When(due_date__isnull=False, then=Value(1)),
                 default=Value(0),
@@ -113,17 +117,17 @@ class TasksTagsView(TemplateView):
         showall = is_showall(self.request)
         context["showall"] = showall
 
-        base_query_dated = Note.objects.filter(due_date__isnull=False, type="task")
-        base_query_undated = Note.objects.filter(due_date__isnull=True, type="task")
+        base_query_dated = Note.objects.filter(user=self.request.user, due_date__isnull=False, type="task")
+        base_query_undated = Note.objects.filter(user=self.request.user, due_date__isnull=True, type="task")
         if not showall:
             base_query_dated = base_query_dated.filter(status__in=['open', 'inprogress'])
             base_query_undated = base_query_undated.filter(status__in=['open', 'inprogress'])
 
-        context["tags_dated"] = Tag.objects.filter(notetag__note__in=base_query_dated) \
+        context["tags_dated"] = Tag.objects.filter(user=self.request.user, notetag__note__in=base_query_dated) \
             .distinct() \
             .annotate(note_count=Count("notetag__note")) \
             .order_by("name")
-        context["tags_undated"] = Tag.objects.filter(notetag__note__in=base_query_undated) \
+        context["tags_undated"] = Tag.objects.filter(user=self.request.user, notetag__note__in=base_query_undated) \
             .distinct() \
             .annotate(note_count=Count("notetag__note")) \
             .order_by("name")
@@ -138,7 +142,7 @@ class TagTasksView(ListView):
     def get_queryset(self):
         slug = self.kwargs['tag_slug']
         showall = is_showall(self.request)
-        notes = Note.objects.filter(notetag__tag__slug=slug, type="task")
+        notes = Note.objects.filter(user=self.request.user, notetag__tag__slug=slug, type="task")
         if not showall:
             notes = notes.filter(status__in=['open', 'inprogress'])
         return notes.annotate(
@@ -152,7 +156,7 @@ class TagTasksView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs['tag_slug']
-        context["tag"] = Tag.objects.get(slug=slug)
+        context["tag"] = Tag.objects.get(user=self.request.user, slug=slug)
 
         showall = is_showall(self.request)
         context["showall"] = showall
@@ -166,7 +170,7 @@ class BookmarksView(ListView):
     context_object_name = 'notes'
 
     def get_queryset(self):
-        return Note.objects.filter(type="bookmark").order_by('-create_date')
+        return Note.objects.filter(user=self.request.user, type="bookmark").order_by('-create_date')
 
 class IdeasView(ListView):
     template_name = 'notes/ideas.html'
@@ -174,12 +178,12 @@ class IdeasView(ListView):
     context_object_name = 'notes'
 
     def get_queryset(self):
-        return Note.objects.filter(type="idea").order_by('-create_date')
+        return Note.objects.filter(user=self.request.user, type="idea").order_by('-create_date')
 
 class CompleteTaskView(TemplateView):
 
     def get(self, request, note_id):
-        note = Note.objects.get(pk=note_id)
+        note = Note.objects.get(user=self.request.user, pk=note_id)
         note.complete_task()
         referer = request.META.get('HTTP_REFERER')
 
@@ -191,7 +195,7 @@ class CompleteTaskView(TemplateView):
 class UnCompleteTaskView(TemplateView):
 
     def get(self, request, note_id):
-        note = Note.objects.get(pk=note_id)
+        note = Note.objects.get(user=self.request.user, pk=note_id)
         note.uncomplete_task()
         referer = request.META.get('HTTP_REFERER')
 
@@ -203,7 +207,7 @@ class UnCompleteTaskView(TemplateView):
 class CloseTaskView(TemplateView):
 
     def get(self, request, note_id):
-        note = Note.objects.get(pk=note_id)
+        note = Note.objects.get(user=self.request.user, pk=note_id)
         note.close_task()
         referer = request.META.get('HTTP_REFERER')
 
@@ -255,7 +259,7 @@ class AddView(TemplateView):
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(',')]
             for t in tags:
-                tag, created = Tag.objects.get_or_create(name=t)
+                tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
                 NoteTag.objects.get_or_create(note=note, tag=tag)
 
             if request.POST.get("action") == "save_and_add":
@@ -277,8 +281,8 @@ class AddView(TemplateView):
 class EditView(TemplateView):
 
     def get(self, request, note_id):
-        note = Note.objects.get(pk=note_id)
-        tags = Tag.objects.filter(notetag__note=note).values_list('name', flat=True)
+        note = Note.objects.get(user=self.request.user, pk=note_id)
+        tags = Tag.objects.filter(user=self.request.user, notetag__note=note).values_list('name', flat=True)
         data = {}
         data['tags'] = ", ".join(tags)
         data['type'] = note.type
@@ -297,14 +301,14 @@ class EditView(TemplateView):
                       {'form': form})
 
     def post(self, request, note_id):
-        note = Note.objects.get(pk=note_id)
+        note = Note.objects.get(user=self.request.user, pk=note_id)
         form = NoteForm(request.POST)
         if form.is_valid():
             NoteTag.objects.filter(note=note).delete()
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(',')]
             for t in tags:
-                tag, created = Tag.objects.get_or_create(name=t)
+                tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
                 note_tag, created = NoteTag.objects.get_or_create(note=note, tag=tag)
 
             old_status = note.status
@@ -345,7 +349,7 @@ class TagView(ListView):
 
     def get_queryset(self):
         slug_list = self.kwargs['tag_slug'].split('+')
-        return Note.objects.filter(notetag__tag__slug__in=slug_list) \
+        return Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
                 .annotate(count=Count('id')) \
                 .filter(count=len(slug_list))
 
@@ -353,7 +357,7 @@ class TagView(ListView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         slug_list = self.kwargs['tag_slug'].split('+')
-        context["tags"] = Tag.objects.filter(slug__in=slug_list)
+        context["tags"] = Tag.objects.filter(user=self.request.user, slug__in=slug_list)
         return context
 
 
@@ -362,7 +366,7 @@ class SearchView(TemplateView):
         search_query = request.GET.get('q', '')
 
         if search_query:
-            search_id_results = CombinedSearch.objects.combined_search(search_query)
+            search_id_results = CombinedSearch.objects.combined_search(request.user.id, search_query)
             search_ids = [result['id'] for result in search_id_results]
         else:
             search_ids = []
@@ -399,7 +403,7 @@ class FavouritesView(ListView):
     context_object_name = 'tags'
 
     def get_queryset(self):
-        return Tag.objects.filter(favourite=True)
+        return Tag.objects.filter(user=self.request.user, favourite=True)
 
 
 class TagsView(ListView):
@@ -409,4 +413,4 @@ class TagsView(ListView):
     context_object_name = 'tags'
 
     def get_queryset(self):
-        return Tag.objects.all().order_by('-favourite', 'name')
+        return Tag.objects.filter(user=self.request.user).order_by('-favourite', 'name')
