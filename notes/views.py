@@ -20,7 +20,8 @@ class HomeView(TemplateView):
         reminder_items = []
         for item in base_query.filter(reminder_days__gt=0):
             due_threshold = item.due_date - timedelta(days=item.reminder_days)
-            if datetime.now().date() >= due_threshold:
+
+            if datetime.now().date() > due_threshold and item.due_date != datetime.now().date():
                 reminder_items.append(item)
         return reminder_items
 
