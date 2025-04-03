@@ -21,7 +21,7 @@ class HomeView(TemplateView):
         for item in base_query.filter(reminder_days__gt=0):
             due_threshold = item.due_date - timedelta(days=item.reminder_days)
 
-            if datetime.now().date() > due_threshold and item.due_date != datetime.now().date():
+            if datetime.now().date() >= due_threshold and item.due_date != datetime.now().date():
                 reminder_items.append(item)
         return reminder_items
 
@@ -223,13 +223,19 @@ class AddView(TemplateView):
     def get(self, request):
         form_type = request.GET.get('type')
         initial_data = {'referer': request.META.get('HTTP_REFERER')}
+        recent_tags = []
         if form_type == 'birthday':
             initial_data['type'] = 'task'
             initial_data['tags'] = 'birthdays'
             initial_data['recurrence'] = 'annually'
             initial_data['reminder_days'] = 14
         elif form_type == 'task':
+            # get 10 most recently used task tags
+            recent_tags = Tag.get_top_10_recent_tags()
             initial_data['type'] = 'task'
+            initial_data['estimated_effort'] = 15
+            initial_data['due_date'] = datetime.now().date()
+            initial_data['priority'] = "medium"
         elif form_type == 'idea':
             initial_data['type'] = 'idea'
         elif form_type == 'bookmark':
@@ -239,7 +245,7 @@ class AddView(TemplateView):
         form = NoteForm(initial=initial_data)
         return render(request,
                       'notes/form.html',
-                      {'form': form})
+                      {'form': form, 'recent_tags': recent_tags})
 
     def post(self, request):
         form = NoteForm(request.POST)

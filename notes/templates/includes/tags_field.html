@@ -1,0 +1,28 @@
+{% load crispy_forms_tags %}
+
+
+<div class="form-group">
+<p>Recent Tags:</p>
+
+    {% for tag in recent_tags %}
+        <button type="button" class="tag-button" data-tag="{{ tag.name }}">{{ tag.name }}</button>
+    {% endfor %}
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tagButtons = document.querySelectorAll('.tag-button');
+        const tagsInput = document.getElementById('id_tags');
+
+        tagButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tag = this.getAttribute('data-tag');
+                if (tagsInput.value) {
+                    tagsInput.value += ', ' + tag;
+                } else {
+                    tagsInput.value = tag;
+                }
+            });
+        });
+    });
+</script>

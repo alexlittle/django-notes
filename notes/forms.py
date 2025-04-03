@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Div
+from crispy_forms.layout import Layout, Submit, Div, Field
 from crispy_forms.bootstrap import FieldWithButtons
 
 from tinymce.widgets import TinyMCE
@@ -61,6 +61,7 @@ class NoteForm(forms.ModelForm):
                 'url',
                 'due_date',
                 'tags',
+                Field('tags', template='includes/tags_field.html'),  #
                 'status',
                 'priority',
                 'recurrence',

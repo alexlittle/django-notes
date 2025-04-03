@@ -122,6 +122,10 @@ a {
     background-color: none; /* Slightly darker background for even rows */
 }
 
+
+.form-group {
+ margin: 10px;
+}
 /* Padding and border styles */
 .striped-row {
     padding: 8px;
