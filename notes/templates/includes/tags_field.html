@@ -1,9 +1,7 @@
 {% load crispy_forms_tags %}
 
 
-<div class="form-group">
-<p>Recent Tags:</p>
-
+<div class="form-group form-recent-tags">
     {% for tag in recent_tags %}
         <button type="button" class="tag-button" data-tag="{{ tag.name }}">{{ tag.name }}</button>
     {% endfor %}

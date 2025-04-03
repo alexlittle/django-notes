@@ -124,8 +124,13 @@ a {
 
 
 .form-group {
- margin: 10px;
+  margin: 10px;
 }
+
+.form-recent-tags {
+  margin: 30px;
+}
+
 /* Padding and border styles */
 .striped-row {
     padding: 8px;
