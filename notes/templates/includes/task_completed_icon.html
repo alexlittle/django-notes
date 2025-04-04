@@ -15,6 +15,13 @@
       <path d="M6.5 12.5L9.5 15.5L17.5 7.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="miter" fill="none"/>
     </svg>
 </a>
+{% elif note.status == "closed" %}
+<a href="{% url 'notes:uncomplete_task' note.id %}">
+    <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" fill="#FF5555cc" />
+      <path d="M6.5 12.5L9.5 15.5L17.5 7.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="miter" fill="none"/>
+    </svg>
+</a>
 {% else %}
 <a href="{% url 'notes:complete_task' note.id %}">
     <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
