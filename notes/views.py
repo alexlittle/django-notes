@@ -265,6 +265,7 @@ class AddView(TemplateView):
             note.save()
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(',')]
+            tags = [tag for tag in tags if tag]
             for t in tags:
                 tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
                 NoteTag.objects.get_or_create(note=note, tag=tag)
@@ -314,9 +315,10 @@ class EditView(TemplateView):
             NoteTag.objects.filter(note=note).delete()
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(',')]
+            tags = [tag for tag in tags if tag]
             for t in tags:
                 tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
-                note_tag, created = NoteTag.objects.get_or_create(note=note, tag=tag)
+                NoteTag.objects.get_or_create(note=note, tag=tag)
 
             old_status = note.status
             old_due_date = note.due_date
