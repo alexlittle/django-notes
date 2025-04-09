@@ -322,6 +322,7 @@ class EditView(TemplateView):
             old_status = note.status
             old_due_date = note.due_date
             note.user = request.user
+            note.update_date = datetime.now()
             note.type = form.cleaned_data.get("type")
             note.title = form.cleaned_data.get("title")
             note.url = form.cleaned_data.get("url")
