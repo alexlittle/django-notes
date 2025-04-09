@@ -1,5 +1,6 @@
 {% load crispy_forms_tags %}
 
+{{ field|as_crispy_field }}
 
 <div class="form-group form-recent-tags">
     {% for tag in recent_tags %}

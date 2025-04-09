@@ -9,10 +9,7 @@ from tinymce.widgets import TinyMCE
 
 from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS, RECURRENCE_OPTIONS, TYPE_OPTIONS, Note
 
-class NoteForm(forms.ModelForm):
-    class Meta:
-        model = Note
-        exclude = ['create_date', 'link_check_date', 'user']
+class NoteForm(forms.Form):
 
     type = forms.ChoiceField(
         choices=TYPE_OPTIONS,
@@ -60,7 +57,6 @@ class NoteForm(forms.ModelForm):
                 'title',
                 'url',
                 'due_date',
-                'tags',
                 Field('tags', template='includes/tags_field.html'),  #
                 'status',
                 'priority',

@@ -1,6 +1,6 @@
 
 from django.urls import reverse
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.utils import timezone
 from django.db.models import Count, Case, When, Value, DateField, IntegerField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -251,6 +251,7 @@ class AddView(TemplateView):
         if form.is_valid():
             note = Note()
             note.user = request.user
+            note.update_date = timezone.now()
             note.type = form.cleaned_data.get("type")
             note.title = form.cleaned_data.get("title")
             note.description = form.cleaned_data.get("description")
@@ -322,7 +323,7 @@ class EditView(TemplateView):
             old_status = note.status
             old_due_date = note.due_date
             note.user = request.user
-            note.update_date = datetime.now()
+            note.update_date = timezone.now()
             note.type = form.cleaned_data.get("type")
             note.title = form.cleaned_data.get("title")
             note.url = form.cleaned_data.get("url")
