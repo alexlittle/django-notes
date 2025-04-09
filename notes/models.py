@@ -102,7 +102,7 @@ class Tag (models.Model):
         Retrieves the 10 most recently used tags, ordered by the latest note creation date.
         """
         recent_tags = Tag.objects.filter(notetag__note__isnull=False).annotate(
-            last_used=Note.objects.filter(notetag__tag=models.OuterRef('pk')).order_by('-create_date').values('create_date')[:1]
+            last_used=Note.objects.filter(notetag__tag=models.OuterRef('pk')).order_by('-update_date').values('update_date')[:1]
         ).order_by('-last_used').distinct()[:10]
 
         return recent_tags

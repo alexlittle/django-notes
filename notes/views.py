@@ -223,15 +223,13 @@ class AddView(TemplateView):
     def get(self, request):
         form_type = request.GET.get('type')
         initial_data = {'referer': request.META.get('HTTP_REFERER')}
-        recent_tags = []
+        recent_tags = Tag.get_top_10_recent_tags()
         if form_type == 'birthday':
             initial_data['type'] = 'task'
             initial_data['tags'] = 'birthdays'
             initial_data['recurrence'] = 'annually'
             initial_data['reminder_days'] = 14
         elif form_type == 'task':
-            # get 10 most recently used task tags
-            recent_tags = Tag.get_top_10_recent_tags()
             initial_data['type'] = 'task'
             initial_data['estimated_effort'] = 15
             initial_data['due_date'] = datetime.now().date()
@@ -303,10 +301,11 @@ class EditView(TemplateView):
         data['priority'] = note.priority
         data['recurrence'] = note.recurrence
         data['reminder_days'] = note.reminder_days
+        recent_tags = Tag.get_top_10_recent_tags()
         form = NoteForm(initial=data)
         return render(request,
                       'notes/form.html',
-                      {'form': form})
+                      {'form': form, 'recent_tags': recent_tags})
 
     def post(self, request, note_id):
         note = Note.objects.get(user=self.request.user, pk=note_id)
