@@ -110,6 +110,7 @@ class Tag (models.Model):
 
 class Note (models.Model):
     create_date = models.DateTimeField(default=timezone.now)
+    update_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=15, choices=TYPE_OPTIONS, default='bookmark')
     url = models.TextField(blank=True, null=True)
