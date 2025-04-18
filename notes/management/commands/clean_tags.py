@@ -15,7 +15,7 @@ class Command(BaseCommand):
     errors = []
 
     def handle(self, *args, **options):
-        tags = Tag.objects.filter(favourite=False).annotate(note_count=Count("notetag"))
+        tags = Tag.objects.filter(favourite=False).annotate(note_count=Count("notetag__note__id"))
 
         unused_tags = tags.filter(note_count=0)
         for tag in unused_tags:
