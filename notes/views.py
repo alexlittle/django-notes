@@ -395,7 +395,7 @@ class SearchView(ListView):
 
         context['form'] = form
         context['query'] = search_query
-        context['total_results'] = self.get_queryset().count() #add total count of results.
+        context['total_results'] = self.get_queryset().count()
         return context
 
 
@@ -415,4 +415,5 @@ class TagsView(ListView):
     context_object_name = 'tags'
 
     def get_queryset(self):
-        return Tag.objects.filter(user=self.request.user).order_by('-favourite', 'name')
+        ordering = self.request.GET.get('orderby', '-favourite')
+        return Tag.objects.filter(user=self.request.user).annotate(count=Count('notetag__note__id')).order_by(ordering, 'name')

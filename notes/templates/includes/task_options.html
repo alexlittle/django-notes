@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load static %}
 
+
 {% if note.status != "closed" %}
     <a href="{% url 'notes:close_task' note.id %}">
         <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

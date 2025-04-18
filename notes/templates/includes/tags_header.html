@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<form action="" method="get">
+    <select name="orderby" onchange="this.form.submit()">
+        <option value="">--</option>
+        <option value="-favorite">Favourites first</option>
+        <option value="name">Alphabetical</option>
+        <option value="-name">Reverse Alphabetical</option>
+        <option value="count">Count ascending</option>
+        <option value="-count">Count descending</option>
+    </select>
+</form>
+
+{% if alpha %}
+	<a href="?alpha=true" class="btn btn-primary">{% trans 'Alphabetical' %}</a>
+{% endif %}
