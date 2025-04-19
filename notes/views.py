@@ -302,6 +302,7 @@ class EditView(TemplateView):
         data['priority'] = note.priority
         data['recurrence'] = note.recurrence
         data['reminder_days'] = note.reminder_days
+        data['referer'] = request.META.get('HTTP_REFERER')
         recent_tags = Tag.get_top_10_recent_tags()
         form = NoteForm(initial=data)
         return render(request,
@@ -350,7 +351,16 @@ class EditView(TemplateView):
             else:
                 nh.action = "updated"
             nh.save()
-        return HttpResponseRedirect(reverse('notes:home'))
+            referer = form.cleaned_data.get("referer")
+            if referer:
+                return HttpResponseRedirect(referer)
+            else:
+                return HttpResponseRedirect(reverse('notes:home'))
+        else:
+            print(form.errors)
+            context = {'form': form}
+            return render(request, 'notes/form.html', context)
+
 
 
 class TagView(ListView):
