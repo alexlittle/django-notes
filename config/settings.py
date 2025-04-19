@@ -122,7 +122,8 @@ EMAIL_FILE_PATH = '/tmp/'
 
 #####################################################################
 # Authentication
-LOGIN_URL = urls.reverse_lazy('profile_login')
+LOGIN_URL = urls.reverse_lazy('notes:login')
+LOGIN_REDIRECT_URL = urls.reverse_lazy('notes:home')
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
@@ -162,8 +163,7 @@ SESSION_COOKIE_NAME = "notes"
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-LOGIN_URL = '/admin/'
-LOGIN_REDIRECT_URL = '/'
+
 
 NOTES_ASSISTANT_ENABLED = False
 

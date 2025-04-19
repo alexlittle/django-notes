@@ -1,10 +1,12 @@
 from django.urls import path
+from django.contrib.auth.views import LoginView
 
 from notes import views as note_views
 
 app_name = 'notes'
 urlpatterns = [
     path('', note_views.HomeView.as_view(), name="home"),
+    path('login/', LoginView.as_view(template_name='notes/login.html'), name='login'),
     path('tasks/', note_views.TasksView.as_view(), name="tasks"),
     path('tasks/tags/', note_views.TasksTagsView.as_view(), name="tasks_tags_home"),
     path('tasks/future/', note_views.FutureTasksView.as_view(), name="tasks_future"),
