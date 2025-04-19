@@ -3,6 +3,7 @@
 .project
 .pydevproject
 .settings/
+/cron.sh
 /.idea/
 /build
 /dist
