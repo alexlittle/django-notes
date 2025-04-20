@@ -20,9 +20,8 @@ class Command(BaseCommand):
         # add new tag to all notes with the old one
         note_tags = NoteTag.objects.filter(tag=oldtag)
         for nt in note_tags:
-            new_nt = NoteTag()
-            new_nt.note = nt.note
-            new_nt.tag = newtag
-            new_nt.save()
-            nt.delete()
+            nt.tag = newtag
+            nt.save()
 
+        oldtag.delete()
+        print(f"{note_tags.count()} tags replaced {options['oldtag']}")
