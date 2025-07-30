@@ -6,7 +6,7 @@
 
 {% include "includes/task_header.html" %}
 
-<h2>{% trans "Tasks" %} {% if tag %}- {{ tag.name }}{% endif %}</h2>
+<h2>{% trans "Tasks" %} {% if tag %}- {{ tag.name }} ({{ tasks.count }}) {% endif %}</h2>
 
 {% include "includes/pagination.html" %}
 
