@@ -56,13 +56,13 @@ class HomeView(TemplateView):
 
         context["overdue"] = base_query_dated.exclude(status='completed').filter(due_date__lt=user_aware_now).order_by("priority_order", "due_date")
         context["reminder"] = self._filter_for_reminders(base_query_dated.exclude(status='completed').order_by("due_date"))
-        queryset = base_query_dated.filter(due_date=user_aware_now).order_by("-status_order", "priority_order")
+        queryset = base_query_dated.filter(due_date=user_aware_now).order_by("-status_order", "priority_order", "title")
         context["today"] = queryset
-        context["tomorrow"] = base_query_dated.filter(due_date=user_aware_now+timedelta(days=1)).order_by("-status_order", "priority_order")
+        context["tomorrow"] = base_query_dated.filter(due_date=user_aware_now+timedelta(days=1)).order_by("-status_order", "priority_order", "title")
         context["next_week"] = base_query_dated.filter(due_date__gt=user_aware_now+timedelta(days=1),
-                                                       due_date__lte=user_aware_now+timedelta(days=7)).order_by("due_date", "priority_order")
+                                                       due_date__lte=user_aware_now+timedelta(days=7)).order_by("due_date", "priority_order", "title")
         context["next_month"] = base_query_dated.filter(due_date__gt=user_aware_now + timedelta(days=7),
-                                                       due_date__lte=user_aware_now + timedelta(days=31)).order_by("due_date", "priority_order")
+                                                       due_date__lte=user_aware_now + timedelta(days=31)).order_by("due_date", "priority_order", "title")
         context["showall"] = showall
         return context
 
@@ -371,7 +371,7 @@ class TagView(ListView):
         slug_list = self.kwargs['tag_slug'].split('+')
         return Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
                 .annotate(count=Count('id')) \
-                .filter(count=len(slug_list))
+                .filter(count=len(slug_list)).order_by("-create_date")
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
