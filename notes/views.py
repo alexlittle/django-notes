@@ -135,6 +135,15 @@ class TasksTagsView(TemplateView):
         return context
 
 
+class RecentView(ListView):
+    template_name = 'notes/recent.html'
+    paginate_by = 50
+    context_object_name = 'tasks'
+
+    def get_queryset(self):
+        qs = Note.objects.filter(user=self.request.user, type="task")
+        return qs.order_by('-update_date', 'create_date')[:self.paginate_by]
+
 class TagTasksView(ListView):
     template_name = 'notes/tasks.html'
     paginate_by = 50
@@ -204,6 +213,8 @@ class UnCompleteTaskView(TemplateView):
             return HttpResponseRedirect(referer)
         else:
             return HttpResponseRedirect(reverse('notes:home'))
+
+
 
 class CloseTaskView(TemplateView):
 

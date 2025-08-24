@@ -177,6 +177,7 @@ class Note (models.Model):
         """Mark the task as completed and create the next one if needed."""
         self.status = 'completed'
         self.completed_date = datetime.datetime.now()
+        self.update_date = datetime.datetime.now()
         self.save()
         next_task = self.generate_next_task()
 
@@ -186,6 +187,7 @@ class Note (models.Model):
         """Mark the task as not completed"""
         self.status = 'open'
         self.completed_date = None
+        self.update_date = datetime.datetime.now()
         self.save()
         return
 
@@ -193,6 +195,7 @@ class Note (models.Model):
         """Mark the task as not completed"""
         self.status = 'closed'
         self.completed_date = None
+        self.update_date = datetime.datetime.now()
         self.save()
         return
 
