@@ -144,6 +144,11 @@ class RecentView(ListView):
         qs = Note.objects.filter(user=self.request.user)
         return qs.order_by('-update_date', 'create_date')[:self.paginate_by]
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["showall"] = is_showall(self.request)
+        return context
+
 class TagTasksView(ListView):
     template_name = 'notes/tasks.html'
     paginate_by = 50
@@ -167,10 +172,7 @@ class TagTasksView(ListView):
         context = super().get_context_data(**kwargs)
         slug = self.kwargs['tag_slug']
         context["tag"] = Tag.objects.get(user=self.request.user, slug=slug)
-
-        showall = is_showall(self.request)
-        context["showall"] = showall
-
+        context["showall"] = is_showall(self.request)
         return context
 
 
