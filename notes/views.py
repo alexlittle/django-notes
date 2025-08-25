@@ -141,7 +141,7 @@ class RecentView(ListView):
     context_object_name = 'tasks'
 
     def get_queryset(self):
-        qs = Note.objects.filter(user=self.request.user, type="task")
+        qs = Note.objects.filter(user=self.request.user)
         return qs.order_by('-update_date', 'create_date')[:self.paginate_by]
 
 class TagTasksView(ListView):
