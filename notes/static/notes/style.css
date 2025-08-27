@@ -148,6 +148,10 @@ a {
   min-width: 24px;
 }
 
+.note-container svg.recurrence-icon {
+  margin-right: 3px; /* Add some space between the icon and text */
+}
+
 .note-text {
   flex-grow: 1; /* Allow text to take up remaining space */
   word-wrap: break-word; /* Ensure wrapping on long words */
