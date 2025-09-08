@@ -382,9 +382,10 @@ class TagView(ListView):
 
     def get_queryset(self):
         slug_list = self.kwargs['tag_slug'].split('+')
+        order_by = self.request.GET.get('order', '-create_date')
         return Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
                 .annotate(count=Count('id')) \
-                .filter(count=len(slug_list)).order_by("-create_date")
+                .filter(count=len(slug_list)).order_by(order_by)
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
