@@ -18,8 +18,14 @@ class Command(BaseCommand):
 
         # delete tasks completed over a month ago
         delete_date = datetime.now().date() - timedelta(days=31)
-        old_tasks = Note.objects.filter(type="task",
+        old_completed_tasks = Note.objects.filter(type="task",
                                         status='completed',
                                         completed_date__lte=delete_date)
-        for ot in old_tasks:
+        for ot in old_completed_tasks:
+            ot.delete()
+
+        old_closed_tasks = Note.objects.filter(type="task",
+                                                  status='closed',
+                                                  completed_date__lte=delete_date)
+        for ot in old_closed_tasks:
             ot.delete()
