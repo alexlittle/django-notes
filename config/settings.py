@@ -46,8 +46,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'notes',
     'tinymce',
-    'crispy_bootstrap4',
-    'ml'
+    'crispy_bootstrap4'
 ]
 
 
