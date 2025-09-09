@@ -1,5 +1,5 @@
 from django.contrib import admin
-from notes.models import Note, Tag, NoteTag, NoteHistory, NotesProfile
+from notes.models import Note, Tag, NoteTag, NoteHistory, NotesProfile, SavedFilter
 
 
 class NoteTagInline(admin.TabularInline):
@@ -42,8 +42,12 @@ class NoteTagAdmin(admin.ModelAdmin):
 class NoteHistoryAdmin(admin.ModelAdmin):
     list_display = ('note', 'update_date', 'action')
 
+class SavedFilterAdmin(admin.ModelAdmin):
+    list_display = ('name', 'value', 'type')
+
 admin.site.register(NotesProfile, NotesProfileAdmin)
 admin.site.register(Note, NoteAdmin)
 admin.site.register(Tag, TagAdmin)
 admin.site.register(NoteTag, NoteTagAdmin)
 admin.site.register(NoteHistory, NoteHistoryAdmin)
+admin.site.register(SavedFilter, SavedFilterAdmin)

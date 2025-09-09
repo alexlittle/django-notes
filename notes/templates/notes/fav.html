@@ -12,4 +12,16 @@
 {% endfor %}
 </ul>
 
+<h2>{% trans "Saved Filters" %}</h2>
+
+<ul>
+{% for filter in filters %}
+    {% if filter.type == "tags" %}
+	    <li><a href="{% url 'notes:tag_view' filter.value %}">{{ filter.name }}</a></li>
+    {% else %}
+        <li><a href="{% url 'notes:search' %}?q=filter.value">{{ filter.name }}</a></li>
+    {% endif %}
+{% endfor %}
+</ul>
+
 {% endblock %}

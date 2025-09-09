@@ -1,7 +1,7 @@
 
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Count, Case, When, Value, DateField, IntegerField
+from django.db.models import Count, Case, When, Value, DateField, IntegerField, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
@@ -10,7 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
-from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch
+from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter
 from notes.utils import get_user_aware_date, is_showall
 
 class HomeView(TemplateView):
@@ -383,9 +383,11 @@ class TagView(ListView):
     def get_queryset(self):
         slug_list = self.kwargs['tag_slug'].split('+')
         order_by = self.request.GET.get('order', '-create_date')
-        return Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
-                .annotate(count=Count('id')) \
-                .filter(count=len(slug_list)).order_by(order_by)
+        filtered_notes = Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
+            .annotate(matched_tags=Count('notetag__tag', filter=Q(notetag__tag__slug__in=slug_list), distinct=True)) \
+            .filter(matched_tags=len(slug_list)) \
+            .order_by(order_by)
+        return filtered_notes
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -423,13 +425,16 @@ class SearchView(ListView):
         return context
 
 
-class FavouritesView(ListView):
+class FavouritesView(TemplateView):
 
     template_name = 'notes/fav.html'
     context_object_name = 'tags'
 
-    def get_queryset(self):
-        return Tag.objects.filter(user=self.request.user, favourite=True)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tags'] = Tag.objects.filter(user=self.request.user, favourite=True)
+        context['filters'] = SavedFilter.objects.all()
+        return context
 
 
 class TagsView(ListView):

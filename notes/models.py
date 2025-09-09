@@ -21,6 +21,11 @@ TYPE_OPTIONS = (
         ('idea', 'Idea'),
     )
 
+FILTER_TYPE_OPTIONS = (
+        ('tags', 'Tags'),
+        ('search', 'Search')
+    )
+
 
 STATUS_OPTIONS = (
         ('open', 'Open'),
@@ -87,7 +92,8 @@ class Tag (models.Model):
     slug = AutoSlugField(populate_from='name',
                          max_length=100,
                          blank=True,
-                         null=True)
+                         null=True,
+                         editable=True)
     favourite = models.BooleanField(default=False)
 
     def __str__(self):
@@ -208,11 +214,23 @@ class NoteHistory (models.Model):
 
 class NoteTag(models.Model):
     note = models.ForeignKey(Note, on_delete=models.CASCADE)
-    tag = models.ForeignKey(Tag,  on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = _('Note Tag')
         verbose_name_plural = _('Note Tags')
+
+
+class SavedFilter(models.Model):
+    create_date = models.DateTimeField(default=timezone.now)
+    type = models.CharField(max_length=15, choices=FILTER_TYPE_OPTIONS, default='tags')
+    name = models.CharField(max_length=50)
+    value = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = _('Saved Filter')
+        verbose_name_plural = _('Saved Filters')
+        ordering = ['name']
 
 class CombinedSearch(models.Model):
     objects = CombinedSearchManager()
