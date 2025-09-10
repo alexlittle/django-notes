@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<h2>{% for t in tags %}{{ t.name }}&nbsp;{% endfor %}</h2>
+<h2>{% for t in tags %}{{ t.name }}&nbsp;{% endfor %} [{{ notes.count }}]</h2>
 
 <p>Order by:
     <a href="?order=-create_date">- Create Date</a> |

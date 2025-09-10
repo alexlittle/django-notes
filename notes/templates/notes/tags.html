@@ -11,7 +11,7 @@
 
 <ol start="{{ page_obj.start_index }}">
 {% for tag in tags %}
-	<li><a href="{% url 'notes:tag_view' tag.slug %}">{{ tag.name }}</a> [{{ tag.count}}]</li>
+	<li><a href="{% url 'notes:tag_view' tag.slug %}">{{ tag.name }}</a> [{{ tag.count }}]</li>
 {% endfor %}
 </ol>
 
