@@ -6,6 +6,13 @@
 
 <h2>{% for t in tags %}{{ t.name }}&nbsp;{% endfor %} [{{ notes.count }}]</h2>
 
+{% if related_tags%}
+    <p>Related:
+        {% for tag in related_tags %}
+            <a href="{% url 'notes:tag_view' tag %}">{{ tag }}</a>
+        {% endfor %}
+    </p>
+{% endif %}
 <p>Order by:
     <a href="?order=-create_date">- Create Date</a> |
     <a href="?order=create_date">Create Date</a> |

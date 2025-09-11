@@ -12,6 +12,7 @@ from datetime import timedelta
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter
 from notes.utils import get_user_aware_date, is_showall
+from notes.libs.association import build_rules, suggest_tags
 
 class HomeView(TemplateView):
     template_name = 'notes/home.html'
@@ -384,6 +385,7 @@ class TagView(ListView):
         slug_list = self.kwargs['tag_slug'].split('+')
         order_by = self.request.GET.get('order', '-create_date')
         filtered_notes = Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
+            .exclude(status="completed") \
             .annotate(matched_tags=Count('notetag__tag', filter=Q(notetag__tag__slug__in=slug_list), distinct=True)) \
             .filter(matched_tags=len(slug_list)) \
             .order_by(order_by)
@@ -394,6 +396,10 @@ class TagView(ListView):
         context = super().get_context_data(**kwargs)
         slug_list = self.kwargs['tag_slug'].split('+')
         context["tags"] = Tag.objects.filter(user=self.request.user, slug__in=slug_list)
+
+        rules = build_rules(min_support=0.0001, min_confidence=0.1)
+        context["related_tags"] = suggest_tags(rules, slug_list)
+
         return context
 
 
