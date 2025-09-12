@@ -245,3 +245,23 @@ class SavedFilter(models.Model):
 
 class CombinedSearch(models.Model):
     objects = CombinedSearchManager()
+
+
+class TagSuggestion(models.Model):
+    suggested_tag = models.CharField(max_length=100)
+    confidence = models.FloatField()
+    lift = models.FloatField()
+    support = models.FloatField()
+
+    def __str__(self):
+        return f"→ {self.suggested_tag}"
+
+
+class TagSuggestionInputTag(models.Model):
+    suggestion = models.ForeignKey(
+        TagSuggestion, related_name="input_tags", on_delete=models.CASCADE
+    )
+    tag = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.tag}"
