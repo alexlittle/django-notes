@@ -16,6 +16,9 @@ class Command(BaseCommand):
         # delete unused tags
         call_command('clean_tags')
 
+        # rebuild tag suggestions
+        call_command('build_tag_suggestions')
+
         # delete tasks completed over a month ago
         delete_date = datetime.now().date() - timedelta(days=31)
         old_completed_tasks = Note.objects.filter(type="task",
