@@ -1,5 +1,5 @@
 from django.contrib import admin
-from notes.models import Note, Tag, NoteTag, NoteHistory, NotesProfile, SavedFilter
+from notes.models import Note, Tag, NoteTag, NoteHistory, NotesProfile, SavedFilter, TagSuggestion, TagSuggestionInputTag
 
 
 class NoteTagInline(admin.TabularInline):
@@ -7,6 +7,7 @@ class NoteTagInline(admin.TabularInline):
     extra = 1
 
 
+@admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
     list_display = ('title', 'type', 'due_date', 'status', 'url', 'update_date')
     search_fields = ['url',
@@ -18,10 +19,13 @@ class NoteAdmin(admin.ModelAdmin):
         NoteTagInline
     ]
 
+
+@admin.register(NotesProfile)
 class NotesProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'timezone')
 
 
+@admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',
                     'slug',
@@ -36,18 +40,27 @@ class TagAdmin(admin.ModelAdmin):
     count.short_description = "Note count"
 
 
+@admin.register(NoteTag)
 class NoteTagAdmin(admin.ModelAdmin):
     list_display = ('note', 'tag')
 
+
+@admin.register(NoteHistory)
 class NoteHistoryAdmin(admin.ModelAdmin):
     list_display = ('note', 'update_date', 'action')
 
+
+@admin.register(SavedFilter)
 class SavedFilterAdmin(admin.ModelAdmin):
     list_display = ('name', 'value', 'type')
 
-admin.site.register(NotesProfile, NotesProfileAdmin)
-admin.site.register(Note, NoteAdmin)
-admin.site.register(Tag, TagAdmin)
-admin.site.register(NoteTag, NoteTagAdmin)
-admin.site.register(NoteHistory, NoteHistoryAdmin)
-admin.site.register(SavedFilter, SavedFilterAdmin)
+
+@admin.register(TagSuggestion)
+class TagSuggestionAdmin(admin.ModelAdmin):
+    list_display = ('suggested_tag', 'confidence', 'lift', 'support')
+
+
+@admin.register(TagSuggestionInputTag)
+class TagSuggestionInputTagAdmin(admin.ModelAdmin):
+    list_display = ('tag', 'suggestion')
+
