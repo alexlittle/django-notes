@@ -147,14 +147,12 @@ class Note (models.Model):
         else:
             return self.url
 
-    '''
     @staticmethod
     def fetch_bookmark_tags():
         notes = defaultdict(list)
         for note in Note.objects.filter(type="bookmark").prefetch_related("tags"):
             notes[note.id] = [tag.slug for tag in note.tags.all()]
         return dict(notes)
-    '''
 
     def get_next_due_date(self):
         """Calculate the next due date based on recurrence."""
