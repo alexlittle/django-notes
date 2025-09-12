@@ -12,7 +12,6 @@ from datetime import timedelta
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter
 from notes.utils import get_user_aware_date, is_showall
-from notes.libs.association import build_rules, suggest_tags
 
 class HomeView(TemplateView):
     template_name = 'notes/home.html'
