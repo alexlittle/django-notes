@@ -1,5 +1,8 @@
 import datetime
 import pytz
+
+from collections import defaultdict
+
 from django.contrib.auth.models import User
 from django.db import models, connection
 from django.utils import timezone
@@ -143,6 +146,15 @@ class Note (models.Model):
             return self.title
         else:
             return self.url
+
+    '''
+    @staticmethod
+    def fetch_bookmark_tags():
+        notes = defaultdict(list)
+        for note in Note.objects.filter(type="bookmark").prefetch_related("tags"):
+            notes[note.id] = [tag.slug for tag in note.tags.all()]
+        return dict(notes)
+    '''
 
     def get_next_due_date(self):
         """Calculate the next due date based on recurrence."""
