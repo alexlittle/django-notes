@@ -397,8 +397,8 @@ class TagView(ListView):
         slug_list = self.kwargs['tag_slug'].split('+')
         context["tags"] = Tag.objects.filter(user=self.request.user, slug__in=slug_list)
 
-        rules = build_rules(min_support=0.0001, min_confidence=0.1)
-        context["related_tags"] = suggest_tags(rules, slug_list)
+        #rules = build_rules(min_support=0.0001, min_confidence=0.1)
+        #context["related_tags"] = suggest_tags(rules, slug_list)
 
         return context
 
