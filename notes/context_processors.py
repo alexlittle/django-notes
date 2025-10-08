@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.utils import timezone
+
+from notes.models import SavedFilter
 from notes.utils import get_user_aware_datetime
 
 
@@ -9,3 +10,13 @@ def debug_mode(request):
 def get_datetime(request):
     user = get_user_aware_datetime(request.user)
     return {'USER_TIME': user.strftime("%d %B %Y %H:%M:%S (%Z%z)") }
+
+
+def favourites_processor(request):
+    user = request.user
+
+    if user.is_authenticated:
+        favourites = SavedFilter.objects.all()
+
+    return {'favourites': favourites}
+

@@ -1,31 +1,35 @@
 {% load i18n %}
 {% load static %}
 {% block content %}
-	    <!-- Image and text -->
+
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'notes:home' %}">{% trans 'Notes/Tasks' %}</a>
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon text-dark"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
+            <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" >
+                <li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add' %}</a></li>
+                <li class="nav-item"><a href="{% url 'notes:tasks' %}" class="nav-link">{% trans 'Tasks' %}</a></li>
+                <li class="nav-item"><a href="{% url 'notes:bookmarks' %}" class="nav-link">{% trans 'Bookmarks' %}</a></li>
+                <li class="nav-item"><a href="{% url 'notes:ideas' %}" class="nav-link">{% trans 'Ideas' %}</a></li>
+                <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
+                <li class="nav-item"><a href="{% url 'notes:recent' %}" class="nav-link">{% trans 'Recent' %}</a></li>
+                <li class="nav-item dropdown">
+                     <a class="nav-link dropdown-toggle" href="#" id="favsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {% trans 'Favourites' %}</a>
+                     <ul class="dropdown-menu" aria-labelledby="favsDropdown">
+                        {% for fav in favourites %}
+                            <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}">{{ fav.name }}</a></li>
+                        {% endfor %}
+                     </ul>
+                </li>
+                <li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
+                <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
+            </ul>
 
-  
-  <a class="navbar-brand" href="{% url 'notes:home' %}">
-    {% trans 'Notes/Tasks' %}
-  </a>
-   <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon text-dark"></span>
-    </button>
-  <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
-      <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" >
-          <li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:tasks' %}" class="nav-link">{% trans 'Tasks' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:bookmarks' %}" class="nav-link">{% trans 'Bookmarks' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:ideas' %}" class="nav-link">{% trans 'Ideas' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:recent' %}" class="nav-link">{% trans 'Recent' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'Favourites' %}</a></li>
-          <li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
-          <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
-    </ul>
-
-  </div>
+        </div>
     </div>
 </nav>
 	    

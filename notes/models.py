@@ -13,6 +13,7 @@ from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 from notes.fields import AutoSlugField
+from notes.utils import get_filtered_notes
 
 from tinymce.models import HTMLField
 
@@ -103,7 +104,7 @@ class Tag (models.Model):
         return self.name
 
     def note_count(self):
-        return Note.objects.filter(tags=self).count()
+        return Note.objects.filter(tags=self).exclude(status__in=['completed', 'archived', 'closed']).count()
 
     @staticmethod
     def get_top_10_recent_tags():
@@ -241,6 +242,10 @@ class SavedFilter(models.Model):
         verbose_name = _('Saved Filter')
         verbose_name_plural = _('Saved Filters')
         ordering = ['name']
+
+    def get_count(self, user):
+        return get_filtered_notes(user, self.value).count()
+
 
 class CombinedSearch(models.Model):
     objects = CombinedSearchManager()

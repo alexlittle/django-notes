@@ -2,6 +2,10 @@ import datetime
 import pytz
 from django.utils import timezone
 from django.conf import settings
+from django.db.models import Count, Q
+
+
+
 
 def get_user_aware_date(user):
     return get_user_aware_datetime(user).date()
@@ -40,3 +44,11 @@ def is_showall(request):
         return False
     else:
         return True
+
+def get_filtered_notes(user, filter):
+    from notes.models import Note
+    slug_list = filter.split('+')
+    return Note.objects.filter(user=user, notetag__tag__slug__in=slug_list) \
+        .exclude(status="completed") \
+        .annotate(matched_tags=Count('notetag__tag', filter=Q(notetag__tag__slug__in=slug_list), distinct=True)) \
+        .filter(matched_tags=len(slug_list))

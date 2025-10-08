@@ -11,7 +11,7 @@ from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
 from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter
-from notes.utils import get_user_aware_date, is_showall
+from notes.utils import get_user_aware_date, is_showall, get_filtered_notes
 from notes.libs.association import suggest_tags
 
 class HomeView(TemplateView):
@@ -193,6 +193,7 @@ class IdeasView(ListView):
     def get_queryset(self):
         return Note.objects.filter(user=self.request.user, type="idea").order_by('-create_date')
 
+
 class CompleteTaskView(TemplateView):
 
     def get(self, request, note_id):
@@ -204,6 +205,7 @@ class CompleteTaskView(TemplateView):
             return HttpResponseRedirect(referer)
         else:
             return HttpResponseRedirect(reverse('notes:home'))
+
 
 class UnCompleteTaskView(TemplateView):
 
@@ -376,23 +378,15 @@ class EditView(TemplateView):
             return render(request, 'notes/form.html', context)
 
 
-
 class TagView(ListView):
     template_name = 'notes/tag.html'
     context_object_name = 'notes'
 
     def get_queryset(self):
-        slug_list = self.kwargs['tag_slug'].split('+')
-        order_by = self.request.GET.get('order', '-create_date')
-        filtered_notes = Note.objects.filter(user=self.request.user, notetag__tag__slug__in=slug_list) \
-            .exclude(status="completed") \
-            .annotate(matched_tags=Count('notetag__tag', filter=Q(notetag__tag__slug__in=slug_list), distinct=True)) \
-            .filter(matched_tags=len(slug_list)) \
-            .order_by(order_by)
-        return filtered_notes
+        order_by = self.request.GET.get('order', '-due_date')
+        return get_filtered_notes(self.request.user, self.kwargs['tag_slug']).order_by(order_by, '-create_date')
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         slug_list = self.kwargs['tag_slug'].split('+')
         context["tags"] = Tag.objects.filter(user=self.request.user, slug__in=slug_list)
@@ -436,8 +430,9 @@ class FavouritesView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tags'] = Tag.objects.filter(user=self.request.user, favourite=True)
-        context['filters'] = SavedFilter.objects.all()
+        context['tags'] = Tag.objects.filter(user=self.request.user,
+                                             favourite=True)
+        context['filters'] = [(fn, fn.get_count(self.request.user)) for fn in SavedFilter.objects.all()]
         return context
 
 

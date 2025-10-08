@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'notes.context_processors.debug_mode',
                 'notes.context_processors.get_datetime',
+                'notes.context_processors.favourites_processor',
             ],
             'debug': DEBUG,
         },
