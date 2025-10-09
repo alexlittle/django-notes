@@ -60,6 +60,17 @@ RECURRENCE_OPTIONS = [
     ('annually', 'Annually'),
 ]
 
+ORDER_BY_OPTIONS =[
+    ('-create_date', '-Create Date'),
+    ('create_date', 'Create Date'),
+    ('-due_date', '-Due Date'),
+    ('due_date', 'Due Date'),
+    ('-update_date', '-Update Date'),
+    ('update_date', 'Update Date'),
+    ('title', 'A-Z'),
+    ('-title', 'Z-A'),
+]
+
 class NotesProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     timezone = models.CharField(max_length=100, blank=True, null=True, choices=TIMEZONES, default='UTC')
@@ -237,6 +248,7 @@ class SavedFilter(models.Model):
     type = models.CharField(max_length=15, choices=FILTER_TYPE_OPTIONS, default='tags')
     name = models.CharField(max_length=50)
     value = models.CharField(max_length=50)
+    order_by = models.CharField(max_length=15, choices=ORDER_BY_OPTIONS, default='due_date')
 
     class Meta:
         verbose_name = _('Saved Filter')

@@ -17,7 +17,7 @@
 <ul>
 {% for filter, count in filters %}
     {% if filter.type == "tags" %}
-	    <li><a href="{% url 'notes:tag_view' filter.value %}">{{ filter.name }}</a> [{{ count }}]</li>
+	    <li><a href="{% url 'notes:tag_view' filter.value %}?order={{ filter.order_by }}">{{ filter.name }}</a> [{{ count }}]</li>
     {% else %}
         <li><a href="{% url 'notes:search' %}?q=filter.value">{{ filter.name }}</a> [{{ count }}]</li>
     {% endif %}

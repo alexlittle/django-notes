@@ -20,8 +20,9 @@
                      <a class="nav-link dropdown-toggle" href="#" id="favsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         {% trans 'Favourites' %}</a>
                      <ul class="dropdown-menu" aria-labelledby="favsDropdown">
+                         <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'All' %}</a></li>
                         {% for fav in favourites %}
-                            <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}">{{ fav.name }}</a></li>
+                            <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}?order={{ fav.order_by }}">{{ fav.name }}</a></li>
                         {% endfor %}
                      </ul>
                 </li>
