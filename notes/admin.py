@@ -52,7 +52,7 @@ class NoteHistoryAdmin(admin.ModelAdmin):
 
 @admin.register(SavedFilter)
 class SavedFilterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'value', 'type')
+    list_display = ('name', 'value', 'type', 'order_by')
 
 
 @admin.register(TagSuggestion)
