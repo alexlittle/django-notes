@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load get_item %}
+
+{% block extra_styles %}
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    vertical-align: top;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+
+  th {
+    background-color: #f0f0f0;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .task {
+    padding: 5px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+  }
+
+  .completed {
+    background-color: #d4edda;
+  }
+
+  .inprogress {
+    background-color: #fff3cd;
+  }
+
+  .default {
+    background-color: #f8f9fa;
+  }
+</style>
+{% endblock extra_styles %}
+
+
+{% block content %}
+<h3>{% trans 'Study Schedule' %}</h3>
+
+
+<table>
+  <thead>
+    <tr>
+      <th>Course</th>
+
+{% for week in weeks %}
+      <th {% if week.is_current %}style="background-color: #cce5ff;"{% endif %}>
+        <strong>{{ week.label }}</strong>
+      </th>
+    {% endfor %}
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for course in course_tags %}
+      <tr>
+        <td><strong>{{ course.name }}</strong></td>
+        {% for cell in grid|get_item:course.id %}
+          <td {% if cell.week.is_current %}style="background-color: #cce5ff;"{% endif %}>
+            {% for task in cell.tasks %}
+              <div class="task {% if task.status == 'completed' %}completed{% elif task.status == 'inprogress' %}inprogress{% else %}default{% endif %}">
+                <strong><a href="{% url 'notes:edit' task.id %}">{{ task.title }}</a></strong><br>
+                Due: {{ task.due_date|date:"D d M" }}
+              </div>
+            {% empty %}
+              <em>No tasks</em>
+            {% endfor %}
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+
+{% endblock %}

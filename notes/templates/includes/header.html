@@ -21,6 +21,7 @@
                         {% trans 'Favourites' %}</a>
                      <ul class="dropdown-menu" aria-labelledby="favsDropdown">
                          <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'All' %}</a></li>
+                         <li class="nav-item"><a href="{% url 'notes:studyschedule' %}" class="nav-link">{% trans 'Schedule' %}</a></li>
                         {% for fav in favourites %}
                             <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}?order={{ fav.order_by }}">{{ fav.name }}</a></li>
                         {% endfor %}

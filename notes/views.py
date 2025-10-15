@@ -445,3 +445,49 @@ class TagsView(ListView):
     def get_queryset(self):
         ordering = self.request.GET.get('orderby', '-favourite')
         return Tag.objects.filter(user=self.request.user).annotate(count=Count('notetag__note__id')).order_by(ordering, 'name')
+
+
+
+class StudyScheduleView(TemplateView):
+    template_name = 'notes/study-schedule.html'
+    start_date = timezone.make_aware(datetime.strptime('2025-09-29', '%Y-%m-%d')).date()
+    end_date = timezone.make_aware(datetime.strptime('2025-12-12', '%Y-%m-%d')).date()
+    course_tags = ['algorithms', 'data-science', 'prog-4-ds', 'knowledge-r-r']
+    study_tag = Tag.objects.get(name='study')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        course_tag_objs = Tag.objects.filter(name__in=self.course_tags)
+
+        weeks = []
+        current = self.start_date
+        while current <= self.end_date:
+            week_end = current + timedelta(days=(4 - current.weekday()) % 7)  # Friday
+            weeks.append({
+                'label': week_end.strftime("Fri %d %b"),
+                'start': current,
+                'end': week_end,
+                'is_current': current <= timezone.now().date() <= week_end
+            })
+            current = week_end + timedelta(days=1)
+
+        context['weeks'] = weeks
+
+        # Prepare grid: rows = course tags, columns = weeks
+        grid = {}
+        for tag in course_tag_objs:
+            grid[tag.id] = []
+            for week in weeks:
+                tasks = Note.objects.filter(type='task', due_date__range=(week['start'], week['end'])) \
+                    .filter(tags__name=self.study_tag) \
+                    .filter(tags__name=tag.name) \
+                    .distinct()
+                grid[tag.id].append({
+                    'week': week,
+                    'tasks': tasks
+                })
+
+        context['grid'] = grid
+        context['course_tags'] = course_tag_objs
+        return context
+
