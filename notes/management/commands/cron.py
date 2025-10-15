@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from datetime import datetime
 from datetime import timedelta
 
-from notes.models import Note
+from notes.models import Note, NotesConfig
 
 class Command(BaseCommand):
     help = _(u"Cron task")
@@ -19,8 +19,12 @@ class Command(BaseCommand):
         # rebuild tag suggestions
         call_command('build_tag_suggestions')
 
+        try:
+            days_to_keep = int(NotesConfig.get_value("retain.days"))
+        except ValueError:
+            days_to_keep = 31
         # delete tasks completed over a month ago
-        delete_date = datetime.now().date() - timedelta(days=31)
+        delete_date = datetime.now().date() - timedelta(days=days_to_keep)
         old_completed_tasks = Note.objects.filter(type="task",
                                         status='completed',
                                         completed_date__lte=delete_date)

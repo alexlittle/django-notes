@@ -5,6 +5,16 @@
 
 {% block extra_styles %}
 <style>
+    .scroll-container {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  table {
+    border-collapse: collapse;
+    min-width: 1000px; /* or whatever width fits your columns */
+  }
+
   table {
     border-collapse: collapse;
     width: 100%;
@@ -41,6 +51,19 @@
   .default {
     background-color: #f8f9fa;
   }
+
+  th,td {
+    width: 150px;
+    vertical-align: top;
+    padding: 10px;
+    border: 1px solid #ccc;
+    min-width: 150px;
+  }
+
+  .current-week {
+    background-color: #cce5ff;
+  }
+
 </style>
 {% endblock extra_styles %}
 
@@ -48,14 +71,14 @@
 {% block content %}
 <h3>{% trans 'Study Schedule' %}</h3>
 
-
+<div class="scroll-container">
 <table>
   <thead>
     <tr>
       <th>Course</th>
 
 {% for week in weeks %}
-      <th {% if week.is_current %}style="background-color: #cce5ff;"{% endif %}>
+      <th class="{% if week.is_current %}current-week{% endif %}">
         <strong>{{ week.label }}</strong>
       </th>
     {% endfor %}
@@ -65,7 +88,7 @@
   <tbody>
     {% for course in course_tags %}
       <tr>
-        <td><strong>{{ course.name }}</strong></td>
+        <td><strong>{{ course.label }}</strong></td>
         {% for cell in grid|get_item:course.id %}
           <td {% if cell.week.is_current %}style="background-color: #cce5ff;"{% endif %}>
             {% for task in cell.tasks %}
@@ -82,7 +105,7 @@
     {% endfor %}
   </tbody>
 </table>
-
+</div>
 
 
 

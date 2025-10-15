@@ -1,5 +1,13 @@
 from django.contrib import admin
-from notes.models import Note, Tag, NoteTag, NoteHistory, NotesProfile, SavedFilter, TagSuggestion, TagSuggestionInputTag
+from notes.models import (Note,
+                          Tag,
+                          NoteTag,
+                          NoteHistory,
+                          NotesProfile,
+                          SavedFilter,
+                          TagSuggestion,
+                          TagSuggestionInputTag,
+                          NotesConfig)
 
 
 class NoteTagInline(admin.TabularInline):
@@ -29,6 +37,7 @@ class NotesProfileAdmin(admin.ModelAdmin):
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name',
                     'slug',
+                    'label',
                     'favourite',
                     'count')
     search_fields = ['name', 'slug']
@@ -64,3 +73,6 @@ class TagSuggestionAdmin(admin.ModelAdmin):
 class TagSuggestionInputTagAdmin(admin.ModelAdmin):
     list_display = ('tag', 'suggestion')
 
+@admin.register(NotesConfig)
+class NotesConfigAdmin(admin.ModelAdmin):
+    list_display = ('name', 'value')

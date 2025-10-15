@@ -10,7 +10,7 @@ from datetime import datetime
 from datetime import timedelta
 
 from notes.forms import NoteForm, SearchForm
-from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter
+from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter, NotesConfig
 from notes.utils import get_user_aware_date, is_showall, get_filtered_notes
 from notes.libs.association import suggest_tags
 
@@ -450,18 +450,24 @@ class TagsView(ListView):
 
 class StudyScheduleView(TemplateView):
     template_name = 'notes/study-schedule.html'
-    start_date = timezone.make_aware(datetime.strptime('2025-09-29', '%Y-%m-%d')).date()
-    end_date = timezone.make_aware(datetime.strptime('2025-12-12', '%Y-%m-%d')).date()
-    course_tags = ['algorithms', 'data-science', 'prog-4-ds', 'knowledge-r-r']
-    study_tag = Tag.objects.get(name='study')
+    study_tag_slug = 'study'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        course_tag_objs = Tag.objects.filter(name__in=self.course_tags)
 
+        course_tags = [tag.strip() for tag in NotesConfig.get_value("schedule.study.tags").split(',')]
+        start_date = timezone.make_aware(
+            datetime.strptime(NotesConfig.get_value("schedule.start.date"),
+                              '%Y-%m-%d')).date()
+        end_date = timezone.make_aware(
+            datetime.strptime(NotesConfig.get_value("schedule.end.date"),
+                              '%Y-%m-%d')).date()
+
+        course_tag_objs = Tag.objects.filter(slug__in=course_tags)
+        study_tag = Tag.objects.get(name=self.study_tag_slug)
         weeks = []
-        current = self.start_date
-        while current <= self.end_date:
+        current = start_date
+        while current <= end_date:
             week_end = current + timedelta(days=(4 - current.weekday()) % 7)  # Friday
             weeks.append({
                 'label': week_end.strftime("Fri %d %b"),
@@ -479,7 +485,7 @@ class StudyScheduleView(TemplateView):
             grid[tag.id] = []
             for week in weeks:
                 tasks = Note.objects.filter(type='task', due_date__range=(week['start'], week['end'])) \
-                    .filter(tags__name=self.study_tag) \
+                    .filter(tags__name=study_tag) \
                     .filter(tags__name=tag.name) \
                     .distinct()
                 grid[tag.id].append({

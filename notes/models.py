@@ -109,6 +109,7 @@ class Tag (models.Model):
                          blank=True,
                          null=True,
                          editable=True)
+    label = models.CharField(max_length=100, null=True, default=None)
     favourite = models.BooleanField(default=False)
 
     def __str__(self):
@@ -281,3 +282,15 @@ class TagSuggestionInputTag(models.Model):
 
     def __str__(self):
         return f"{self.tag}"
+
+
+class NotesConfig(models.Model):
+    name = models.CharField(max_length=50)
+    value = models.CharField(max_length=200)
+
+    @staticmethod
+    def get_value(name):
+        try:
+            return NotesConfig.objects.get(name=name).value
+        except NotesConfig.DoesNotExist:
+            return ""
