@@ -447,7 +447,6 @@ class TagsView(ListView):
         return Tag.objects.filter(user=self.request.user).annotate(count=Count('notetag__note__id')).order_by(ordering, 'name')
 
 
-
 class StudyScheduleView(TemplateView):
     template_name = 'notes/study-schedule.html'
     study_tag_slug = 'study'
@@ -484,7 +483,9 @@ class StudyScheduleView(TemplateView):
         for tag in course_tag_objs:
             grid[tag.id] = []
             for week in weeks:
-                tasks = Note.objects.filter(type='task', due_date__range=(week['start'], week['end'])) \
+                tasks = Note.objects.filter(type='task',
+                                            due_date__range=(week['start'], week['end']),
+                                            status__in=['open', 'inprogress', 'completed']) \
                     .filter(tags__name=study_tag) \
                     .filter(tags__name=tag.name) \
                     .distinct()
