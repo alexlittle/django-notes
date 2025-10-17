@@ -1,4 +1,6 @@
 import datetime
+from operator import truediv
+
 import pytz
 
 from collections import defaultdict
@@ -229,6 +231,16 @@ class Note (models.Model):
         self.update_date = datetime.datetime.now()
         self.save()
         return
+
+    def has_important_tag(self):
+        # get important tag/s from db
+        tags = [tag.strip() for tag in NotesConfig.get_value("schedule.important.tags").split(',')]
+        tag_names = self.tags.values_list('slug', flat=True)
+        for t in tags:
+            if t in tag_names:
+                return True
+        return False
+
 
 
 class NoteHistory (models.Model):

@@ -28,6 +28,7 @@
 
   th {
     background-color: #f0f0f0;
+    text-align: right;
   }
 
   tr:nth-child(even) {
@@ -64,6 +65,9 @@
     background-color: #cce5ff;
   }
 
+    .important-tag {
+    border: 1px solid #f00;
+    }
 </style>
 {% endblock extra_styles %}
 
@@ -92,7 +96,14 @@
         {% for cell in grid|get_item:course.id %}
           <td {% if cell.week.is_current %}style="background-color: #cce5ff;"{% endif %}>
             {% for task in cell.tasks %}
-              <div class="task {% if task.status == 'completed' %}completed{% elif task.status == 'inprogress' %}inprogress{% else %}default{% endif %}">
+              <div class="task {% if task.status == 'completed' %}
+                                   completed
+                               {% elif task.status == 'inprogress' %}
+                                   inprogress
+                               {% else %}
+                                    default
+                               {% endif %}
+                               {% if task.has_important_tag %} important-tag {% endif %}">
                 <strong><a href="{% url 'notes:edit' task.id %}">{{ task.title }}</a></strong><br>
                 Due: {{ task.due_date|date:"D d M" }}
               </div>
