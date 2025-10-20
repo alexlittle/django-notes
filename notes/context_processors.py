@@ -17,6 +17,7 @@ def favourites_processor(request):
 
     if user.is_authenticated:
         favourites = SavedFilter.objects.all()
-
-    return {'favourites': favourites}
+        return {'favourites': favourites}
+    else:
+        return {'favourites': None }
 
