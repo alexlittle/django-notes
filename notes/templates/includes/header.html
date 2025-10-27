@@ -10,25 +10,27 @@
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarScroll">
             <ul class="navbar-nav ms-auto my-2 my-lg-0 navbar-nav-scroll" >
-                <li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add' %}</a></li>
-                <li class="nav-item"><a href="{% url 'notes:tasks' %}" class="nav-link">{% trans 'Tasks' %}</a></li>
-                <li class="nav-item"><a href="{% url 'notes:bookmarks' %}" class="nav-link">{% trans 'Bookmarks' %}</a></li>
-                <li class="nav-item"><a href="{% url 'notes:ideas' %}" class="nav-link">{% trans 'Ideas' %}</a></li>
-                <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
-                <li class="nav-item"><a href="{% url 'notes:recent' %}" class="nav-link">{% trans 'Recent' %}</a></li>
-                <li class="nav-item dropdown">
-                     <a class="nav-link dropdown-toggle" href="#" id="favsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% trans 'Favourites' %}</a>
-                     <ul class="dropdown-menu" aria-labelledby="favsDropdown">
-                         <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'All' %}</a></li>
-                         <li class="nav-item"><a href="{% url 'notes:weeklyschedule' %}" class="nav-link">{% trans 'Schedule' %}</a></li>
-                        {% for fav in favourites %}
-                            <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}?order={{ fav.order_by }}">{{ fav.name }}</a></li>
-                        {% endfor %}
-                     </ul>
-                </li>
-                <li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
-                <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item"><a href="{% url 'notes:add' %}" class="nav-link">{% trans 'Add' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'notes:tasks' %}" class="nav-link">{% trans 'Tasks' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'notes:bookmarks' %}" class="nav-link">{% trans 'Bookmarks' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'notes:ideas' %}" class="nav-link">{% trans 'Ideas' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'notes:recent' %}" class="nav-link">{% trans 'Recent' %}</a></li>
+                    <li class="nav-item dropdown">
+                         <a class="nav-link dropdown-toggle" href="#" id="favsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Favourites' %}</a>
+                         <ul class="dropdown-menu" aria-labelledby="favsDropdown">
+                             <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'All' %}</a></li>
+                             <li class="nav-item"><a href="{% url 'notes:weeklyschedule' %}" class="nav-link">{% trans 'Schedule' %}</a></li>
+                            {% for fav in favourites %}
+                                <li><a class="dropdown-item" href="{% url 'notes:tag_view' fav.value %}?order={{ fav.order_by }}">{{ fav.name }}</a></li>
+                            {% endfor %}
+                         </ul>
+                    </li>
+                    <li class="nav-item"><a href="{% url 'notes:tags' %}" class="nav-link">{% trans 'Tags' %}</a></li>
+                    <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link">{% trans 'Admin' %}</a></li>
+                {% endif %}
             </ul>
 
         </div>

@@ -1,7 +1,7 @@
 
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Count, Case, When, Value, DateField, IntegerField, Q
+from django.db.models import Count, Case, When, Value, DateField, IntegerField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView
