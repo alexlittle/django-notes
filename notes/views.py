@@ -489,7 +489,7 @@ class WeeklyScheduleView(TemplateView):
                     .filter(tags__name=study_tag) \
                     .filter(tags__name=tag.name) \
                     .distinct() \
-                    .order_by('due_date')
+                    .order_by('due_date','title')
                 grid[tag.id].append({
                     'week': week,
                     'tasks': tasks
