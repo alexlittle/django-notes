@@ -6,7 +6,8 @@
 	{% include "includes/task_completed_icon.html" %}
 	{% include "includes/task_priority_icon.html" %}
 	<div class="note-text">
-		<strong><a href="{% url 'notes:edit' note.id %}">{{ note.title }}</a></strong>
+		<strong><a href="{% url 'notes:edit' note.id %}"
+                {% if note.status == "archived" %}class="note-archived"{% endif %}>{{ note.title }}</a></strong>
 		{% if note.url %}
 			<a href="{{ note.url }}" target="_blank">
 				<img src="{% static 'notes/icons/arrow_outward.png' %}" title="{{ note.url }}" class="link-icon"/>

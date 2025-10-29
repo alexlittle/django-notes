@@ -158,6 +158,10 @@ a {
   word-wrap: break-word; /* Ensure wrapping on long words */
 }
 
+.note-archived {
+    text-decoration: line-through;
+}
+
 /* RESPONSIVE CSS
 -------------------------------------------------- */
 
