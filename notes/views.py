@@ -455,12 +455,11 @@ class WeeklyScheduleView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         course_tags = [tag.strip() for tag in NotesConfig.get_value("schedule.study.tags").split(',')]
-        start_date = timezone.make_aware(
-            datetime.strptime(NotesConfig.get_value("schedule.start.date"),
-                              '%Y-%m-%d')).date()
-        end_date = timezone.make_aware(
-            datetime.strptime(NotesConfig.get_value("schedule.end.date"),
-                              '%Y-%m-%d')).date()
+
+        start_days = int(NotesConfig.get_value("schedule.start.days"))
+        end_days = int(NotesConfig.get_value("schedule.end.days"))
+        start_date = timezone.localdate() - timedelta(days=start_days)
+        end_date = timezone.localdate() + timedelta(days=end_days)
 
         course_tag_objs = Tag.objects.filter(slug__in=course_tags)
         study_tag = Tag.objects.get(name=self.study_tag_slug)
