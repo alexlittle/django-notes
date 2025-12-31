@@ -4,7 +4,7 @@ django-crispy-forms==2.5
 crispy-bootstrap4==2025.6
 django-tinymce==5.0.0
 pycodestyle==2.14.0
-pytest==8.4.2
+pytest==9.0.1
 pytest-django==4.11.1
 mysqlclient==2.2.7
 python-dateutil==2.9.0.post0

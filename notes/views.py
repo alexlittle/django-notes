@@ -2,9 +2,10 @@
 from django.urls import reverse
 from django.utils import timezone
 from django.db.models import Count, Case, When, Value, DateField, IntegerField
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, View
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import datetime
 from datetime import timedelta
@@ -220,6 +221,18 @@ class UnCompleteTaskView(TemplateView):
             return HttpResponseRedirect(reverse('notes:home'))
 
 
+class TagAutocompleteView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        term = request.GET.get('term', '')
+
+        # We filter by user to keep tags private
+        # icontains provides a case-insensitive search
+        tags = Tag.objects.filter(
+            user=request.user,
+            name__icontains=term
+        ).values_list('name', flat=True)[:10]
+
+        return JsonResponse(list(tags), safe=False)
 
 class CloseTaskView(TemplateView):
 
