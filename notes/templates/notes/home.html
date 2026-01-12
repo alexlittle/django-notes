@@ -47,7 +47,7 @@
 	<h2>{% trans "Next week" %} ({{ next_week|length }})</h2>
 	<div class="container mt-5">
 	{% for note in next_week %}
-		{% if not forloop.first and note.due_date != overdue|get_previous_due_date:forloop.counter0 %}
+		{% if not forloop.first and note.due_date != next_week|get_previous_due_date:forloop.counter0 %}
             <hr class="darker-hr">
         {% endif %}
 		{% include "includes/note_row.html" %}
@@ -60,7 +60,7 @@
 	<div class="container mt-5">
 	{% for note in next_month %}
 		test
-		{% if not forloop.first and note.due_date != overdue|get_previous_due_date:forloop.counter0 %}
+		{% if not forloop.first and note.due_date != next_month|get_previous_due_date:forloop.counter0 %}
             testhr<hr class="darker-hr">
         {% endif %}
 		{% include "includes/note_row.html" %}
