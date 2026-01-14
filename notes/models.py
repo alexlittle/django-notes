@@ -233,6 +233,9 @@ class Note (models.Model):
         return
 
     def has_important_tag(self):
+        if self.priority == 'high':
+            return True
+
         # get important tag/s from db
         tags = [tag.strip() for tag in NotesConfig.get_value("schedule.important.tags").split(',')]
         tag_names = self.tags.values_list('slug', flat=True)
