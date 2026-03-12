@@ -28,8 +28,9 @@ class Command(BaseCommand):
         old_completed_tasks = Note.objects.filter(type="task",
                                         status='completed',
                                         completed_date__lte=delete_date)
-        print(old_completed_tasks)
+
         for ot in old_completed_tasks:
+            print(f"{ot.title} deleted")
             ot.delete()
 
         old_closed_tasks = Note.objects.filter(type="task",
@@ -37,4 +38,5 @@ class Command(BaseCommand):
                                                   completed_date__lte=delete_date)
         print(old_closed_tasks)
         for ot in old_closed_tasks:
+            print(f"{ot.title} deleted")
             ot.delete()
