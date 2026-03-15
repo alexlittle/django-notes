@@ -36,7 +36,6 @@ class Command(BaseCommand):
         old_closed_tasks = Note.objects.filter(type="task",
                                                   status='closed',
                                                   completed_date__lte=delete_date)
-        print(old_closed_tasks)
         for ot in old_closed_tasks:
             print(f"{ot.title} deleted")
             ot.delete()
