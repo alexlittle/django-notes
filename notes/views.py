@@ -364,7 +364,7 @@ class EditView(TemplateView):
             note.priority = form.cleaned_data.get("priority")
             note.recurrence = form.cleaned_data.get("recurrence")
             note.reminder_days = form.cleaned_data.get("reminder_days")
-            # if completed check if recurring
+            # if completed, check if recurring
             completed_status_key = 'completed'
             if old_status != completed_status_key and form.cleaned_data.get("status") == completed_status_key:
                 note.complete_task()
