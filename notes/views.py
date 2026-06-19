@@ -460,26 +460,31 @@ class TagsView(ListView):
         return Tag.objects.filter(user=self.request.user).annotate(count=Count('notetag__note__id')).order_by(ordering, 'name')
 
 
-class WeeklyScheduleView(TemplateView):
-    template_name = 'notes/weekly-schedule.html'
-    study_tag_slug = 'study'
+class ScheduleView(TemplateView):
+    template_name = 'notes/schedule.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        course_tags = [tag.strip() for tag in NotesConfig.get_value("schedule.study.tags").split(',')]
+        raw_row_defs = NotesConfig.get_value("schedule.tags").split(',')
+        row_defs = []
+        for raw in raw_row_defs:
+            raw = raw.strip()
+            if not raw:
+                continue
+            tag_slugs = [t.strip() for t in raw.split('+') if t.strip()]
+            row_defs.append(tag_slugs)
 
         start_days = int(NotesConfig.get_value("schedule.start.days"))
         end_days = int(NotesConfig.get_value("schedule.end.days"))
         start_date = timezone.localdate() - timedelta(days=start_days)
         end_date = timezone.localdate() + timedelta(days=end_days)
 
-        course_tag_objs = Tag.objects.filter(slug__in=course_tags)
-        study_tag = Tag.objects.get(name=self.study_tag_slug)
         weeks = []
         current = start_date
         while current <= end_date:
-            week_end = current + timedelta(days=(4 - current.weekday()) % 7)  # Friday
+            week_end = current + timedelta(
+                days=(4 - current.weekday()) % 7)  # Friday
             weeks.append({
                 'label': week_end.strftime("Fri %d %b"),
                 'start': current,
@@ -487,27 +492,45 @@ class WeeklyScheduleView(TemplateView):
                 'is_current': current <= timezone.now().date() <= week_end
             })
             current = week_end + timedelta(days=1)
-
         context['weeks'] = weeks
 
-        # Prepare grid: rows = course tags, columns = weeks
         grid = {}
-        for tag in course_tag_objs:
-            grid[tag.id] = []
+        row_tags = []
+        for tag_slugs in row_defs:
+            row_key = '+'.join(tag_slugs)
+
+            # look up Tag objects for this row, preserving the order given in config
+            tags_qs = {t.slug: t for t in
+                       Tag.objects.filter(slug__in=tag_slugs)}
+            row_tag_objs = [tags_qs[slug] for slug in tag_slugs if
+                            slug in tags_qs]
+
+            row_tags.append({
+                'key': row_key,
+                'label': ' / '.join((t.label or t.slug) for t in row_tag_objs),
+                'first_label': (row_tag_objs[0].label or row_tag_objs[0].slug) if row_tag_objs else tag_slugs[0],
+                'slugs': tag_slugs,
+            })
+
+            grid[row_key] = []
             for week in weeks:
-                tasks = Note.objects.filter(type='task',
-                                            due_date__range=(week['start'], week['end']),
-                                            status__in=['open', 'inprogress', 'completed']) \
-                    .filter(tags__name=study_tag) \
-                    .filter(tags__name=tag.name) \
-                    .distinct() \
-                    .order_by('due_date','title')
-                grid[tag.id].append({
+                tasks = Note.objects.filter(
+                    type='task',
+                    due_date__range=(week['start'], week['end']),
+                    status__in=['open', 'inprogress', 'completed'],
+                )
+                for slug in tag_slugs:
+                    tasks = tasks.filter(tags__slug=slug)
+
+                tasks = tasks.distinct().order_by('due_date', 'title')
+
+                grid[row_key].append({
                     'week': week,
-                    'tasks': tasks
+                    'tasks': tasks,
                 })
 
         context['grid'] = grid
-        context['course_tags'] = course_tag_objs
+        context['row_tags'] = sorted(row_tags,
+                                     key=lambda r: r['first_label'].lower())
         return context
 

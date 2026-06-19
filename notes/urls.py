@@ -25,5 +25,5 @@ urlpatterns = [
     path('search/', note_views.SearchView.as_view(), name="search"),
     path('fav/', note_views.FavouritesView.as_view(), name="favs"),
 
-    path('weeklyschedule/', note_views.WeeklyScheduleView.as_view(), name="weeklyschedule"),
+    path('schedule/', note_views.ScheduleView.as_view(), name="schedule"),
 ]

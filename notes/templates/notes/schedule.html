@@ -73,13 +73,13 @@
 
 
 {% block content %}
-<h3>{% trans 'Study Schedule' %}</h3>
+<h3>{% trans 'Schedule' %}</h3>
 
 <div class="scroll-container">
 <table>
   <thead>
     <tr>
-      <th>Course</th>
+      <th>Tags</th>
 
 {% for week in weeks %}
       <th class="{% if week.is_current %}current-week{% endif %}">
@@ -90,10 +90,10 @@
     </tr>
   </thead>
   <tbody>
-    {% for course in course_tags %}
+    {% for row in row_tags %}
       <tr>
-        <td><strong>{{ course.label }}</strong></td>
-        {% for cell in grid|get_item:course.id %}
+        <td><strong>{{ row.label }}</strong></td>
+        {% for cell in grid|get_item:row.key %}
           <td {% if cell.week.is_current %}style="background-color: #cce5ff;"{% endif %}>
             {% for task in cell.tasks %}
               <div class="task {% if task.status == 'completed' %}
