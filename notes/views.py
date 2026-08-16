@@ -260,7 +260,6 @@ class AddView(TemplateView):
             initial_data['reminder_days'] = 14
         elif form_type == 'task':
             initial_data['type'] = 'task'
-            initial_data['estimated_effort'] = 15
             initial_data['due_date'] = datetime.now().date()
             initial_data['priority'] = "medium"
         elif form_type == 'idea':
@@ -286,7 +285,6 @@ class AddView(TemplateView):
             note.description = form.cleaned_data.get("description")
             note.url = form.cleaned_data.get("url")
             note.due_date = form.cleaned_data.get("due_date")
-            note.estimated_effort = form.cleaned_data.get("estimated_effort")
             note.priority = form.cleaned_data.get("priority")
             note.recurrence = form.cleaned_data.get("recurrence")
             note.reminder_days = form.cleaned_data.get("reminder_days")
@@ -327,7 +325,6 @@ class EditView(TemplateView):
         data['url'] = note.url
         data['status'] = note.status
         data['due_date'] = note.due_date
-        data['estimated_effort'] = note.estimated_effort
         data['priority'] = note.priority
         data['recurrence'] = note.recurrence
         data['reminder_days'] = note.reminder_days
@@ -360,7 +357,6 @@ class EditView(TemplateView):
             note.description = form.cleaned_data.get("description")
             note.status = form.cleaned_data.get("status")
             note.due_date = form.cleaned_data.get("due_date")
-            note.estimated_effort = form.cleaned_data.get("estimated_effort")
             note.priority = form.cleaned_data.get("priority")
             note.recurrence = form.cleaned_data.get("recurrence")
             note.reminder_days = form.cleaned_data.get("reminder_days")

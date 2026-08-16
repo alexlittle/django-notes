@@ -17,7 +17,6 @@
 		{% for nt in note.tags.all %}
 			<a href="{% url 'notes:tag_tasks' nt.slug %}">{{ nt.name }}</a>
 		{% endfor %}
-		| {{ note.estimated_effort }} mins
 
 		{% if note.due_date %}
 			{% with note.due_date|naturalday as natural_day %}
