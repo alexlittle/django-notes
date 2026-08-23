@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "django-notes"
+dynamic = ["version"]
+description = "Notes and Bookmarks web application"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [
+    { name = "Alex Little", email = "alex@alexlittle.net" }
+]
+
+dependencies = [
+    "crispy-bootstrap4==2026.2",
+    "django==6.0.7",
+    "django-autoslug==1.9.9",
+    "django-crispy-forms==2.7",
+    "django-tinymce==5.0.0",
+    "mlxtend==0.25.0",
+    "mysqlclient==2.2.8",
+    "pandas==3.0.5",
+    "pycodestyle==2.14.0",
+    "python-dateutil==2.9.0.post0",
+    "pytz==2026.3.post1",
+    "setuptools==84.0.0",
+]
+
+# Tell setuptools where to find code and how to determine the version
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["notes*"]
+
+# Interrogate settings for checking existence of doc strings
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = true
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = false
+fail-under = 0
+verbose = 2
+exclude = ["tests", "docs", "build"]
+
+# pydoclint settings for checking correctness and consistency of docstrings
+[tool.pydoclint]
+style = "google"
+exclude = "tests|docs"
+
+# Read version from notes/_version.py
+[tool.setuptools.dynamic]
+version = { attr = "notes._version.__version__" }
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["test_*.py"]
+
+[tool.coverage.run]
+relative_files = true
+source = ["."]
+omit = ["*/migrations/*", "*/tests/*", "*/settings*.py", "manage.py", "env/*", "docs/*"]
+
+
+
+[dependency-groups]
+dev = [
+    "twine==6.2.0",
+    "build==1.4.0",
+    "wheel==0.46.3",
+    "pytest-cov==7.1.0",
+    "Sphinx==9.1.0",
+    "sphinx_rtd_theme==3.1.0",
+    "interrogate==1.7.0",
+    "pydoclint==0.9.1",
+    "setuptools==84.0.0",
+    "pytest>=9.1.1",
+    "ruff>=0.16.4",
+    "pytest-django==4.12.0",
+]
+local = [
+    "django-extensions==4.1"
+]
+deploy = [
+    "mod-wsgi==6.0.5"
+]
+
+[tool.uv]
+default-groups = ["local", "deploy"]
+

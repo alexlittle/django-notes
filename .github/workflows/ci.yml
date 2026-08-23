@@ -1,0 +1,101 @@
+name: CI + SonarCloud
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+
+
+jobs:
+  build-test-sonar:
+    name: Build, Test, Analyze
+    runs-on: ubuntu-24.04
+    env:
+      UV_NO_SYNC: "1"
+    permissions:
+      contents: read
+      pull-requests: write
+      actions: read
+      checks: write
+      # Required for SonarCloud SARIF upload
+      security-events: write
+
+    # -------------------------
+    # MySQL service container
+    # -------------------------
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.CI_MYSQL_ROOT_PASSWORD }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root
+          -p$MYSQL_ROOT_PASSWORD"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
+    steps:
+      # -------------------------
+      # Checkout code
+      # -------------------------
+      - name: Checkout repository
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0  # Sonar needs full history
+
+      # -------------------------
+      # Python setup via uv
+      # -------------------------
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --no-default-groups --group dev --locked
+
+      # -------------------------
+      # Run tests + collect coverage
+      # -------------------------
+      - name: Run tests
+        run: uv run --frozen pytest --cov --cov-report=xml --cov-report=term
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings_ci
+          DB_HOST: 127.0.0.1
+          DB_PORT: "3306"
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.CI_MYSQL_ROOT_PASSWORD }}
+
+      # -------------------------
+      # Upload coverage as artifact
+      # -------------------------
+      - name: Upload coverage
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: coverage
+          path: coverage.xml
+
+      # -------------------------
+      # Docstring coverage and consistency
+      # -------------------------
+      - name: Docstring coverage report
+        run: uv run --frozen interrogate -v notes/
+        continue-on-error: true # so won't fail the action
+
+      - name: Docstring/signature consistency report
+        run: uv run --frozen pydoclint notes/
+        continue-on-error: true # so won't fail the action
+
+      # -------------------------
+      # SonarQube Cloud scan
+      # -------------------------
+      - name: SonarQube Cloud Scan
+        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
