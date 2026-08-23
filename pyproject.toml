@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-notes"
-dynamic = ["version"]
+version = "0.1.0"
 description = "Notes and Bookmarks web application"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -57,7 +57,7 @@ exclude = "tests|docs"
 
 # Read version from notes/_version.py
 [tool.setuptools.dynamic]
-version = { attr = "notes._version.__version__" }
+version = { attr = "notes.__version__" }
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
@@ -68,6 +68,12 @@ relative_files = true
 source = ["."]
 omit = ["*/migrations/*", "*/tests/*", "*/settings*.py", "manage.py", "env/*", "docs/*"]
 
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
 
 
 [dependency-groups]

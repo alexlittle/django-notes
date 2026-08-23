@@ -5,26 +5,37 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0030_tagsuggestion'),
+        ("notes", "0030_tagsuggestion"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='tagsuggestion',
+            name="tagsuggestion",
             options={},
         ),
         migrations.RemoveField(
-            model_name='tagsuggestion',
-            name='input_tags',
+            model_name="tagsuggestion",
+            name="input_tags",
         ),
         migrations.CreateModel(
-            name='TagSuggestionInputTag',
+            name="TagSuggestionInputTag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('tag', models.CharField(max_length=100)),
-                ('suggestion', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='input_tags', to='notes.tagsuggestion')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("tag", models.CharField(max_length=100)),
+                (
+                    "suggestion",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="input_tags",
+                        to="notes.tagsuggestion",
+                    ),
+                ),
             ],
         ),
     ]

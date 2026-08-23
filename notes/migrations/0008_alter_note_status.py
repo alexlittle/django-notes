@@ -4,15 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0007_note_completed_date'),
+        ("notes", "0007_note_completed_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='status',
-            field=models.CharField(choices=[('open', 'Open'), ('inprogress', 'In progress'), ('completed', 'Completed'), ('closed', 'Closed'), ('archived', 'Archived')], default='open', max_length=15),
+            model_name="note",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("open", "Open"),
+                    ("inprogress", "In progress"),
+                    ("completed", "Completed"),
+                    ("closed", "Closed"),
+                    ("archived", "Archived"),
+                ],
+                default="open",
+                max_length=15,
+            ),
         ),
     ]

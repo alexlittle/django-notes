@@ -2,9 +2,8 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0016_alter_note_estimated_effort'),
+        ("notes", "0016_alter_note_estimated_effort"),
     ]
 
     operations = [

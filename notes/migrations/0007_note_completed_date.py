@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0006_alter_note_priority'),
+        ("notes", "0006_alter_note_priority"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='completed_date',
+            model_name="note",
+            name="completed_date",
             field=models.DateField(blank=True, default=None, null=True),
         ),
     ]

@@ -13,6 +13,7 @@ class AutoSlugField(BaseSlugField):
 
     - unique: True
     """
+
     def __init__(self, *args, **kwargs):
         if "unique" not in kwargs and "unique_with" not in kwargs:
             kwargs["unique"] = True

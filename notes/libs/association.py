@@ -1,5 +1,5 @@
-
 from notes.models import TagSuggestion
+
 
 def suggest_tags(input_tags, top_n=5):
     input_set = set(input_tags)

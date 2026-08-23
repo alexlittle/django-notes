@@ -6,34 +6,52 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0004_note_assistant_loaded'),
+        ("notes", "0004_note_assistant_loaded"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='due_date',
+            model_name="note",
+            name="due_date",
             field=models.DateField(blank=True, default=None, null=True),
         ),
         migrations.AddField(
-            model_name='note',
-            name='estimated_effort',
+            model_name="note",
+            name="estimated_effort",
             field=models.IntegerField(default=30),
         ),
         migrations.AddField(
-            model_name='note',
-            name='priority',
-            field=models.CharField(choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')], default=None, max_length=15),
+            model_name="note",
+            name="priority",
+            field=models.CharField(
+                choices=[("high", "High"), ("medium", "Medium"), ("low", "Low")],
+                default=None,
+                max_length=15,
+            ),
         ),
         migrations.CreateModel(
-            name='NoteHistory',
+            name="NoteHistory",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('update_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('action', models.CharField(choices=[('deferred', 'Deferred'), ('updated', 'Updated')], default=None, max_length=15)),
-                ('note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='notes.note')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("update_date", models.DateTimeField(default=django.utils.timezone.now)),
+                (
+                    "action",
+                    models.CharField(
+                        choices=[("deferred", "Deferred"), ("updated", "Updated")],
+                        default=None,
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "note",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="notes.note"),
+                ),
             ],
         ),
     ]

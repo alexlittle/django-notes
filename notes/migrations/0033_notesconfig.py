@@ -4,18 +4,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0032_savedfilter_order_by'),
+        ("notes", "0032_savedfilter_order_by"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='NotesConfig',
+            name="NotesConfig",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=50)),
-                ('value', models.CharField(max_length=200)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(max_length=50)),
+                ("value", models.CharField(max_length=200)),
             ],
         ),
     ]

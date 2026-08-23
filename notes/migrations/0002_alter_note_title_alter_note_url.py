@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0001_initial'),
+        ("notes", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='title',
+            model_name="note",
+            name="title",
             field=models.TextField(default=None),
         ),
         migrations.AlterField(
-            model_name='note',
-            name='url',
+            model_name="note",
+            name="url",
             field=models.TextField(blank=True, null=True),
         ),
     ]

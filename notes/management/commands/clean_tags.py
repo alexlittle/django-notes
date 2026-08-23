@@ -1,6 +1,6 @@
-'''
+"""
 Removes unused tags
-'''
+"""
 
 from django.core.management.base import BaseCommand
 from django.db.models import Count
@@ -10,7 +10,7 @@ from notes.models import Tag
 
 
 class Command(BaseCommand):
-    help = _(u"Cleans unused tags and flags any that are only used once")
+    help = _("Cleans unused tags and flags any that are only used once")
     errors = []
 
     def handle(self, *args, **options):

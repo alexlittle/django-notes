@@ -5,10 +5,9 @@ from django.conf import settings
 from django.db.models import Count, Q
 
 
-
-
 def get_user_aware_date(user):
     return get_user_aware_datetime(user).date()
+
 
 def get_user_aware_datetime(user):
     """
@@ -18,7 +17,7 @@ def get_user_aware_datetime(user):
         user: A Django user object.
 
     Returns:
-        A datetime.datetime object, or None if the user or timezone is invalid.
+        datetime: A datetime.datetime object, or None if the user or timezone is invalid.
     """
 
     if not user.is_authenticated:
@@ -39,16 +38,24 @@ def get_user_aware_datetime(user):
 
 
 def is_showall(request):
-    showall_str = request.GET.get('showall', 'false').lower()
-    if showall_str == 'false':
+    showall_str = request.GET.get("showall", "false").lower()
+    if showall_str == "false":
         return False
     else:
         return True
 
+
 def get_filtered_notes(user, filter):
     from notes.models import Note
-    slug_list = filter.split('+')
-    return Note.objects.filter(user=user, notetag__tag__slug__in=slug_list) \
-        .exclude(status="completed") \
-        .annotate(matched_tags=Count('notetag__tag', filter=Q(notetag__tag__slug__in=slug_list), distinct=True)) \
+
+    slug_list = filter.split("+")
+    return (
+        Note.objects.filter(user=user, notetag__tag__slug__in=slug_list)
+        .exclude(status="completed")
+        .annotate(
+            matched_tags=Count(
+                "notetag__tag", filter=Q(notetag__tag__slug__in=slug_list), distinct=True
+            )
+        )
         .filter(matched_tags=len(slug_list))
+    )

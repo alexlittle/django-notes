@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0015_user_backfill'),
+        ("notes", "0015_user_backfill"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='estimated_effort',
+            model_name="note",
+            name="estimated_effort",
             field=models.IntegerField(blank=True, default=None, null=True),
         ),
     ]

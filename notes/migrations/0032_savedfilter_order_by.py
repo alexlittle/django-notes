@@ -4,15 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0031_alter_tagsuggestion_options_and_more'),
+        ("notes", "0031_alter_tagsuggestion_options_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='savedfilter',
-            name='order_by',
-            field=models.CharField(choices=[('-create_date', '-Create Date'), ('create_date', 'Create Date'), ('-due_date', '-Due Date'), ('due_date', 'Due Date'), ('-update_date', '-Update Date'), ('update_date', 'Update Date'), ('title', 'A-Z'), ('-title', 'Z-A')], default='due_date', max_length=15),
+            model_name="savedfilter",
+            name="order_by",
+            field=models.CharField(
+                choices=[
+                    ("-create_date", "-Create Date"),
+                    ("create_date", "Create Date"),
+                    ("-due_date", "-Due Date"),
+                    ("due_date", "Due Date"),
+                    ("-update_date", "-Update Date"),
+                    ("update_date", "Update Date"),
+                    ("title", "A-Z"),
+                    ("-title", "Z-A"),
+                ],
+                default="due_date",
+                max_length=15,
+            ),
         ),
     ]

@@ -5,11 +5,12 @@ from notes.utils import get_user_aware_datetime
 
 
 def debug_mode(request):
-    return {'DEBUG': settings.DEBUG}
+    return {"DEBUG": settings.DEBUG}
+
 
 def get_datetime(request):
     user = get_user_aware_datetime(request.user)
-    return {'USER_TIME': user.strftime("%d %B %Y %H:%M:%S (%Z%z)") }
+    return {"USER_TIME": user.strftime("%d %B %Y %H:%M:%S (%Z%z)")}
 
 
 def favourites_processor(request):
@@ -17,7 +18,6 @@ def favourites_processor(request):
 
     if user.is_authenticated:
         favourites = SavedFilter.objects.all()
-        return {'favourites': favourites}
+        return {"favourites": favourites}
     else:
-        return {'favourites': None }
-
+        return {"favourites": None}

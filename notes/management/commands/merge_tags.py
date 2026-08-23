@@ -44,19 +44,25 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--from", dest="old_tag", required=True,
+            "--from",
+            dest="old_tag",
+            required=True,
             help="Exact name of the tag to replace, e.g. books-to-read",
         )
         parser.add_argument(
-            "--to", dest="new_tags", required=True,
+            "--to",
+            dest="new_tags",
+            required=True,
             help="Comma-separated list of replacement tag names, e.g. books,to-read",
         )
         parser.add_argument(
-            "--dry-run", action="store_true",
+            "--dry-run",
+            action="store_true",
             help="Show what would happen without changing anything",
         )
         parser.add_argument(
-            "--delete-old", action="store_true",
+            "--delete-old",
+            action="store_true",
             help="Delete the old tag afterwards if no notes reference it any more",
         )
 
@@ -100,9 +106,13 @@ class Command(BaseCommand):
                         if not already_linked:
                             if not dry_run:
                                 NoteTag.objects.create(note=note, tag=new_tag)
-                            self.stdout.write(f'  Note {note.id} "{note.title}": + "{new_tag.name}"')
+                            self.stdout.write(
+                                f'  Note {note.id} "{note.title}": + "{new_tag.name}"'
+                            )
                         else:
-                            self.stdout.write(f'  Note {note.id} "{note.title}": already has "{new_tag.name}"')
+                            self.stdout.write(
+                                f'  Note {note.id} "{note.title}": already has "{new_tag.name}"'
+                            )
 
                     if not dry_run:
                         NoteTag.objects.filter(note=note, tag=old_tag).delete()
@@ -113,14 +123,20 @@ class Command(BaseCommand):
                 if delete_old:
                     remaining = NoteTag.objects.filter(tag=old_tag).count()
                     if remaining == 0:
-                        self.stdout.write(f'  Deleting now-unused tag "{old_tag_name}" for user {user}')
+                        self.stdout.write(
+                            f'  Deleting now-unused tag "{old_tag_name}" for user {user}'
+                        )
                         if not dry_run:
                             old_tag.delete()
                     else:
-                        self.stdout.write(f'  Skipping delete: "{old_tag_name}" still used {remaining} time(s) for user {user}')
+                        self.stdout.write(
+                            f'  Skipping delete: "{old_tag_name}" still used {remaining} time(s) for user {user}'
+                        )
 
             if dry_run:
-                self.stdout.write(self.style.WARNING("Dry run: rolling back, no changes were saved"))
+                self.stdout.write(
+                    self.style.WARNING("Dry run: rolling back, no changes were saved")
+                )
                 transaction.set_rollback(True)
 
         self.stdout.write(self.style.SUCCESS(f"Done. {total_notes_updated} note(s) processed."))

@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -18,47 +17,85 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Tag',
+            name="Tag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('name', models.CharField(max_length=100)),
-                ('slug', notes.fields.AutoSlugField(blank=True, editable=False, max_length=100, null=True, populate_from='name', unique=True)),
-                ('favourite', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("create_date", models.DateTimeField(default=django.utils.timezone.now)),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "slug",
+                    notes.fields.AutoSlugField(
+                        blank=True,
+                        editable=False,
+                        max_length=100,
+                        null=True,
+                        populate_from="name",
+                        unique=True,
+                    ),
+                ),
+                ("favourite", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='Note',
+            name="Note",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('create_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('url', models.TextField()),
-                ('title', models.TextField(blank=True, null=True)),
-                ('description', tinymce.models.HTMLField(blank=True, null=True)),
-                ('link_check_date', models.DateTimeField(default=django.utils.timezone.now)),
-                ('link_check_result', models.TextField(blank=True, null=True)),
-                ('favourite', models.BooleanField(default=False)),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("create_date", models.DateTimeField(default=django.utils.timezone.now)),
+                ("url", models.TextField()),
+                ("title", models.TextField(blank=True, null=True)),
+                ("description", tinymce.models.HTMLField(blank=True, null=True)),
+                ("link_check_date", models.DateTimeField(default=django.utils.timezone.now)),
+                ("link_check_result", models.TextField(blank=True, null=True)),
+                ("favourite", models.BooleanField(default=False)),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-create_date'],
+                "ordering": ["-create_date"],
             },
         ),
         migrations.CreateModel(
-            name='NoteTag',
+            name="NoteTag",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='notes.note')),
-                ('tag', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='notes.tag')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "note",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="notes.note"),
+                ),
+                (
+                    "tag",
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="notes.tag"),
+                ),
             ],
             options={
-                'verbose_name': 'Note Tag',
-                'verbose_name_plural': 'Note Tags',
+                "verbose_name": "Note Tag",
+                "verbose_name_plural": "Note Tags",
             },
         ),
         migrations.AddField(
-            model_name='note',
-            name='tags',
-            field=models.ManyToManyField(through='notes.NoteTag', to='notes.tag'),
+            model_name="note",
+            name="tags",
+            field=models.ManyToManyField(through="notes.NoteTag", to="notes.tag"),
         ),
     ]

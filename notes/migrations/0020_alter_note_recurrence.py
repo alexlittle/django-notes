@@ -4,15 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0019_update_fulltext'),
+        ("notes", "0019_update_fulltext"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='recurrence',
-            field=models.CharField(blank=True, choices=[('daily', 'Daily'), ('weekly', 'Weekly'), ('biweekly', 'Fortnightly'), ('monthly', 'Monthly'), ('quarterly', 'Quarterly'), ('annually', 'Annually')], default=None, max_length=10, null=True),
+            model_name="note",
+            name="recurrence",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("daily", "Daily"),
+                    ("weekly", "Weekly"),
+                    ("biweekly", "Fortnightly"),
+                    ("monthly", "Monthly"),
+                    ("quarterly", "Quarterly"),
+                    ("annually", "Annually"),
+                ],
+                default=None,
+                max_length=10,
+                null=True,
+            ),
         ),
     ]

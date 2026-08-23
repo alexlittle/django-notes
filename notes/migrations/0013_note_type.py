@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0012_alter_note_recurrence'),
+        ("notes", "0012_alter_note_recurrence"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='note',
-            name='type',
-            field=models.CharField(choices=[('bookmark', 'Bookmark'), ('task', 'Task'), ('idea', 'Idea')], default='bookmark', max_length=15),
+            model_name="note",
+            name="type",
+            field=models.CharField(
+                choices=[("bookmark", "Bookmark"), ("task", "Task"), ("idea", "Idea")],
+                default="bookmark",
+                max_length=15,
+            ),
         ),
     ]

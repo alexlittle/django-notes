@@ -61,6 +61,15 @@ jobs:
         run: uv sync --no-default-groups --group dev --locked
 
       # -------------------------
+      # code format checks
+      # -------------------------
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      # -------------------------
       # Run tests + collect coverage
       # -------------------------
       - name: Run tests

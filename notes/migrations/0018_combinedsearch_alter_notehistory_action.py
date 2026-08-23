@@ -4,21 +4,33 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0017_fulltext_indices'),
+        ("notes", "0017_fulltext_indices"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='CombinedSearch',
+            name="CombinedSearch",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
             ],
         ),
         migrations.AlterField(
-            model_name='notehistory',
-            name='action',
-            field=models.CharField(choices=[('deferred', 'Deferred'), ('updated', 'Updated'), ('promoted', 'Promoted')], default=None, max_length=15),
+            model_name="notehistory",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("deferred", "Deferred"),
+                    ("updated", "Updated"),
+                    ("promoted", "Promoted"),
+                ],
+                default=None,
+                max_length=15,
+            ),
         ),
     ]

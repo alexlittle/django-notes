@@ -79,6 +79,4 @@ class Command(BaseCommand):
 
         TagSuggestionInputTag.objects.bulk_create(input_tags_objs)
 
-        self.stdout.write(
-            self.style.SUCCESS(f"Saved {len(all_suggestions)} tag suggestions.")
-        )
+        self.stdout.write(self.style.SUCCESS(f"Saved {len(all_suggestions)} tag suggestions."))

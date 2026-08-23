@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0027_savedfilter'),
+        ("notes", "0027_savedfilter"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='savedfilter',
-            name='name',
+            model_name="savedfilter",
+            name="name",
             field=models.CharField(max_length=50),
         ),
     ]

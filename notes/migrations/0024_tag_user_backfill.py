@@ -5,8 +5,8 @@ logger = logging.getLogger(__name__)
 
 
 def update_tags(apps, schema_editor):
-    notes_model = apps.get_model('notes', 'Tag')
-    user_model = apps.get_model('auth', 'user')
+    notes_model = apps.get_model("notes", "Tag")
+    user_model = apps.get_model("auth", "user")
     user = user_model.objects.get(pk=1)
     tags = notes_model.objects.all()
     count = 0
@@ -21,9 +21,8 @@ def update_tags(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0023_tag_user'),
+        ("notes", "0023_tag_user"),
     ]
 
     operations = [

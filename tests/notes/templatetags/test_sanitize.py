@@ -182,9 +182,7 @@ class TestAttributes:
         assert sanitize('<p onclick="evil()">hi</p>') == "<p>hi</p>"
 
     def test_event_handlers_on_links_are_removed(self):
-        assert "onclick" not in sanitize(
-            '<a href="https://example.com" onclick="evil()">link</a>'
-        )
+        assert "onclick" not in sanitize('<a href="https://example.com" onclick="evil()">link</a>')
 
     def test_class_and_id_are_removed(self):
         assert sanitize('<p class="danger" id="x">hi</p>') == "<p>hi</p>"
@@ -217,16 +215,12 @@ class TestLinks:
         # The anchor itself survives, just inert — the text is not lost.
         assert ">click</a>" in out
 
-    @pytest.mark.parametrize(
-        "scheme", ["javascript:", "JaVaScRiPt:", "data:text/html;base64,PHA+"]
-    )
+    @pytest.mark.parametrize("scheme", ["javascript:", "JaVaScRiPt:", "data:text/html;base64,PHA+"])
     def test_dangerous_schemes_are_dropped(self, scheme):
         assert "href" not in sanitize(f'<a href="{scheme}">x</a>')
 
     def test_target_is_dropped(self):
-        assert "target" not in sanitize(
-            '<a href="https://example.com" target="_blank">x</a>'
-        )
+        assert "target" not in sanitize('<a href="https://example.com" target="_blank">x</a>')
 
     def test_rel_noopener_is_added_by_nh3(self):
         # `rel` is not in ALLOWED_ATTRIBUTES, but nh3's link_rel default

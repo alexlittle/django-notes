@@ -5,15 +5,21 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0028_alter_savedfilter_name'),
+        ("notes", "0028_alter_savedfilter_name"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='tag',
-            name='slug',
-            field=notes.fields.AutoSlugField(blank=True, editable=True, max_length=100, null=True, populate_from='name', unique=True),
+            model_name="tag",
+            name="slug",
+            field=notes.fields.AutoSlugField(
+                blank=True,
+                editable=True,
+                max_length=100,
+                null=True,
+                populate_from="name",
+                unique=True,
+            ),
         ),
     ]

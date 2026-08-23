@@ -4,15 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0005_note_due_date_note_estimated_effort_note_priority_and_more'),
+        ("notes", "0005_note_due_date_note_estimated_effort_note_priority_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='note',
-            name='priority',
-            field=models.CharField(blank=True, choices=[('high', 'High'), ('medium', 'Medium'), ('low', 'Low')], default=None, max_length=15, null=True),
+            model_name="note",
+            name="priority",
+            field=models.CharField(
+                blank=True,
+                choices=[("high", "High"), ("medium", "Medium"), ("low", "Low")],
+                default=None,
+                max_length=15,
+                null=True,
+            ),
         ),
     ]

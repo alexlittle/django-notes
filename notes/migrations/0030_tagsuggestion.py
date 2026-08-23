@@ -4,25 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0029_alter_tag_slug'),
+        ("notes", "0029_alter_tag_slug"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TagSuggestion',
+            name="TagSuggestion",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('input_tags', models.JSONField()),
-                ('suggested_tag', models.CharField(max_length=100)),
-                ('confidence', models.FloatField()),
-                ('lift', models.FloatField()),
-                ('support', models.FloatField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("input_tags", models.JSONField()),
+                ("suggested_tag", models.CharField(max_length=100)),
+                ("confidence", models.FloatField()),
+                ("lift", models.FloatField()),
+                ("support", models.FloatField()),
             ],
             options={
-                'verbose_name': 'Tag Suggestion',
-                'verbose_name_plural': 'Tag Suggestions',
+                "verbose_name": "Tag Suggestion",
+                "verbose_name_plural": "Tag Suggestions",
             },
         ),
     ]

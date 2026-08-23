@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0033_notesconfig'),
+        ("notes", "0033_notesconfig"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='tag',
-            name='label',
+            model_name="tag",
+            name="label",
             field=models.CharField(default=None, max_length=100, null=True),
         ),
     ]

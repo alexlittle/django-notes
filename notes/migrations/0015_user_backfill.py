@@ -5,8 +5,8 @@ logger = logging.getLogger(__name__)
 
 
 def update_users(apps, schema_editor):
-    notes_model = apps.get_model('notes', 'Note')
-    user_model = apps.get_model('auth', 'user')
+    notes_model = apps.get_model("notes", "Note")
+    user_model = apps.get_model("auth", "user")
     user = user_model.objects.get(pk=1)
     notes = notes_model.objects.all()
     count = 0
@@ -21,9 +21,8 @@ def update_users(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('notes', '0014_note_type_backfill'),
+        ("notes", "0014_note_type_backfill"),
     ]
 
     operations = [
