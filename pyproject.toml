@@ -21,6 +21,7 @@ dependencies = [
     "django-tinymce==5.0.0",
     "mlxtend==0.25.0",
     "mysqlclient==2.2.8",
+    "nh3>=0.3.7",
     "pandas==3.0.5",
     "pycodestyle==2.14.0",
     "python-dateutil==2.9.0.post0",
