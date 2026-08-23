@@ -106,7 +106,7 @@ jobs:
       # -------------------------
       - name: Get version
         id: ver
-        run: echo "v=$(uv run python -c 'import notes; print(notes._version.__version__)')" >> "$GITHUB_OUTPUT"
+        run: echo "v=$(uv run python -c 'import notes; print(notes.__version__)')" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud
         uses: SonarSource/sonarqube-scan-action@v6
