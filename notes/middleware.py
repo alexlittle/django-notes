@@ -1,8 +1,8 @@
 # oppia/middlewaare.py
-from django.http import HttpResponseRedirect
-from django.conf import settings
 from re import compile
 
+from django.conf import settings
+from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 
 EXEMPT_URLS = [compile(settings.LOGIN_URL.lstrip("/"))]

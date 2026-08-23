@@ -1,18 +1,17 @@
-from django.urls import reverse
-from django.utils import timezone
-from django.db.models import Count, Case, When, Value, DateField, IntegerField
+from datetime import datetime, timedelta
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Case, Count, DateField, IntegerField, Value, When
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
-from django.views.generic import TemplateView, ListView, View
-from django.contrib.auth.mixins import LoginRequiredMixin
-
-from datetime import datetime
-from datetime import timedelta
+from django.urls import reverse
+from django.utils import timezone
+from django.views.generic import ListView, TemplateView, View
 
 from notes.forms import NoteForm, SearchForm
-from notes.models import Note, Tag, NoteTag, NoteHistory, CombinedSearch, SavedFilter, NotesConfig
-from notes.utils import get_user_aware_date, is_showall, get_filtered_notes
 from notes.libs.association import suggest_tags
+from notes.models import CombinedSearch, Note, NoteHistory, NotesConfig, NoteTag, SavedFilter, Tag
+from notes.utils import get_filtered_notes, get_user_aware_date, is_showall
 
 
 class HomeView(TemplateView):

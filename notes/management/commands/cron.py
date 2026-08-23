@@ -1,9 +1,8 @@
+from datetime import datetime, timedelta
+
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
-
-from datetime import datetime
-from datetime import timedelta
 
 from notes.models import Note, NotesConfig
 

@@ -1,5 +1,5 @@
-from django.urls import path
 from django.contrib.auth.views import LoginView
+from django.urls import path
 
 from notes import views as note_views
 

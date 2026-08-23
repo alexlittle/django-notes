@@ -2,10 +2,11 @@
 
 import django.db.models.deletion
 import django.utils.timezone
-import notes.fields
 import tinymce.models
 from django.conf import settings
 from django.db import migrations, models
+
+import notes.fields
 
 
 class Migration(migrations.Migration):

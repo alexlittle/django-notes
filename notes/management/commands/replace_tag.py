@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
-from notes.models import Tag, NoteTag
+from notes.models import NoteTag, Tag
 
 
 class Command(BaseCommand):

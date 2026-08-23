@@ -1,5 +1,3 @@
-# coding: utf-8
-
 """
 Model field definitions
 """
@@ -17,4 +15,4 @@ class AutoSlugField(BaseSlugField):
     def __init__(self, *args, **kwargs):
         if "unique" not in kwargs and "unique_with" not in kwargs:
             kwargs["unique"] = True
-        super(AutoSlugField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

@@ -1,5 +1,6 @@
-from django.db import migrations
 import logging
+
+from django.db import migrations
 
 logger = logging.getLogger(__name__)
 

@@ -1,9 +1,8 @@
 import dateutil.relativedelta
-
 from django.core.management.base import BaseCommand
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from notes.models import Note
 

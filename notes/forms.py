@@ -1,13 +1,11 @@
+from crispy_forms.bootstrap import FieldWithButtons
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Div, Field, Layout, Submit
 from django import forms
 from django.utils.translation import gettext_lazy as _
-
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Div, Field
-from crispy_forms.bootstrap import FieldWithButtons
-
 from tinymce.widgets import TinyMCE
 
-from notes.models import STATUS_OPTIONS, PRIORITY_OPTIONS, RECURRENCE_OPTIONS, TYPE_OPTIONS, Note
+from notes.models import PRIORITY_OPTIONS, RECURRENCE_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS
 
 
 class NoteForm(forms.Form):
@@ -48,7 +46,7 @@ class NoteForm(forms.Form):
     referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
-        super(NoteForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_class = "form-horizontal"
         self.helper.label_class = "col-lg-2"
@@ -97,7 +95,7 @@ class SearchForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        super(SearchForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_show_labels = False
         self.helper.form_method = "GET"

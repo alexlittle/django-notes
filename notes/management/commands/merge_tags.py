@@ -36,7 +36,7 @@ NOTES
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from notes.models import Tag, Note, NoteTag
+from notes.models import Note, NoteTag, Tag
 
 
 class Command(BaseCommand):

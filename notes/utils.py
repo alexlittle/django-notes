@@ -1,8 +1,9 @@
 import datetime
+
 import pytz
-from django.utils import timezone
 from django.conf import settings
 from django.db.models import Count, Q
+from django.utils import timezone
 
 
 def get_user_aware_date(user):

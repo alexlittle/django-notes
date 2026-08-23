@@ -5,13 +5,12 @@ Checks the urls to ensure they are valid links
 
 import datetime
 import http
-import socket
 import ssl
-from urllib import request, error
+from urllib import error, request
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from notes.models import Note
 
@@ -58,10 +57,10 @@ class Command(BaseCommand):
                 print(response.code)
                 self.update_link_check(note, "ok")
             except (
+                TimeoutError,
                 ssl.CertificateError,
                 http.client.RemoteDisconnected,
                 ConnectionResetError,
-                socket.timeout,
                 http.client.BadStatusLine,
             ):
                 print("Error")

@@ -1,23 +1,18 @@
 import datetime
-from operator import truediv
+from collections import defaultdict
+from datetime import timedelta
 
 import pytz
-
-from collections import defaultdict
-
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
-from django.db import models, connection
+from django.db import connection, models
+from django.forms.models import model_to_dict
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django.forms.models import model_to_dict
-
-from datetime import timedelta
-from dateutil.relativedelta import relativedelta
+from tinymce.models import HTMLField
 
 from notes.fields import AutoSlugField
 from notes.utils import get_filtered_notes
-
-from tinymce.models import HTMLField
 
 TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 

@@ -1,8 +1,9 @@
-from django.core.management.base import BaseCommand
-from notes.models import Note, TagSuggestion, TagSuggestionInputTag
-from mlxtend.preprocessing import TransactionEncoder
-from mlxtend.frequent_patterns import apriori, association_rules
 import pandas as pd
+from django.core.management.base import BaseCommand
+from mlxtend.frequent_patterns import apriori, association_rules
+from mlxtend.preprocessing import TransactionEncoder
+
+from notes.models import Note, TagSuggestion, TagSuggestionInputTag
 
 
 class Command(BaseCommand):

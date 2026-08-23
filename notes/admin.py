@@ -1,14 +1,15 @@
 from django.contrib import admin
+
 from notes.models import (
     Note,
-    Tag,
-    NoteTag,
     NoteHistory,
+    NotesConfig,
     NotesProfile,
+    NoteTag,
     SavedFilter,
+    Tag,
     TagSuggestion,
     TagSuggestionInputTag,
-    NotesConfig,
 )
 
 
