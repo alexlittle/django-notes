@@ -95,7 +95,13 @@ jobs:
       # -------------------------
       # SonarQube Cloud scan
       # -------------------------
-      - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarqube-scan-action@22918119ff8e1ca75a623e15c8296b6ea4fbe28f # v8
+      - name: Get version
+        id: ver
+        run: echo "v=$(uv run python -c 'import notes; print(notes._version.__version__)')" >> "$GITHUB_OUTPUT"
+
+      - name: SonarCloud
+        uses: SonarSource/sonarqube-scan-action@v6
+        with:
+          args: -Dsonar.projectVersion=${{ steps.ver.outputs.v }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
