@@ -1,11 +1,6 @@
-[build-system]
-requires = ["setuptools>=61", "wheel"]
-build-backend = "setuptools.build_meta"
-
-
 [project]
 name = "django-notes"
-dynamic = ["version"]
+version = "0.1.0"
 description = "Notes and Bookmarks web application"
 readme = "README.md"
 requires-python = ">=3.12"
