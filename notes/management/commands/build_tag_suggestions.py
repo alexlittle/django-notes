@@ -1,5 +1,6 @@
 import pandas as pd
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from mlxtend.frequent_patterns import apriori, association_rules
 from mlxtend.preprocessing import TransactionEncoder
 
@@ -63,14 +64,14 @@ class Command(BaseCommand):
                 objs.append((suggestion, antecedents))
 
         # Bulk insert TagSuggestions
-        TagSuggestion.objects.bulk_create([s for s, _ in objs])
-
-        input_tags_objs = [
-            TagSuggestionInputTag(suggestion=suggestion, tag=tag)
-            for suggestion, antecedents in objs
-            for tag in antecedents
-        ]
-        TagSuggestionInputTag.objects.bulk_create(input_tags_objs)
+        with transaction.atomic():
+            input_tags_objs = []
+            for suggestion, antecedents in objs:
+                suggestion.save()
+                input_tags_objs.extend(
+                    TagSuggestionInputTag(suggestion=suggestion, tag=tag) for tag in antecedents
+                )
+            TagSuggestionInputTag.objects.bulk_create(input_tags_objs)
 
         self.stdout.write(
             self.style.SUCCESS(
