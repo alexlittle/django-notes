@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block extra_scripts %}
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="{% static 'vendor/jquery-ui/jquery-ui.min.css' %}">
+<script src="{% static 'vendor/jquery-ui/jquery-ui.min.js' %}"></script>
 <script>
 $(function() {
     function split(val) {
