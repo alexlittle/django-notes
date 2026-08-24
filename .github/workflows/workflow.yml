@@ -58,7 +58,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --locked --no-default-groups --group dev --no-build
+        run: uv sync --locked --no-default-groups --group dev --no-build-package mod-wsgi
 
       # -------------------------
       # code format checks
