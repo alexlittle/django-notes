@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
             "ALTER TABLE notes_note  DROP INDEX note_fulltext_index;",
         ),
         migrations.RunSQL(
-            "ALTER TABLE notes_note ADD FULLTEXT INDEX note_fulltext_index (type, title, url, description, status, priority);",
+            """ALTER TABLE notes_note ADD FULLTEXT INDEX note_fulltext_index 
+            (type, title, url, description, status, priority);""",
             "ALTER TABLE notes_note  DROP INDEX note_fulltext_index;",
         ),
     ]

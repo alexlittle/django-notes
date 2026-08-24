@@ -26,14 +26,15 @@ class Command(BaseCommand):
         )
         for idx, ob in enumerate(old_notes):
             print()
-            print("%d/%d %s - %s " % (idx, old_notes.count(), ob.title, ob.url))
-            print("Added: %s" % ob.create_date)
-            print(
-                "Edit: %s%s"
-                % ("http://localhost:9030", reverse("admin:notes_note_change", args=[ob.id]))
-            )
+            print(f"{idx}/{old_notes.count()} {ob.title} - {ob.url} ")
+            print(f"Added: {ob.create_date}")
+
+            domain = "http://localhost:9030"
+            path = reverse("admin:notes_note_change", args=[ob.id])
+
+            print(f"Edit: {domain}{path}")
             tags = ", ".join(ob.tags.all().values_list("name", flat=True))
-            print("Tags: %s" % tags)
+            print(f"Tags: {tags}")
             print()
             accept = input(_("Delete this link? [y/n]"))
             if accept == "y":

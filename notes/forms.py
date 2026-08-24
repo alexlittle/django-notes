@@ -80,7 +80,6 @@ class NoteForm(forms.Form):
         type = cleaned_data.get("type")
         priority = cleaned_data.get("priority")
         url = cleaned_data.get("url")
-        estimated_effort = cleaned_data.get("estimated_effort")
         if type == "task" and not priority:
             raise forms.ValidationError("A task must have a priority")
         if type == "bookmark" and not url:

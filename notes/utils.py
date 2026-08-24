@@ -1,7 +1,6 @@
 import datetime
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import pytz
-from django.conf import settings
 from django.db.models import Count, Q
 from django.utils import timezone
 
@@ -18,32 +17,24 @@ def get_user_aware_datetime(user):
         user: A Django user object.
 
     Returns:
-        datetime: A datetime.datetime object, or None if the user or timezone is invalid.
+        datetime: A datetime.datetime object in the user's timezone, falling back
+        to Django's current timezone if the user has no valid timezone set.
     """
-
     if not user.is_authenticated:
         return timezone.now()
 
     try:
         user_timezone = user.profile.timezone
         if isinstance(user_timezone, str):
-            user_timezone = pytz.timezone(user_timezone)
-        user_time = datetime.datetime.now(user_timezone)
-        return user_time
-
-    except (AttributeError, pytz.exceptions.UnknownTimeZoneError):
-        if settings.USE_TZ:
-            return timezone.now()
-        else:
-            return datetime.datetime.now()
+            user_timezone = ZoneInfo(user_timezone)
+        return datetime.datetime.now(user_timezone)
+    except (AttributeError, TypeError, ValueError, ZoneInfoNotFoundError):
+        return timezone.now()
 
 
 def is_showall(request):
     showall_str = request.GET.get("showall", "false").lower()
-    if showall_str == "false":
-        return False
-    else:
-        return True
+    return showall_str != "false"
 
 
 def get_filtered_notes(user, filter):

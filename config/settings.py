@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["localhost.notes", "localhost"]
 
@@ -108,11 +108,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 #####################################################################
-# Email
-SERVER_EMAIL = "Alex Little <consult@alexlittle.net>"
-EMAIL_SUBJECT_PREFIX = "[Alex Little]: "
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-EMAIL_FILE_PATH = "/tmp/"
+# Email - none configured
 #####################################################################
 
 
@@ -158,8 +154,11 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 NOTES_ASSISTANT_ENABLED = False
 
 try:
-    from config.local_settings import *
+    from config.local_settings import *  # noqa: F403
 except ImportError:
     import warnings
 
-    warnings.warn("Using default settings. Add `config.local_settings.py`for custom settings.")
+    warnings.warn(
+        "Using default settings. Add `config/local_settings.py` for custom settings.",
+        stacklevel=2,
+    )

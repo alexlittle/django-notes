@@ -8,7 +8,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            "ALTER TABLE notes_note ADD FULLTEXT INDEX note_fulltext_index (title, url, description, status, priority);",
+            """ALTER TABLE notes_note ADD FULLTEXT INDEX note_fulltext_index 
+            (title, url, description, status, priority);""",
             "ALTER TABLE notes_note  DROP INDEX note_fulltext_index;",
         ),
         migrations.RunSQL(

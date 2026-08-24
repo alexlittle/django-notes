@@ -1,4 +1,6 @@
 # config/settings_ci.py
+import os
+
 from config.settings import *  # NOSONAR
 
 DATABASES = {

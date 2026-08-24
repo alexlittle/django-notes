@@ -42,7 +42,7 @@ class Command(BaseCommand):
         redirect_list = []
 
         for idx, note in enumerate(notes):
-            print("Checking: %s (%d/%d)" % (note.url, idx, len(notes)))
+            print(f"Checking: {note.url} ({idx}/{len(notes)})")
             opener = request.build_opener(NoRedirect)
             request.install_opener(opener)
             try:
@@ -50,7 +50,9 @@ class Command(BaseCommand):
                     note.url,
                     method="GET",
                     headers={
-                        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36"
+                        "User-Agent": """Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) 
+                        AppleWebKit/537.36 (KHTML, like Gecko) 
+                        Chrome/35.0.1916.47 Safari/537.36"""
                     },
                 )
                 response = request.urlopen(my_request, timeout=20)
@@ -71,16 +73,16 @@ class Command(BaseCommand):
                 self.update_link_check(note, "redirect")
                 redirect_list.append(note)
 
-        print("%d errors" % len(error_list))
+        print(f"{len(error_list)} errors")
         for idx, el in enumerate(error_list):
-            print("%d/%d %s" % (idx, len(error_list), el.url))
+            print(f"{idx}/{len(error_list)} {el.url}")
             accept = input(_("Delete this link? [y/n]"))
             if accept == "y":
                 el.delete()
 
-        print("%d redirects" % len(redirect_list))
+        print(f"{len(redirect_list)} redirects")
         for idx, rl in enumerate(redirect_list):
-            print("%d/%d %s" % (idx, len(redirect_list), rl.url))
+            print(f"{idx}/{len(redirect_list)} {rl.url}")
 
     def update_link_check(self, note, result):
         note.link_check_date = timezone.now()

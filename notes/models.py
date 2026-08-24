@@ -1,8 +1,8 @@
 import datetime
 from collections import defaultdict
 from datetime import timedelta
+from zoneinfo import available_timezones
 
-import pytz
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import User
 from django.db import connection, models
@@ -14,7 +14,7 @@ from tinymce.models import HTMLField
 from notes.fields import AutoSlugField
 from notes.utils import get_filtered_notes
 
-TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+TIMEZONES = tuple((tz, tz) for tz in sorted(available_timezones()))
 
 TYPE_OPTIONS = (
     ("bookmark", "Bookmark"),
@@ -79,7 +79,13 @@ class CombinedSearchManager(models.Manager):
                 WHERE
                     note.user_id = %s
                 AND
-                    (MATCH(note.type, note.title, note.url, note.description, note.status, note.priority) AGAINST(%s IN NATURAL LANGUAGE MODE)
+                    (MATCH(note.type,
+                        note.title,
+                        note.url,
+                        note.description,
+                        note.status,
+                        note.priority)
+                    AGAINST(%s IN NATURAL LANGUAGE MODE)
                 OR
                     MATCH (t.name, t.slug) AGAINST (%s IN NATURAL LANGUAGE MODE))
 
@@ -223,7 +229,6 @@ class Note(models.Model):
         self.completed_date = None
         self.update_date = datetime.datetime.now()
         self.save()
-        return
 
     def close_task(self):
         """Mark the task as not completed"""
@@ -231,7 +236,6 @@ class Note(models.Model):
         self.completed_date = None
         self.update_date = datetime.datetime.now()
         self.save()
-        return
 
     def has_important_tag(self):
         if self.priority == "high":
@@ -240,10 +244,7 @@ class Note(models.Model):
         # get important tag/s from db
         tags = [tag.strip() for tag in NotesConfig.get_value("schedule.important.tags").split(",")]
         tag_names = self.tags.values_list("slug", flat=True)
-        for t in tags:
-            if t in tag_names:
-                return True
-        return False
+        return any(t in tag_names for t in tags)
 
 
 class NoteHistory(models.Model):

@@ -7,7 +7,8 @@ from notes.models import Note, TagSuggestion, TagSuggestionInputTag
 
 
 class Command(BaseCommand):
-    help = "Build tag association rules and store them in TagSuggestion / TagSuggestionInputTag tables."
+    help = """Build tag association rules and store them in 
+            TagSuggestion / TagSuggestionInputTag tables."""
 
     def add_arguments(self, parser):
         parser.add_argument("--min_support", type=float, default=0.002)
@@ -64,20 +65,15 @@ class Command(BaseCommand):
         # Bulk insert TagSuggestions
         TagSuggestion.objects.bulk_create([s for s, _ in objs])
 
-        # Reload with IDs
-        all_suggestions = list(TagSuggestion.objects.all())
-        for suggestion, antecedents in zip(all_suggestions, [a for _, a in objs]):
-            for t in antecedents:
-                input_tags_objs.append(TagSuggestionInputTag(suggestion=suggestion, tag=t))
-
+        input_tags_objs = [
+            TagSuggestionInputTag(suggestion=suggestion, tag=tag)
+            for suggestion, antecedents in objs
+            for tag in antecedents
+        ]
         TagSuggestionInputTag.objects.bulk_create(input_tags_objs)
 
-        # Reload them with IDs
-        all_suggestions = list(TagSuggestion.objects.all())
-        for suggestion, antecedents in zip(all_suggestions, [a for _, a in objs]):
-            for t in antecedents:
-                input_tags_objs.append(TagSuggestionInputTag(suggestion=suggestion, tag=t))
-
-        TagSuggestionInputTag.objects.bulk_create(input_tags_objs)
-
-        self.stdout.write(self.style.SUCCESS(f"Saved {len(all_suggestions)} tag suggestions."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Saved {len(objs)} tag suggestions with {len(input_tags_objs)} input tags."
+            )
+        )

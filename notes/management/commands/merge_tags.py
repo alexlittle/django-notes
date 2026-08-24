@@ -124,13 +124,14 @@ class Command(BaseCommand):
                     remaining = NoteTag.objects.filter(tag=old_tag).count()
                     if remaining == 0:
                         self.stdout.write(
-                            f'  Deleting now-unused tag "{old_tag_name}" for user {user}'
+                            f'Deleting now-unused tag "{old_tag_name}" for user {user}'
                         )
                         if not dry_run:
                             old_tag.delete()
                     else:
                         self.stdout.write(
-                            f'  Skipping delete: "{old_tag_name}" still used {remaining} time(s) for user {user}'
+                            f"""Skipping delete: "{old_tag_name}" still used
+                                {remaining} time(s) for user {user}"""
                         )
 
             if dry_run:
