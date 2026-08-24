@@ -102,5 +102,5 @@ deploy = [
 
 [tool.uv]
 package = false
-default-groups = ["local", "deploy"]
+default-groups = ["local"]
 
