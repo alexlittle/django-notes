@@ -1,5 +1,7 @@
 {% load i18n %}
 {% load static %}
+{% load sanitize %}
+
 <div class="note-container">
 	<div class="note-text">
 		<strong>{% if note.url %}
@@ -29,7 +31,7 @@
 	{% if note.description %}
 		<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
 		<div id="desc-{{ note.id }}">
-			{{ note.description|safe }}
+			{{ note.description|sanitize }}
 		</div>
 	{% endif %}
 		</div>

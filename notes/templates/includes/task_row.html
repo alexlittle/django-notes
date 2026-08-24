@@ -1,6 +1,7 @@
 {% load i18n %}
 {% load static %}
 {% load humanize %}
+{% load sanitize %}
 
 <div class="note-container">
 	{% include "includes/task_completed_icon.html" %}
@@ -40,7 +41,7 @@
 		{% if note.description %}
 			<div type="button" id="desc-{{ note.id }}-toggle" value="Toggle Div">Show description</div>
 			<div id="desc-{{ note.id }}">
-				{{ note.description|safe }}
+				{{ note.description|sanitize }}
 			</div>
 	{% endif %}
 	</div>

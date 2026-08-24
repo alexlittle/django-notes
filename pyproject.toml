@@ -81,7 +81,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [dependency-groups]
 dev = [
     "twine==7.0.0",
-    "build==1.4.0",
+    "build==1.5.0",
     "wheel==0.46.3",
     "pytest-cov==7.1.0",
     "Sphinx==9.1.0",
@@ -91,13 +91,13 @@ dev = [
     "setuptools==84.0.0",
     "pytest>=9.1.1",
     "ruff>=0.16.4",
-    "pytest-django==4.12.0",
+    "pytest-django==4.14.0",
 ]
 local = [
     "django-extensions==4.1"
 ]
 deploy = [
-    "mod-wsgi==6.0.5"
+    "mod-wsgi==6.0.6"
 ]
 
 [tool.uv]
