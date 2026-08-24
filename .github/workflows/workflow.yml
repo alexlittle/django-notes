@@ -64,16 +64,16 @@ jobs:
       # code format checks
       # -------------------------
       - name: Lint
-        run: uv run ruff check .
+        run: .venv/bin/ruff check .
 
       - name: Format check
-        run: uv run ruff format --check .
+        run: .venv/bin/ruff format --check .
 
       # -------------------------
       # Run tests + collect coverage
       # -------------------------
       - name: Run tests
-        run: uv run --frozen pytest --cov --cov-report=xml --cov-report=term
+        run: .venv/bin/pytest --ds=config.settings_ci --cov --cov-report=xml --cov-report=term
         env:
           DJANGO_SETTINGS_MODULE: config.settings_ci
           DB_HOST: 127.0.0.1
@@ -94,11 +94,11 @@ jobs:
       # Docstring coverage and consistency
       # -------------------------
       - name: Docstring coverage report
-        run: uv run --frozen interrogate -v notes/
+        run: .venv/bin/interrogate -v notes/
         continue-on-error: true # so won't fail the action
 
       - name: Docstring/signature consistency report
-        run: uv run --frozen pydoclint notes/
+        run: .venv/bin/pydoclint notes/
         continue-on-error: true # so won't fail the action
 
       # -------------------------

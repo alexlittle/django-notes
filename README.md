@@ -19,7 +19,7 @@ Very happy for anyone to reuse and/or send any pull requests etc
 
 ### Continuous Integration
 
-[![CI](https://github.com/alexlittle/django-notes/actions/workflows/ci.yml/badge.svg)](https://github.com/alexlittle/django-notes/actions)
+[![CI](https://github.com/alexlittle/django-notes/actions/workflows/workflow.yml/badge.svg)](https://github.com/alexlittle/django-notes/actions)
 
 ### SonarCloud - Quality Overview
 
