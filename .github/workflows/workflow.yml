@@ -109,7 +109,7 @@ jobs:
         run: echo "v=$(uv run python -c 'import notes; print(notes.__version__)')" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud
-        uses: SonarSource/sonarqube-scan-action@v6
+        uses: SonarSource/sonarqube-scan-action@fd88b7d7ccbaefd23d8f36f73b59db7a3d246602 # v6.0.0
         with:
           args: -Dsonar.projectVersion=${{ steps.ver.outputs.v }}
         env:

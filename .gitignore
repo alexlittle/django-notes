@@ -11,5 +11,4 @@ cron.sh
 /uwsgi.sock
 /env/
 /static/
-/requirements-frozen.txt
 /django_notes.egg-info/
