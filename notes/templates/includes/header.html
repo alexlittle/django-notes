@@ -18,8 +18,9 @@
                     <li class="nav-item"><a href="{% url 'notes:search' %}" class="nav-link">{% trans 'Search' %}</a></li>
                     <li class="nav-item"><a href="{% url 'notes:recent' %}" class="nav-link">{% trans 'Recent' %}</a></li>
                     <li class="nav-item dropdown">
-                         <a class="nav-link dropdown-toggle" href="#" id="favsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            {% trans 'Favourites' %}</a>
+                         <button class="nav-link dropdown-toggle" id="favsDropdown" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% trans 'Favourites' %}
+                        </button>
                          <ul class="dropdown-menu" aria-labelledby="favsDropdown">
                              <li class="nav-item"><a href="{% url 'notes:favs' %}" class="nav-link">{% trans 'All' %}</a></li>
                              <li class="nav-item"><a href="{% url 'notes:schedule' %}" class="nav-link">{% trans 'Schedule' %}</a></li>

@@ -1,7 +1,8 @@
 {% load i18n %}
 
 <form action="" method="get">
-    <select name="orderby" onchange="this.form.submit()">
+    <label for="orderby" class="visually-hidden">{% trans 'Order by' %}</label>
+    <select name="orderby" onchange="this.form.submit()" id="orderby">
         <option value="">--</option>
         <option value="-favorite">Favourites first</option>
         <option value="name">Alphabetical</option>
