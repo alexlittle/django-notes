@@ -12,3 +12,4 @@ cron.sh
 /env/
 /static/
 /django_notes.egg-info/
+/.coverage

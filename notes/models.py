@@ -98,6 +98,13 @@ class CombinedSearchManager(models.Manager):
         return results
 
 
+class CombinedSearch(models.Model):
+    objects = CombinedSearchManager()
+
+    class Meta:
+        managed = False
+
+
 class Tag(models.Model):
     create_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -276,10 +283,6 @@ class SavedFilter(models.Model):
 
     def get_count(self, user):
         return get_filtered_notes(user, self.value).count()
-
-
-class CombinedSearch(models.Model):
-    objects = CombinedSearchManager()
 
 
 class TagSuggestion(models.Model):

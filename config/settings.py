@@ -154,7 +154,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 NOTES_ASSISTANT_ENABLED = False
 
 try:
-    from config.local_settings import *  # noqa: F403
+    from config.local_settings import *  # noqa: F403  # NOSONAR
 except ImportError:
     import warnings
 
