@@ -267,6 +267,9 @@ class NoteTag(models.Model):
     class Meta:
         verbose_name = _("Note Tag")
         verbose_name_plural = _("Note Tags")
+        constraints = [
+            models.UniqueConstraint(fields=["note", "tag"], name="unique_note_tag"),
+        ]
 
 
 class SavedFilter(models.Model):

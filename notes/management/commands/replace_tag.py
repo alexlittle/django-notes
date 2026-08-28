@@ -17,10 +17,13 @@ class Command(BaseCommand):
         newtag = Tag.objects.get(slug=options["newtag"])
 
         # add new tag to all notes with the old one
-        note_tags = NoteTag.objects.filter(tag=oldtag)
+        note_tags = list(NoteTag.objects.filter(tag=oldtag))
         for nt in note_tags:
-            nt.tag = newtag
-            nt.save()
+            if NoteTag.objects.filter(note=nt.note, tag=newtag).exists():
+                nt.delete()
+            else:
+                nt.tag = newtag
+                nt.save()
 
         oldtag.delete()
-        print(f"{note_tags.count()} tags replaced {options['oldtag']}")
+        print(f"{len(note_tags)} tags replaced {options['oldtag']}")
