@@ -66,6 +66,65 @@ class Command(BaseCommand):
             help="Delete the old tag afterwards if no notes reference it any more",
         )
 
+    def _get_or_create_new_tags(self, user, new_tag_names):
+        """Get or create each replacement tag for this user, logging any creations."""
+        new_tags = []
+        for name in new_tag_names:
+            tag_obj, created = Tag.objects.get_or_create(user=user, name=name)
+            new_tags.append(tag_obj)
+            if created:
+                self.stdout.write(f'  Created new tag "{name}" for user {user}')
+        return new_tags
+
+    def _link_new_tag(self, note, new_tag, dry_run):
+        already_linked = NoteTag.objects.filter(note=note, tag=new_tag).exists()
+        if already_linked:
+            self.stdout.write(f'  Note {note.id} "{note.title}": already has "{new_tag.name}"')
+            return
+        if not dry_run:
+            NoteTag.objects.create(note=note, tag=new_tag)
+        self.stdout.write(f'  Note {note.id} "{note.title}": + "{new_tag.name}"')
+
+    def _relink_note(self, note, old_tag, old_tag_name, new_tags, dry_run):
+        for new_tag in new_tags:
+            self._link_new_tag(note, new_tag, dry_run)
+
+        if not dry_run:
+            NoteTag.objects.filter(note=note, tag=old_tag).delete()
+        self.stdout.write(f'  Note {note.id} "{note.title}": - "{old_tag_name}"')
+
+    def _maybe_delete_old_tag(self, old_tag, old_tag_name, user, dry_run):
+        remaining = NoteTag.objects.filter(tag=old_tag).count()
+        if remaining != 0:
+            self.stdout.write(
+                f"""Skipping delete: "{old_tag_name}" still used
+                    {remaining} time(s) for user {user}"""
+            )
+            return
+
+        self.stdout.write(f'Deleting now-unused tag "{old_tag_name}" for user {user}')
+        if not dry_run:
+            old_tag.delete()
+
+    def _process_old_tag(self, old_tag, old_tag_name, new_tag_names, dry_run, delete_old):
+        """Relink every note on old_tag to the replacement tag(s). Returns notes updated."""
+        user = old_tag.user
+        notes = Note.objects.filter(tags=old_tag)
+        count = notes.count()
+        self.stdout.write(f'User {user}: tag "{old_tag_name}" found on {count} note(s)')
+
+        if count == 0:
+            return 0
+
+        new_tags = self._get_or_create_new_tags(user, new_tag_names)
+        for note in notes:
+            self._relink_note(note, old_tag, old_tag_name, new_tags, dry_run)
+
+        if delete_old:
+            self._maybe_delete_old_tag(old_tag, old_tag_name, user, dry_run)
+
+        return count
+
     def handle(self, *args, **options):
         old_tag_name = options["old_tag"]
         new_tag_names = [t.strip() for t in options["new_tags"].split(",") if t.strip()]
@@ -84,55 +143,9 @@ class Command(BaseCommand):
 
         with transaction.atomic():
             for old_tag in old_tags:
-                user = old_tag.user
-                notes = Note.objects.filter(tags=old_tag)
-                count = notes.count()
-                self.stdout.write(f'User {user}: tag "{old_tag_name}" found on {count} note(s)')
-
-                if count == 0:
-                    continue
-
-                # get or create each replacement tag for this same user
-                new_tags = []
-                for name in new_tag_names:
-                    tag_obj, created = Tag.objects.get_or_create(user=user, name=name)
-                    new_tags.append(tag_obj)
-                    if created:
-                        self.stdout.write(f'  Created new tag "{name}" for user {user}')
-
-                for note in notes:
-                    for new_tag in new_tags:
-                        already_linked = NoteTag.objects.filter(note=note, tag=new_tag).exists()
-                        if not already_linked:
-                            if not dry_run:
-                                NoteTag.objects.create(note=note, tag=new_tag)
-                            self.stdout.write(
-                                f'  Note {note.id} "{note.title}": + "{new_tag.name}"'
-                            )
-                        else:
-                            self.stdout.write(
-                                f'  Note {note.id} "{note.title}": already has "{new_tag.name}"'
-                            )
-
-                    if not dry_run:
-                        NoteTag.objects.filter(note=note, tag=old_tag).delete()
-                    self.stdout.write(f'  Note {note.id} "{note.title}": - "{old_tag_name}"')
-
-                total_notes_updated += count
-
-                if delete_old:
-                    remaining = NoteTag.objects.filter(tag=old_tag).count()
-                    if remaining == 0:
-                        self.stdout.write(
-                            f'Deleting now-unused tag "{old_tag_name}" for user {user}'
-                        )
-                        if not dry_run:
-                            old_tag.delete()
-                    else:
-                        self.stdout.write(
-                            f"""Skipping delete: "{old_tag_name}" still used
-                                {remaining} time(s) for user {user}"""
-                        )
+                total_notes_updated += self._process_old_tag(
+                    old_tag, old_tag_name, new_tag_names, dry_run, delete_old
+                )
 
             if dry_run:
                 self.stdout.write(

@@ -361,59 +361,54 @@ class EditView(TemplateView):
         form = NoteForm(initial=data)
         return render(request, "notes/form.html", {"form": form, "recent_tags": recent_tags})
 
+    def _update_tags(self, note, tags_field):
+        NoteTag.objects.filter(note=note).delete()
+        tags = [tag.strip() for tag in tags_field.split(",") if tag.strip()]
+        for name in tags:
+            tag, _created = Tag.objects.get_or_create(user=self.request.user, name=name)
+            NoteTag.objects.get_or_create(note=note, tag=tag)
+
+    def _apply_form_data(self, note, request, form, old_status):
+        note.user = request.user
+        note.update_date = timezone.now()
+        note.type = form.cleaned_data.get("type")
+        note.title = form.cleaned_data.get("title")
+        note.url = form.cleaned_data.get("url")
+        note.description = form.cleaned_data.get("description")
+        note.status = form.cleaned_data.get("status")
+        note.due_date = form.cleaned_data.get("due_date")
+        note.priority = form.cleaned_data.get("priority")
+        note.recurrence = form.cleaned_data.get("recurrence")
+        note.reminder_days = form.cleaned_data.get("reminder_days")
+
+        if old_status != "completed" and note.status == "completed":
+            note.complete_task()
+        note.save()
+
+    def _record_history(self, note, old_due_date):
+        nh = NoteHistory(note=note)
+        if old_due_date and note.due_date:
+            nh.action = "deferred" if old_due_date <= note.due_date else "promoted"
+        else:
+            nh.action = "updated"
+        nh.save()
+
     def post(self, request, note_id):
         note = Note.objects.get(user=self.request.user, pk=note_id)
         form = NoteForm(request.POST)
-        if form.is_valid():
-            NoteTag.objects.filter(note=note).delete()
-            new_tags = form.cleaned_data.get("tags")
-            tags = [x.strip() for x in new_tags.split(",")]
-            tags = [tag for tag in tags if tag]
-            for t in tags:
-                tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
-                NoteTag.objects.get_or_create(note=note, tag=tag)
-
-            old_status = note.status
-            old_due_date = note.due_date
-            note.user = request.user
-            note.update_date = timezone.now()
-            note.type = form.cleaned_data.get("type")
-            note.title = form.cleaned_data.get("title")
-            note.url = form.cleaned_data.get("url")
-            note.description = form.cleaned_data.get("description")
-            note.status = form.cleaned_data.get("status")
-            note.due_date = form.cleaned_data.get("due_date")
-            note.priority = form.cleaned_data.get("priority")
-            note.recurrence = form.cleaned_data.get("recurrence")
-            note.reminder_days = form.cleaned_data.get("reminder_days")
-            # if completed, check if recurring
-            completed_status_key = "completed"
-            if (
-                old_status != completed_status_key
-                and form.cleaned_data.get("status") == completed_status_key
-            ):
-                note.complete_task()
-            note.save()
-
-            nh = NoteHistory()
-            nh.note = note
-            if old_due_date and note.due_date:
-                if old_due_date <= note.due_date:
-                    nh.action = "deferred"
-                else:
-                    nh.action = "promoted"
-            else:
-                nh.action = "updated"
-            nh.save()
-            referer = form.cleaned_data.get("referer")
-            if referer:
-                return HttpResponseRedirect(referer)
-            else:
-                return HttpResponseRedirect(reverse("notes:home"))
-        else:
+        if not form.is_valid():
             print(form.errors)
-            context = {"form": form}
-            return render(request, "notes/form.html", context)
+            return render(request, "notes/form.html", {"form": form})
+
+        old_status = note.status
+        old_due_date = note.due_date
+
+        self._update_tags(note, form.cleaned_data.get("tags"))
+        self._apply_form_data(note, request, form, old_status)
+        self._record_history(note, old_due_date)
+
+        referer = form.cleaned_data.get("referer")
+        return HttpResponseRedirect(referer or reverse("notes:home"))
 
 
 class TagView(ListView):
