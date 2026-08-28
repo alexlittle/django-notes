@@ -45,15 +45,15 @@ class TagDiffCommandTests(NotesCommandTestCase):
 
         self.assertEqual(with_default, with_explicit_default)
 
-    def test_identically_named_tags_belonging_to_different_users_are_never_flagged(self):
-        # Comparison is by exact name string, and current_tag is filtered
-        # out of the list it's compared against (`tag != current_tag`).
-        # Two different users' tags that happen to share the exact same
-        # name are therefore invisible to this tool - arguably the most
-        # important duplicate to catch, and the one case it can't catch.
+    def test_identically_named_tags_belonging_to_different_users_are_flagged(self):
+        # Only each tag's own entry is excluded from its comparison list
+        # now, not every tag sharing its name - so two different users'
+        # tags with the exact same name do get flagged as a match.
         self.make_tag(user=self.user, name="python")
         self.make_tag(user=self.other_user, name="python")
+        self.make_tag(user=self.user, name="gardening")
 
         output = _run_and_capture(0.6)
 
-        self.assertEqual(output.strip(), "")
+        self.assertIn("python", output)
+        self.assertNotIn("gardening", output)

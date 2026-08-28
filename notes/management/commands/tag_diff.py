@@ -20,8 +20,11 @@ class Command(BaseCommand):
         # get all tags as plain list
         tags = list(Tag.objects.order_by("name").values_list("name", flat=True))
 
-        for current_tag in tags:
-            filtered_list = [tag for tag in tags if tag != current_tag]
+        for index, current_tag in enumerate(tags):
+            # Exclude only this tag's own entry, not every tag sharing its
+            # name - otherwise two different users' tags with the exact
+            # same name are invisible to each other.
+            filtered_list = [tag for i, tag in enumerate(tags) if i != index]
             matches = difflib.get_close_matches(current_tag, filtered_list, cutoff=cutoff)
             if matches:
                 print(current_tag)

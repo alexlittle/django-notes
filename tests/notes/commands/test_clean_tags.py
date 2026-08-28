@@ -13,14 +13,22 @@ class CleanTagsCommandTests(NotesCommandTestCase):
 
         self.assertFalse(Tag.objects.filter(pk=unused.pk).exists())
 
-    def test_keeps_tags_that_have_at_least_one_note_of_any_status(self):
-        # note_count here is a plain Count("notetag__note__id") with no
-        # status filter - unlike Tag.note_count() elsewhere in the app,
-        # which excludes completed/archived/closed notes. So a tag whose
-        # only note is e.g. archived still counts as "used" here.
-        tag = self.make_tag(name="used")
+    def test_deletes_tags_whose_only_note_is_completed_archived_or_closed(self):
+        # note_count now matches Tag.note_count() elsewhere in the app,
+        # which excludes completed/archived/closed notes - so a tag whose
+        # only note is e.g. archived counts as "unused" here too.
+        tag = self.make_tag(name="unused")
         archived_note = self.make_note(type="task", title="Old", status="archived")
         self.tag_note(archived_note, tag)
+
+        call_command("clean_tags")
+
+        self.assertFalse(Tag.objects.filter(pk=tag.pk).exists())
+
+    def test_keeps_tags_that_have_at_least_one_active_note(self):
+        tag = self.make_tag(name="used")
+        open_note = self.make_note(type="task", title="Still open", status="open")
+        self.tag_note(open_note, tag)
 
         call_command("clean_tags")
 

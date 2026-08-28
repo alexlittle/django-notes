@@ -33,6 +33,10 @@ STATUS_OPTIONS = (
     ("archived", "Archived"),
 )
 
+# Statuses that don't count as "active" use of a note - excluded when
+# deciding whether a tag is still in use (Tag.note_count(), clean_tags).
+INACTIVE_NOTE_STATUSES = ["completed", "archived", "closed"]
+
 PRIORITY_OPTIONS = (("high", "High"), ("medium", "Medium"), ("low", "Low"))
 
 HISTORY_OPTIONS = (("deferred", "Deferred"), ("updated", "Updated"), ("promoted", "Promoted"))
@@ -117,11 +121,7 @@ class Tag(models.Model):
         return self.name
 
     def note_count(self):
-        return (
-            Note.objects.filter(tags=self)
-            .exclude(status__in=["completed", "archived", "closed"])
-            .count()
-        )
+        return Note.objects.filter(tags=self).exclude(status__in=INACTIVE_NOTE_STATUSES).count()
 
     @staticmethod
     def get_top_10_recent_tags():
