@@ -149,7 +149,7 @@ class Note(models.Model):
     title = models.TextField(blank=False, null=False, default=None)
     description = HTMLField(blank=True, default="")
     link_check_date = models.DateTimeField(default=timezone.now)
-    link_check_result = models.TextField(blank=True, null=True)
+    link_check_result = models.TextField(blank=True, default="")
     favourite = models.BooleanField(default=False)
     tags = models.ManyToManyField(Tag, through="NoteTag", name="tags")
     status = models.CharField(max_length=15, choices=STATUS_OPTIONS, default="open")
