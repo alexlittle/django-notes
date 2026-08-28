@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("notes", "0039_alter_combinedsearch_options"),
+        ("notes", "0040_dedupe_notetag_duplicates"),
     ]
 
     operations = [
