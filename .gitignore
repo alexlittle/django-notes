@@ -13,4 +13,3 @@ cron.sh
 /static/
 /django_notes.egg-info/
 /.coverage
-/tasks.md
