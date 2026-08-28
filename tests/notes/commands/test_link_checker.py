@@ -15,16 +15,15 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         return self.make_note(type="bookmark", title="A link", url=url, **kwargs)
 
     def test_notes_without_a_url_are_never_checked(self):
-        no_url = self._make_link(url=None)
+        # Note.url has no null=True any more (backed by a NOT NULL column),
+        # so an empty string is the only way a bookmark can be without a URL.
         blank_url = self._make_link(url="")
 
         with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
             call_command("link_checker", 0)
 
         mocked.assert_not_called()
-        no_url.refresh_from_db()
         blank_url.refresh_from_db()
-        self.assertIsNone(no_url.link_check_result)
         self.assertIsNone(blank_url.link_check_result)
 
     def test_days_zero_checks_every_url_regardless_of_last_check_date(self):

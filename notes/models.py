@@ -64,9 +64,7 @@ ORDER_BY_OPTIONS = [
 
 class NotesProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-    timezone = models.CharField(
-        max_length=100, blank=True, null=True, choices=TIMEZONES, default="UTC"
-    )
+    timezone = models.CharField(max_length=100, blank=True, choices=TIMEZONES, default="UTC")
 
 
 class CombinedSearchManager(models.Manager):
@@ -114,7 +112,7 @@ class Tag(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100, blank=False, null=False)
     slug = AutoSlugField(populate_from="name", max_length=100, blank=True, null=True, editable=True)
-    label = models.CharField(max_length=100, null=True, default=None)
+    label = models.CharField(max_length=100, blank=True, default="")
     favourite = models.BooleanField(default=False)
 
     def __str__(self):
@@ -147,9 +145,9 @@ class Note(models.Model):
     update_date = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     type = models.CharField(max_length=15, choices=TYPE_OPTIONS, default="bookmark")
-    url = models.TextField(blank=True, null=True)
+    url = models.TextField(blank=True, default="")
     title = models.TextField(blank=False, null=False, default=None)
-    description = HTMLField(blank=True, null=True)
+    description = HTMLField(blank=True, default="")
     link_check_date = models.DateTimeField(default=timezone.now)
     link_check_result = models.TextField(blank=True, null=True)
     favourite = models.BooleanField(default=False)
@@ -159,12 +157,8 @@ class Note(models.Model):
     due_date = models.DateField(blank=True, null=True, default=None)
     completed_date = models.DateField(blank=True, null=True, default=None)
     estimated_effort = models.IntegerField(blank=True, null=True, default=None)
-    priority = models.CharField(
-        max_length=15, choices=PRIORITY_OPTIONS, blank=True, null=True, default=None
-    )
-    recurrence = models.CharField(
-        max_length=10, choices=RECURRENCE_OPTIONS, blank=True, null=True, default=None
-    )
+    priority = models.CharField(max_length=15, choices=PRIORITY_OPTIONS, blank=True, default="")
+    recurrence = models.CharField(max_length=10, choices=RECURRENCE_OPTIONS, blank=True, default="")
     reminder_days = models.IntegerField(default=None, blank=True, null=True)
 
     class Meta:

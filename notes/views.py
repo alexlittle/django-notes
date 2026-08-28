@@ -13,6 +13,9 @@ from notes.libs.association import suggest_tags
 from notes.models import CombinedSearch, Note, NoteHistory, NotesConfig, NoteTag, SavedFilter, Tag
 from notes.utils import get_filtered_notes, get_user_aware_date, is_showall
 
+HOME_URL_NAME = "notes:home"
+NOTE_FORM_TEMPLATE = "notes/form.html"
+
 
 class HomeView(TemplateView):
     template_name = "notes/home.html"
@@ -236,7 +239,7 @@ class CompleteTaskView(TemplateView):
         if referer:
             return HttpResponseRedirect(referer)
         else:
-            return HttpResponseRedirect(reverse("notes:home"))
+            return HttpResponseRedirect(reverse(HOME_URL_NAME))
 
 
 class UnCompleteTaskView(TemplateView):
@@ -248,7 +251,7 @@ class UnCompleteTaskView(TemplateView):
         if referer:
             return HttpResponseRedirect(referer)
         else:
-            return HttpResponseRedirect(reverse("notes:home"))
+            return HttpResponseRedirect(reverse(HOME_URL_NAME))
 
 
 class TagAutocompleteView(LoginRequiredMixin, View):
@@ -273,7 +276,7 @@ class CloseTaskView(TemplateView):
         if referer:
             return HttpResponseRedirect(referer)
         else:
-            return HttpResponseRedirect(reverse("notes:home"))
+            return HttpResponseRedirect(reverse(HOME_URL_NAME))
 
 
 class AddView(TemplateView):
@@ -297,7 +300,7 @@ class AddView(TemplateView):
         if request.GET.get("tags"):
             initial_data["tags"] = request.GET.get("tags")
         form = NoteForm(initial=initial_data)
-        return render(request, "notes/form.html", {"form": form, "recent_tags": recent_tags})
+        return render(request, NOTE_FORM_TEMPLATE, {"form": form, "recent_tags": recent_tags})
 
     def post(self, request):
         form = NoteForm(request.POST)
@@ -332,11 +335,11 @@ class AddView(TemplateView):
                 if referer:
                     return HttpResponseRedirect(referer)
                 else:
-                    return HttpResponseRedirect(reverse("notes:home"))
+                    return HttpResponseRedirect(reverse(HOME_URL_NAME))
         else:
             print(form.errors)
             context = {"form": form, "form_type": form_type}
-            return render(request, "notes/form.html", context)
+            return render(request, NOTE_FORM_TEMPLATE, context)
 
 
 class EditView(TemplateView):
@@ -359,7 +362,7 @@ class EditView(TemplateView):
         data["referer"] = request.META.get("HTTP_REFERER")
         recent_tags = Tag.get_top_10_recent_tags()
         form = NoteForm(initial=data)
-        return render(request, "notes/form.html", {"form": form, "recent_tags": recent_tags})
+        return render(request, NOTE_FORM_TEMPLATE, {"form": form, "recent_tags": recent_tags})
 
     def _update_tags(self, note, tags_field):
         NoteTag.objects.filter(note=note).delete()
@@ -398,7 +401,7 @@ class EditView(TemplateView):
         form = NoteForm(request.POST)
         if not form.is_valid():
             print(form.errors)
-            return render(request, "notes/form.html", {"form": form})
+            return render(request, NOTE_FORM_TEMPLATE, {"form": form})
 
         old_status = note.status
         old_due_date = note.due_date
@@ -408,7 +411,7 @@ class EditView(TemplateView):
         self._record_history(note, old_due_date)
 
         referer = form.cleaned_data.get("referer")
-        return HttpResponseRedirect(referer or reverse("notes:home"))
+        return HttpResponseRedirect(referer or reverse(HOME_URL_NAME))
 
 
 class TagView(ListView):

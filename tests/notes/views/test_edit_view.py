@@ -89,7 +89,7 @@ class EditViewPostTests(NotesTestCase):
         self.assertEqual(history.action, "updated")
 
     def test_marking_a_non_recurring_task_completed_sets_status_and_completed_date(self):
-        note = self.make_task(title="Task", due_date=TODAY, status="open", recurrence=None)
+        note = self.make_task(title="Task", due_date=TODAY, status="open", recurrence="")
 
         self._post(note, status="completed")
 

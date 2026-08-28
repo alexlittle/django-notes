@@ -6,7 +6,10 @@ def suggest_tags(input_tags, top_n=5):
 
     best = {}  # suggested_tag -> best TagSuggestion
 
-    for s in TagSuggestion.objects.exclude(suggested_tag__in=input_tags):
+    candidates = TagSuggestion.objects.exclude(suggested_tag__in=input_tags).prefetch_related(
+        "input_tags"
+    )
+    for s in candidates:
         antecedents = set(s.input_tags.values_list("tag", flat=True))
         # keep only the highest confidence version
         if antecedents.issubset(input_set) and (

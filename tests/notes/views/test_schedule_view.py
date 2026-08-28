@@ -87,7 +87,7 @@ class ScheduleViewTests(NotesTestCase):
         self.assertNotIn(closed, all_tasks_shown)
 
     def test_row_label_falls_back_to_slug_when_tag_has_no_label(self):
-        self.make_tag(name="nolabel", label=None)
+        self.make_tag(name="nolabel", label="")
         self._set_config("schedule.tags", "nolabel")
 
         resp = self.client.get(reverse("notes:schedule"))

@@ -7,6 +7,8 @@ from tinymce.widgets import TinyMCE
 
 from notes.models import PRIORITY_OPTIONS, RECURRENCE_OPTIONS, STATUS_OPTIONS, TYPE_OPTIONS
 
+BUTTON_CSS_CLASS = "btn btn-default"
+
 
 class NoteForm(forms.Form):
     type = forms.ChoiceField(
@@ -64,11 +66,11 @@ class NoteForm(forms.Form):
             "description",
             "referer",
             Div(
-                Submit("action", "save", css_class="btn btn-default", title=_("Save")),
+                Submit("action", "save", css_class=BUTTON_CSS_CLASS, title=_("Save")),
                 Submit(
                     "action",
                     "save_and_add",
-                    css_class="btn btn-default",
+                    css_class=BUTTON_CSS_CLASS,
                     title=_("Save and add another"),
                 ),
                 css_class="col-lg-offset-2 col-lg-4",
@@ -101,5 +103,5 @@ class SearchForm(forms.Form):
         self.helper.form_class = "form-horizontal"
         self.helper.field_class = "col-lg-8"
         self.helper.layout = Layout(
-            FieldWithButtons("q", Submit("submit", _("Go"), css_class="btn btn-default"))
+            FieldWithButtons("q", Submit("submit", _("Go"), css_class=BUTTON_CSS_CLASS))
         )

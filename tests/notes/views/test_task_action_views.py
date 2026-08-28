@@ -8,7 +8,7 @@ from tests.base import TODAY, NotesTestCase
 
 class CompleteTaskViewTests(NotesTestCase):
     def test_completes_a_non_recurring_task(self):
-        task = self.make_task(title="Do it", due_date=TODAY, recurrence=None)
+        task = self.make_task(title="Do it", due_date=TODAY, recurrence="")
 
         resp = self.client.get(reverse("notes:complete_task", kwargs={"note_id": task.pk}))
 
