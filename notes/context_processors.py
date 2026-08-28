@@ -4,7 +4,7 @@ from notes.models import SavedFilter
 from notes.utils import get_user_aware_datetime
 
 
-def debug_mode(request):
+def debug_mode(_request):
     return {"DEBUG": settings.DEBUG}
 
 

@@ -15,7 +15,7 @@
 
         tagButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const tag = this.getAttribute('data-tag');
+                const tag = this.dataset.tag;
                 if (tagsInput.value) {
                     tagsInput.value += ', ' + tag;
                 } else {

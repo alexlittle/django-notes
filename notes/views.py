@@ -322,7 +322,7 @@ class AddView(TemplateView):
             tags = [x.strip() for x in new_tags.split(",")]
             tags = [tag for tag in tags if tag]
             for t in tags:
-                tag, created = Tag.objects.get_or_create(user=self.request.user, name=t)
+                tag, _created = Tag.objects.get_or_create(user=self.request.user, name=t)
                 NoteTag.objects.get_or_create(note=note, tag=tag)
 
             if request.POST.get("action") == "save_and_add":

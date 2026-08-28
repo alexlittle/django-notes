@@ -79,12 +79,12 @@ class NoteForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        type = cleaned_data.get("type")
+        note_type = cleaned_data.get("type")
         priority = cleaned_data.get("priority")
         url = cleaned_data.get("url")
-        if type == "task" and not priority:
+        if note_type == "task" and not priority:
             raise forms.ValidationError("A task must have a priority")
-        if type == "bookmark" and not url:
+        if note_type == "bookmark" and not url:
             raise forms.ValidationError("A bookmark must have a url")
         return cleaned_data
 
