@@ -85,14 +85,17 @@ class BuildTagSuggestionsCommandTests(NotesCommandTestCase):
         suggested_tags = set(TagSuggestion.objects.values_list("suggested_tag", flat=True))
         self.assertEqual(suggested_tags, {"alpha"})
 
-    def test_a_min_support_high_enough_to_exclude_everything_currently_crashes(self):
+    def test_a_min_support_high_enough_to_exclude_everything_exits_gracefully(self):
         # When min_support filters out every itemset, frequent_itemsets
-        # ends up empty, and mlxtend's association_rules() raises
-        # ValueError rather than the command handling it gracefully (it
-        # only guards the "no transactions at all" case, not "transactions
-        # exist but nothing meets the threshold"). See README for a
-        # suggested one-line fix.
+        # ends up empty. association_rules() would raise ValueError on
+        # that, so the command bails out early instead - same as the
+        # "no transactions at all" case - leaving existing suggestions
+        # untouched.
         self._make_correlated_dataset()
+        stale = TagSuggestion.objects.create(
+            suggested_tag="stale", confidence=0.5, lift=1.0, support=0.5
+        )
 
-        with self.assertRaises(ValueError):
-            call_command("build_tag_suggestions", min_support=0.9)
+        call_command("build_tag_suggestions", min_support=0.9)
+
+        self.assertTrue(TagSuggestion.objects.filter(pk=stale.pk).exists())

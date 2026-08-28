@@ -96,33 +96,26 @@ class CronCommandTests(NotesCommandTestCase):
 
         self.assertFalse(Note.objects.filter(pk=old_archived.pk).exists())
 
-    def test_closed_tasks_produced_by_close_task_are_never_cleaned_up(self):
-        # Note.close_task() always sets completed_date to None. The cron
-        # command's "old closed tasks" cleanup filters on
-        # completed_date__lte=<cutoff>, which can never match a NULL
-        # value in SQL - so tasks closed the normal way are never actually
-        # eligible for this cleanup, no matter how old update_date is.
+    def test_old_closed_tasks_are_deleted_based_on_update_date(self):
+        # Note.close_task() never sets completed_date (a closed task was
+        # never completed), so the cleanup has to key off update_date -
+        # same as the archived-tasks branch just below it.
+        self._set_config("retain.days", "31")
         closed_task = self.make_note(type="task", title="Closed the normal way", status="open")
         closed_task.close_task()
         Note.objects.filter(pk=closed_task.pk).update(
-            update_date=timezone.now() - timedelta(days=100)
-        )
-
-        _run_cron()
-
-        self.assertTrue(Note.objects.filter(pk=closed_task.pk).exists())
-
-    def test_closed_tasks_are_only_removed_if_completed_date_happens_to_be_set(self):
-        # Demonstrates the branch does work when completed_date is present -
-        # it just never naturally ends up that way via close_task().
-        self._set_config("retain.days", "31")
-        closed_task = self.make_note(
-            type="task",
-            title="Closed with a completed_date",
-            status="closed",
-            completed_date=timezone.now().date() - timedelta(days=100),
+            update_date=timezone.now() - timedelta(days=40)
         )
 
         _run_cron()
 
         self.assertFalse(Note.objects.filter(pk=closed_task.pk).exists())
+
+    def test_recently_closed_tasks_are_not_cleaned_up(self):
+        self._set_config("retain.days", "31")
+        closed_task = self.make_note(type="task", title="Closed recently", status="open")
+        closed_task.close_task()
+
+        _run_cron()
+
+        self.assertTrue(Note.objects.filter(pk=closed_task.pk).exists())

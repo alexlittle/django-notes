@@ -34,6 +34,10 @@ class Command(BaseCommand):
         df = pd.DataFrame(te_array, columns=te.columns_)
 
         frequent_itemsets = apriori(df, min_support=min_support, use_colnames=True)
+        if frequent_itemsets.empty:
+            self.stdout.write(self.style.WARNING("No itemsets meet min_support. Exiting."))
+            return
+
         rules = association_rules(
             frequent_itemsets, metric="confidence", min_threshold=min_confidence
         )
