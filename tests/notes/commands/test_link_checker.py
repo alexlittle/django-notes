@@ -24,7 +24,7 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
 
         mocked.assert_not_called()
         blank_url.refresh_from_db()
-        self.assertIsNone(blank_url.link_check_result)
+        self.assertEqual(blank_url.link_check_result, "")
 
     def test_days_zero_checks_every_url_regardless_of_last_check_date(self):
         note = self._make_link(link_check_date=timezone.now() - timedelta(days=1000))
@@ -55,7 +55,7 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         stale.refresh_from_db()
         fresh.refresh_from_db()
         self.assertEqual(stale.link_check_result, "ok")
-        self.assertIsNone(fresh.link_check_result)
+        self.assertEqual(fresh.link_check_result, "")
 
     def test_a_successful_response_is_recorded_as_ok(self):
         note = self._make_link()
