@@ -1,7 +1,4 @@
 #!/bin/bash
-
-source ../.venv/bin/activate
-
-cd ./django-notes
-
-python manage.py cron
+set -euo pipefail
+cd /path/to/django-notes
+.venv/bin/python manage.py cron
