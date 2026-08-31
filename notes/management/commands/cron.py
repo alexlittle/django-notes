@@ -52,6 +52,15 @@ class Command(BaseCommand):
             link_check_days = int(NotesConfig.get_value("link_check.days"))
         except ValueError:
             link_check_days = 7
-        # only re-checks links whose link_check_date is older than link_check_days,
-        # so running this every hour still only touches each link roughly weekly
-        call_command("link_checker", link_check_days, interactive=False)
+
+        try:
+            link_check_batch_size = int(NotesConfig.get_value("link_check.batch_size"))
+        except ValueError:
+            link_check_batch_size = 50
+
+        # only re-checks links whose link_check_date is older than link_check_days, and
+        # caps each run to link_check_batch_size (oldest-checked first) so a run doesn't
+        # hit every due link - and every site - at once
+        call_command(
+            "link_checker", link_check_days, interactive=False, limit=link_check_batch_size
+        )

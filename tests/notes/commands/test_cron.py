@@ -135,3 +135,17 @@ class CronCommandTests(NotesCommandTestCase):
 
         link_checker_calls = [c for c in mocked.call_args_list if c.args[0] == "link_checker"]
         self.assertEqual(link_checker_calls[0].args[1], 3)
+
+    def test_defaults_link_check_batch_size_to_50_when_config_is_missing(self):
+        self._clear_config("link_check.batch_size")
+        mocked = _run_cron()
+
+        link_checker_calls = [c for c in mocked.call_args_list if c.args[0] == "link_checker"]
+        self.assertEqual(link_checker_calls[0].kwargs.get("limit"), 50)
+
+    def test_uses_the_configured_link_check_batch_size_when_present(self):
+        self._set_config("link_check.batch_size", "5")
+        mocked = _run_cron()
+
+        link_checker_calls = [c for c in mocked.call_args_list if c.args[0] == "link_checker"]
+        self.assertEqual(link_checker_calls[0].kwargs.get("limit"), 5)

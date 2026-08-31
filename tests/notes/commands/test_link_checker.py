@@ -69,6 +69,42 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         self.assertEqual(stale.link_check_result, "ok")
         self.assertEqual(fresh.link_check_result, "")
 
+    def test_limit_checks_only_the_oldest_checked_links(self):
+        oldest = self._make_link(
+            url="https://oldest.example.com",
+            link_check_date=timezone.now() - timedelta(days=30),
+        )
+        middle = self._make_link(
+            url="https://middle.example.com",
+            link_check_date=timezone.now() - timedelta(days=20),
+        )
+        newest = self._make_link(
+            url="https://newest.example.com",
+            link_check_date=timezone.now() - timedelta(days=10),
+        )
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0, limit=2)
+
+        self.assertEqual(mocked.call_count, 2)
+        oldest.refresh_from_db()
+        middle.refresh_from_db()
+        newest.refresh_from_db()
+        self.assertEqual(oldest.link_check_result, "ok")
+        self.assertEqual(middle.link_check_result, "ok")
+        self.assertEqual(newest.link_check_result, "")
+
+    def test_no_limit_checks_every_due_link(self):
+        self._make_link(url="https://one.example.com")
+        self._make_link(url="https://two.example.com")
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0)
+
+        self.assertEqual(mocked.call_count, 2)
+
     def test_a_successful_response_is_recorded_as_ok(self):
         note = self._make_link()
 

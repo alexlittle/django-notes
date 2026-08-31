@@ -7,7 +7,9 @@ import datetime
 import http
 import smtplib
 import ssl
+import time
 from urllib import error, request
+from urllib.parse import urlparse
 
 from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
@@ -22,6 +24,24 @@ from notes.utils import send_templated_mail
 class NoRedirect(request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         return None
+
+
+# Minimum gap between requests to the same domain - avoids tripping CDN/WAF rate
+# limiting (e.g. Fastly, Cloudflare) when many notes share a domain.
+SAME_DOMAIN_DELAY_SECONDS = 2
+
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/35.0.1916.47 Safari/537.36"
+    ),
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+    ),
+    "Accept-Language": "en-US,en;q=0.5",
+    "Accept-Encoding": "gzip, deflate, br",
+}
 
 
 class Command(BaseCommand):
@@ -40,11 +60,22 @@ class Command(BaseCommand):
                 "(used when run unattended, e.g. from cron)."
             ),
         )
+        parser.add_argument(
+            "--limit",
+            type=int,
+            default=None,
+            help=_(
+                "Only check the N links with the oldest link_check_date, instead of every "
+                "due link - lets a scheduled run work through the backlog gradually rather "
+                "than hitting every site at once."
+            ),
+        )
 
     def handle(self, *args, **options):
 
         days = options["days"]
         interactive = options["interactive"]
+        limit = options["limit"]
 
         if days == 0:
             notes = Note.objects.all()
@@ -53,25 +84,31 @@ class Command(BaseCommand):
             today_minus_days = today - datetime.timedelta(days=days)
             notes = Note.objects.filter(link_check_date__lte=today_minus_days)
 
-        notes = notes.exclude(url__isnull=True).exclude(url="")
+        notes = notes.exclude(url__isnull=True).exclude(url="").order_by("link_check_date")
+        if limit:
+            notes = notes[:limit]
         error_list = []
         redirect_list = []
+        domain_last_request = {}
 
         for idx, note in enumerate(notes):
             print(f"Checking: {note.url} ({idx}/{len(notes)})")
             opener = request.build_opener(NoRedirect)
             request.install_opener(opener)
+
+            domain = urlparse(note.url).netloc
+            last_request = domain_last_request.get(domain)
+            if last_request is not None:
+                elapsed = time.monotonic() - last_request
+                if elapsed < SAME_DOMAIN_DELAY_SECONDS:
+                    time.sleep(SAME_DOMAIN_DELAY_SECONDS - elapsed)
+            domain_last_request[domain] = time.monotonic()
+
             try:
                 my_request = request.Request(
                     note.url,
                     method="GET",
-                    headers={
-                        "User-Agent": (
-                            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) "
-                            "AppleWebKit/537.36 (KHTML, like Gecko) "
-                            "Chrome/35.0.1916.47 Safari/537.36"
-                        )
-                    },
+                    headers=REQUEST_HEADERS,
                 )
                 response = request.urlopen(my_request, timeout=20)
                 print(response.code)
