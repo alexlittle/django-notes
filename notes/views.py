@@ -317,6 +317,7 @@ class AddView(TemplateView):
             note.priority = form.cleaned_data.get("priority")
             note.recurrence = form.cleaned_data.get("recurrence")
             note.reminder_days = form.cleaned_data.get("reminder_days")
+            note.link_check_ignore_redirects = form.cleaned_data.get("link_check_ignore_redirects")
             note.save()
             new_tags = form.cleaned_data.get("tags")
             tags = [x.strip() for x in new_tags.split(",")]
@@ -359,6 +360,7 @@ class EditView(TemplateView):
         data["priority"] = note.priority
         data["recurrence"] = note.recurrence
         data["reminder_days"] = note.reminder_days
+        data["link_check_ignore_redirects"] = note.link_check_ignore_redirects
         data["referer"] = request.META.get("HTTP_REFERER")
         recent_tags = Tag.get_top_10_recent_tags()
         form = NoteForm(initial=data)
@@ -383,6 +385,7 @@ class EditView(TemplateView):
         note.priority = form.cleaned_data.get("priority")
         note.recurrence = form.cleaned_data.get("recurrence")
         note.reminder_days = form.cleaned_data.get("reminder_days")
+        note.link_check_ignore_redirects = form.cleaned_data.get("link_check_ignore_redirects")
 
         if old_status != "completed" and note.status == "completed":
             note.complete_task()

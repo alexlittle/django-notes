@@ -45,6 +45,14 @@ class NoteForm(forms.Form):
         required=False,
     )
     reminder_days = forms.IntegerField(required=False)
+    link_check_ignore_redirects = forms.BooleanField(
+        required=False,
+        label=_("Ignore redirects in link checker"),
+        help_text=_(
+            "e.g. a link behind a login screen that always redirects - "
+            "still checked, but not flagged as broken"
+        ),
+    )
     referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
@@ -63,6 +71,7 @@ class NoteForm(forms.Form):
             "priority",
             "recurrence",
             "reminder_days",
+            "link_check_ignore_redirects",
             "description",
             "referer",
             Div(

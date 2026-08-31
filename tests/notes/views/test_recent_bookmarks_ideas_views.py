@@ -49,6 +49,30 @@ class BookmarksViewTests(NotesTestCase):
 
         self.assertEqual(list(resp.context["notes"]), [bookmark])
 
+    def test_link_check_result_controls_which_status_icon_is_shown(self):
+        self.make_note(
+            type="bookmark", title="OK", url="https://ok.example.com", link_check_result="ok"
+        )
+        self.make_note(
+            type="bookmark",
+            title="Redirected",
+            url="https://redirected.example.com",
+            link_check_result="redirect",
+        )
+        self.make_note(
+            type="bookmark",
+            title="Broken",
+            url="https://broken.example.com",
+            link_check_result="error",
+        )
+
+        resp = self.client.get(reverse("notes:bookmarks"))
+        content = resp.content.decode()
+
+        self.assertIn("icon-yes.svg", content)
+        self.assertIn("icon-alert.svg", content)
+        self.assertIn("icon-no.svg", content)
+
 
 class IdeasViewTests(NotesTestCase):
     def test_only_idea_type_notes_for_current_user(self):

@@ -19,10 +19,15 @@
 	
 		{% if note.link_check_result %}
 			{% if note.link_check_result == "ok" %}
-				<span class="status_ok"><img src="{% static '/admin/img/icon-yes.svg' %}" alt="True"></span>
+				<span class="status_ok"><img src="{% static '/admin/img/icon-yes.svg' %}" alt="OK"></span>
+			{% elif note.link_check_result == "redirect" %}
+				<span class="status_redirect">
+					<img src="{% static '/admin/img/icon-alert.svg' %}" alt="Redirected">
+					[<a href="{% url 'notes:edit' note.id %}">{% trans 'edit' %}</a>]
+				</span>
 			{% else %}
 				<span class="status_error">
-					<img src="{% static '/admin/img/icon-no.svg' %}" alt="False">
+					<img src="{% static '/admin/img/icon-no.svg' %}" alt="Broken">
 					[<a href="{% url 'admin:notes_note_delete' note.id %}" target="_blank">{% trans 'delete' %}</a>]
 				</span>
 			{% endif %}

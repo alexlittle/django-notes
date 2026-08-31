@@ -88,7 +88,10 @@ class Command(BaseCommand):
                 if exc.code in (301, 302, 303, 307, 308):
                     print("has been redirected")
                     self.update_link_check(note, "redirect")
-                    redirect_list.append(note)
+                    # Still checked and recorded above - just not flagged as broken,
+                    # e.g. for links behind a login screen that always redirect.
+                    if not note.link_check_ignore_redirects:
+                        redirect_list.append(note)
                 else:
                     print(f"Error: HTTP {exc.code}")
                     self.update_link_check(note, "error")

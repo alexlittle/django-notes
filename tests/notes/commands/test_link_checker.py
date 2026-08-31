@@ -144,6 +144,24 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "redirect")
 
+    def test_redirects_are_still_checked_but_excluded_from_the_report_when_ignored(self):
+        note = self._make_link(link_check_ignore_redirects=True)
+        self._enable_email()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=error.HTTPError(note.url, 301, "Moved Permanently", None, None),
+            ),
+            patch("builtins.input") as mocked_input,
+        ):
+            call_command("link_checker", 0)
+
+        mocked_input.assert_not_called()
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "redirect")
+        self.assertEqual(len(mail.outbox), 0)
+
     def test_non_redirect_http_errors_are_recorded_as_an_error_and_deletion_is_offered(self):
         note = self._make_link()
 
