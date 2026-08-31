@@ -9,7 +9,9 @@ import smtplib
 import ssl
 from urllib import error, request
 
+from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -82,10 +84,19 @@ class Command(BaseCommand):
                 print("Error")
                 self.update_link_check(note, "error")
                 error_list.append(note)
-            except (error.URLError, error.HTTPError):
-                print("has been redirected")
-                self.update_link_check(note, "redirect")
-                redirect_list.append(note)
+            except error.HTTPError as exc:
+                if exc.code in (301, 302, 303, 307, 308):
+                    print("has been redirected")
+                    self.update_link_check(note, "redirect")
+                    redirect_list.append(note)
+                else:
+                    print(f"Error: HTTP {exc.code}")
+                    self.update_link_check(note, "error")
+                    error_list.append(note)
+            except error.URLError:
+                print("Error")
+                self.update_link_check(note, "error")
+                error_list.append(note)
 
         if error_list or redirect_list:
             self.send_report(error_list, redirect_list)
@@ -115,6 +126,12 @@ class Command(BaseCommand):
 
         recipients = NotesConfig.get_value("link_check.email_recipients")
         recipient_list = [addr.strip() for addr in recipients.split(",") if addr.strip()] or None
+
+        # Attach the edit link so the email can link there directly - clicking
+        # through to the site itself isn't useful, you want to fix/remove the note.
+        domain = Site.objects.get_current().domain
+        for note in [*error_list, *redirect_list]:
+            note.edit_url = f"https://{domain}{reverse('notes:edit', args=[note.id])}"
 
         try:
             send_templated_mail(

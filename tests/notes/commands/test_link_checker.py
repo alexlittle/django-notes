@@ -126,13 +126,15 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         self.assertEqual(note.link_check_result, "error")
         self.assertTrue(Note.objects.filter(pk=note.pk).exists())
 
-    def test_url_errors_are_recorded_as_redirect_without_a_deletion_prompt(self):
+    def test_actual_redirect_status_codes_are_recorded_as_redirect_without_a_deletion_prompt(
+        self,
+    ):
         note = self._make_link()
 
         with (
             patch(
                 "notes.management.commands.link_checker.request.urlopen",
-                side_effect=error.URLError("boom"),
+                side_effect=error.HTTPError(note.url, 301, "Moved Permanently", None, None),
             ),
             patch("builtins.input") as mocked_input,
         ):
@@ -142,6 +144,36 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "redirect")
 
+    def test_non_redirect_http_errors_are_recorded_as_an_error_and_deletion_is_offered(self):
+        note = self._make_link()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=error.HTTPError(note.url, 403, "Forbidden", None, None),
+            ),
+            patch("builtins.input", return_value="n"),
+        ):
+            call_command("link_checker", 0)
+
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "error")
+
+    def test_generic_url_errors_are_recorded_as_an_error_and_deletion_is_offered(self):
+        note = self._make_link()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=error.URLError("boom"),
+            ),
+            patch("builtins.input", return_value="n"),
+        ):
+            call_command("link_checker", 0)
+
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "error")
+
     def _check_one_broken_and_one_redirected_link(self):
         broken = self._make_link(url="https://broken.example.com")
         redirected = self._make_link(url="https://redirected.example.com")
@@ -149,7 +181,7 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         def fake_urlopen(req, timeout=20):
             if req.full_url == broken.url:
                 raise TimeoutError
-            raise error.URLError("boom")
+            raise error.HTTPError(redirected.url, 301, "Moved Permanently", None, None)
 
         with (
             patch(

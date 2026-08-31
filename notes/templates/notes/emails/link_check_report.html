@@ -7,7 +7,10 @@
 <h3>Broken links ({{ error_list|length }})</h3>
 <ul style="padding-left:20px;">
   {% for note in error_list %}
-  <li style="margin-bottom:8px;"><a href="{{ note.url }}">{{ note.title }}</a></li>
+  <li style="margin-bottom:8px;">
+    <a href="{{ note.edit_url }}">{{ note.title }}</a><br>
+    <span style="color:#666; font-size:12px;">{{ note.url }}</span>
+  </li>
   {% endfor %}
 </ul>
 {% endif %}
@@ -16,7 +19,10 @@
 <h3>Redirected links ({{ redirect_list|length }})</h3>
 <ul style="padding-left:20px;">
   {% for note in redirect_list %}
-  <li style="margin-bottom:8px;"><a href="{{ note.url }}">{{ note.title }}</a></li>
+  <li style="margin-bottom:8px;">
+    <a href="{{ note.edit_url }}">{{ note.title }}</a><br>
+    <span style="color:#666; font-size:12px;">{{ note.url }}</span>
+  </li>
   {% endfor %}
 </ul>
 {% endif %}
