@@ -108,7 +108,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 
 #####################################################################
-# Email - none configured
+# Email - configure in local_settings
 #####################################################################
 
 

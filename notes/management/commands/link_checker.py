@@ -5,6 +5,7 @@ Checks the urls to ensure they are valid links
 
 import datetime
 import http
+import smtplib
 import ssl
 from urllib import error, request
 
@@ -12,7 +13,8 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from notes.models import Note
+from notes.models import Note, NotesConfig
+from notes.utils import send_templated_mail
 
 
 class NoRedirect(request.HTTPRedirectHandler):
@@ -24,11 +26,23 @@ class Command(BaseCommand):
     help = _("Checks the urls to ensure they are still valid links")
 
     def add_arguments(self, parser):
-        parser.add_argument("days", type=int, default=0)
+        parser.add_argument("days", type=int, nargs="?", default=0)
+        parser.add_argument(
+            "--noinput",
+            "--no-input",
+            action="store_false",
+            dest="interactive",
+            default=True,
+            help=_(
+                "Do not prompt before deleting broken links; just record the failure "
+                "(used when run unattended, e.g. from cron)."
+            ),
+        )
 
     def handle(self, *args, **options):
 
         days = options["days"]
+        interactive = options["interactive"]
 
         if days == 0:
             notes = Note.objects.all()
@@ -73,12 +87,16 @@ class Command(BaseCommand):
                 self.update_link_check(note, "redirect")
                 redirect_list.append(note)
 
+        if error_list or redirect_list:
+            self.send_report(error_list, redirect_list)
+
         print(f"{len(error_list)} errors")
         for idx, el in enumerate(error_list):
             print(f"{idx}/{len(error_list)} {el.url}")
-            accept = input(_("Delete this link? [y/n]"))
-            if accept == "y":
-                el.delete()
+            if interactive:
+                accept = input(_("Delete this link? [y/n]"))
+                if accept == "y":
+                    el.delete()
 
         print(f"{len(redirect_list)} redirects")
         for idx, rl in enumerate(redirect_list):
@@ -88,3 +106,23 @@ class Command(BaseCommand):
         note.link_check_date = timezone.now()
         note.link_check_result = result
         note.save()
+
+    def send_report(self, error_list, redirect_list):
+        # Off by default - enable via NotesConfig (e.g. in the admin) rather than code,
+        # so it can be turned on/off and re-addressed without a deploy.
+        if NotesConfig.get_value("link_check.email_enabled").strip().lower() != "true":
+            return
+
+        recipients = NotesConfig.get_value("link_check.email_recipients")
+        recipient_list = [addr.strip() for addr in recipients.split(",") if addr.strip()] or None
+
+        try:
+            send_templated_mail(
+                subject=_("Link checker report"),
+                template_name="link_check_report",
+                context={"error_list": error_list, "redirect_list": redirect_list},
+                recipient_list=recipient_list,
+            )
+        except (OSError, smtplib.SMTPException) as exc:
+            # don't let a broken mail server stop the rest of the cron run
+            print(f"Failed to send link checker report email: {exc}")

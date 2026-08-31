@@ -1,0 +1,23 @@
+{% extends "notes/emails/base.html" %}
+
+{% block content %}
+<h2 style="margin-top:0;">Link checker report</h2>
+
+{% if error_list %}
+<h3>Broken links ({{ error_list|length }})</h3>
+<ul style="padding-left:20px;">
+  {% for note in error_list %}
+  <li style="margin-bottom:8px;"><a href="{{ note.url }}">{{ note.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if redirect_list %}
+<h3>Redirected links ({{ redirect_list|length }})</h3>
+<ul style="padding-left:20px;">
+  {% for note in redirect_list %}
+  <li style="margin-bottom:8px;"><a href="{{ note.url }}">{{ note.title }}</a></li>
+  {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,16 @@
+Link checker report
+====================
+{% if error_list %}
+Broken links ({{ error_list|length }}):
+{% for note in error_list %}
+- {{ note.title }}
+  {{ note.url }}
+{% endfor %}
+{% endif %}
+{% if redirect_list %}
+Redirected links ({{ redirect_list|length }}):
+{% for note in redirect_list %}
+- {{ note.title }}
+  {{ note.url }}
+{% endfor %}
+{% endif %}

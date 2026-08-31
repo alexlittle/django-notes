@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <body style="margin:0; padding:0; background-color:#f4f4f4; font-family: Arial, Helvetica, sans-serif; color:#222222;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4; padding:24px 0;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:4px; overflow:hidden;">
+            <tr>
+              <td style="background-color:#2c3e50; padding:16px 24px;">
+                <span style="color:#ffffff; font-size:18px; font-weight:bold;">django-notes</span>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:24px;">
+                {% block content %}{% endblock %}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

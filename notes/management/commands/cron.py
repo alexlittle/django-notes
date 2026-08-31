@@ -47,3 +47,11 @@ class Command(BaseCommand):
         for ot in old_archived_tasks:
             print(f"{ot.title} deleted")
             ot.delete()
+
+        try:
+            link_check_days = int(NotesConfig.get_value("link_check.days"))
+        except ValueError:
+            link_check_days = 7
+        # only re-checks links whose link_check_date is older than link_check_days,
+        # so running this every hour still only touches each link roughly weekly
+        call_command("link_checker", link_check_days, interactive=False)

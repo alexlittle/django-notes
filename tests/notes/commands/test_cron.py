@@ -119,3 +119,19 @@ class CronCommandTests(NotesCommandTestCase):
         _run_cron()
 
         self.assertTrue(Note.objects.filter(pk=closed_task.pk).exists())
+
+    def test_delegates_to_link_checker_non_interactively_with_default_stale_days(self):
+        self._clear_config("link_check.days")
+        mocked = _run_cron()
+
+        link_checker_calls = [c for c in mocked.call_args_list if c.args[0] == "link_checker"]
+        self.assertEqual(len(link_checker_calls), 1)
+        self.assertEqual(link_checker_calls[0].args[1], 7)
+        self.assertEqual(link_checker_calls[0].kwargs.get("interactive"), False)
+
+    def test_uses_the_configured_link_check_days_when_present(self):
+        self._set_config("link_check.days", "3")
+        mocked = _run_cron()
+
+        link_checker_calls = [c for c in mocked.call_args_list if c.args[0] == "link_checker"]
+        self.assertEqual(link_checker_calls[0].args[1], 3)

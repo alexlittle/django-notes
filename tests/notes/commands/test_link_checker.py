@@ -2,10 +2,12 @@ from datetime import timedelta
 from unittest.mock import patch
 from urllib import error
 
+from django.conf import settings
+from django.core import mail
 from django.core.management import call_command
 from django.utils import timezone
 
-from notes.models import Note
+from notes.models import Note, NotesConfig
 
 from .base import NotesCommandTestCase
 
@@ -13,6 +15,16 @@ from .base import NotesCommandTestCase
 class LinkCheckerCommandTests(NotesCommandTestCase):
     def _make_link(self, url="https://example.com", **kwargs):
         return self.make_note(type="bookmark", title="A link", url=url, **kwargs)
+
+    @staticmethod
+    def _enable_email(recipients=None):
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_enabled", defaults={"value": "true"}
+        )
+        if recipients is not None:
+            NotesConfig.objects.update_or_create(
+                name="link_check.email_recipients", defaults={"value": recipients}
+            )
 
     def test_notes_without_a_url_are_never_checked(self):
         # Note.url has no null=True any more (backed by a NOT NULL column),
@@ -97,6 +109,23 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "error")
 
+    def test_noinput_records_errors_without_prompting_or_deleting(self):
+        note = self._make_link()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=TimeoutError,
+            ),
+            patch("builtins.input") as mocked_input,
+        ):
+            call_command("link_checker", 0, interactive=False)
+
+        mocked_input.assert_not_called()
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "error")
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
     def test_url_errors_are_recorded_as_redirect_without_a_deletion_prompt(self):
         note = self._make_link()
 
@@ -112,3 +141,72 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         mocked_input.assert_not_called()
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "redirect")
+
+    def _check_one_broken_and_one_redirected_link(self):
+        broken = self._make_link(url="https://broken.example.com")
+        redirected = self._make_link(url="https://redirected.example.com")
+
+        def fake_urlopen(req, timeout=20):
+            if req.full_url == broken.url:
+                raise TimeoutError
+            raise error.URLError("boom")
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=fake_urlopen,
+            ),
+            patch("builtins.input", return_value="n"),
+        ):
+            call_command("link_checker", 0)
+
+        return broken, redirected
+
+    def test_no_email_is_sent_by_default_even_when_links_are_broken(self):
+        # link_check.email_enabled is unset - email is off by default until
+        # someone turns it on via NotesConfig.
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_no_email_is_sent_when_explicitly_disabled_via_notesconfig(self):
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_enabled", defaults={"value": "false"}
+        )
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_broken_and_redirected_links_trigger_a_report_email_when_enabled(self):
+        self._enable_email()
+        broken, redirected = self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertIn(broken.url, sent.body)
+        self.assertIn(redirected.url, sent.body)
+        html_body, _mimetype = sent.alternatives[0]
+        self.assertIn(broken.url, html_body)
+        self.assertIn(redirected.url, html_body)
+
+    def test_email_goes_to_the_admins_by_default_when_no_recipients_are_configured(self):
+        self._enable_email()
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(mail.outbox[0].to, [addr for _name, addr in settings.ADMINS])
+
+    def test_email_uses_the_configured_recipients(self):
+        self._enable_email(recipients="a@example.com, b@example.com")
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(mail.outbox[0].to, ["a@example.com", "b@example.com"])
+
+    def test_no_email_is_sent_when_every_link_is_ok(self):
+        self._enable_email()
+        self._make_link()
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0)
+
+        self.assertEqual(len(mail.outbox), 0)

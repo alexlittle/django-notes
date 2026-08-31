@@ -3,12 +3,20 @@
 import datetime
 from zoneinfo import ZoneInfo
 
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
+from django.core import mail
+from django.test import RequestFactory, override_settings
 from django.utils import timezone
 
 from notes.models import NotesProfile
-from notes.utils import get_filtered_notes, get_user_aware_date, get_user_aware_datetime, is_showall
+from notes.utils import (
+    get_filtered_notes,
+    get_user_aware_date,
+    get_user_aware_datetime,
+    is_showall,
+    send_templated_mail,
+)
 from tests.base import NotesTestCase
 
 
@@ -137,3 +145,55 @@ class GetFilteredNotesTests(NotesTestCase):
         result = get_filtered_notes(self.user, "work")
 
         assert list(result) == []
+
+
+class SendTemplatedMailTests(NotesTestCase):
+    def test_sends_a_multipart_email_to_the_admins_by_default(self):
+        send_templated_mail(
+            subject="Test subject",
+            template_name="link_check_report",
+            context={"error_list": [], "redirect_list": []},
+        )
+
+        assert len(mail.outbox) == 1
+        sent = mail.outbox[0]
+        assert sent.subject == "Test subject"
+        assert sent.to == [email for _name, email in settings.ADMINS]
+        assert len(sent.alternatives) == 1
+        html_body, mimetype = sent.alternatives[0]
+        assert mimetype == "text/html"
+
+    def test_renders_context_into_both_text_and_html_bodies(self):
+        note = self.make_note(title="Broken bookmark", url="https://example.com/broken")
+
+        send_templated_mail(
+            subject="Test subject",
+            template_name="link_check_report",
+            context={"error_list": [note], "redirect_list": []},
+        )
+
+        sent = mail.outbox[0]
+        assert "Broken bookmark" in sent.body
+        html_body, _mimetype = sent.alternatives[0]
+        assert "Broken bookmark" in html_body
+
+    def test_returns_false_and_sends_nothing_when_there_are_no_recipients(self):
+        with override_settings(ADMINS=[]):
+            result = send_templated_mail(
+                subject="Test subject",
+                template_name="link_check_report",
+                context={"error_list": [], "redirect_list": []},
+            )
+
+        assert result is False
+        assert len(mail.outbox) == 0
+
+    def test_recipient_list_overrides_the_admins_default(self):
+        send_templated_mail(
+            subject="Test subject",
+            template_name="link_check_report",
+            context={"error_list": [], "redirect_list": []},
+            recipient_list=["someone@example.com"],
+        )
+
+        assert mail.outbox[0].to == ["someone@example.com"]
