@@ -68,8 +68,8 @@ dev = [
     "interrogate==1.7.0",
     "pydoclint==0.9.1",
     "setuptools==84.0.0",
-    "pytest>=9.1.1",
-    "ruff>=0.16.4",
+    "pytest==9.1.1",
+    "ruff==0.16.7",
     "pytest-django==4.14.0",
 ]
 local = [
