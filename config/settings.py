@@ -133,9 +133,20 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {
+        "django.db.backends": {
+            "level": "ERROR",
             "handlers": ["console"],
-            "level": "DEBUG",  # Or INFO, WARNING, ERROR, CRITICAL
+            "propagate": False,
+        },
+        "portfolio": {
+            "level": "DEBUG",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "django.security.DisallowedHost": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
         },
     },
 }
