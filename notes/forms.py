@@ -1,7 +1,8 @@
 from crispy_forms.bootstrap import FieldWithButtons
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout, Submit
+from crispy_forms.layout import HTML, Div, Field, Layout, Submit
 from django import forms
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from tinymce.widgets import TinyMCE
 
@@ -55,12 +56,29 @@ class NoteForm(forms.Form):
     )
     referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, note_id=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_class = "form-horizontal"
         self.helper.label_class = "col-lg-2"
         self.helper.field_class = "col-lg-8"
+        buttons = [
+            Submit("action", "save", css_class=BUTTON_CSS_CLASS, title=_("Save")),
+            Submit(
+                "action",
+                "save_and_add",
+                css_class=BUTTON_CSS_CLASS,
+                title=_("Save and add another"),
+            ),
+        ]
+        if note_id:
+            delete_url = reverse("admin:notes_note_delete", args=[note_id])
+            buttons.append(
+                HTML(
+                    f'<a href="{delete_url}" class="{BUTTON_CSS_CLASS} btn-danger" '
+                    f'title="{_("Delete")}">{_("delete")}</a>'
+                )
+            )
         self.helper.layout = Layout(
             "type",
             "title",
@@ -75,13 +93,7 @@ class NoteForm(forms.Form):
             "description",
             "referer",
             Div(
-                Submit("action", "save", css_class=BUTTON_CSS_CLASS, title=_("Save")),
-                Submit(
-                    "action",
-                    "save_and_add",
-                    css_class=BUTTON_CSS_CLASS,
-                    title=_("Save and add another"),
-                ),
+                *buttons,
                 css_class="col-lg-offset-2 col-lg-4",
             ),
         )

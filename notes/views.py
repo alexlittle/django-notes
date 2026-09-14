@@ -363,7 +363,7 @@ class EditView(TemplateView):
         data["link_check_ignore_redirects"] = note.link_check_ignore_redirects
         data["referer"] = request.META.get("HTTP_REFERER")
         recent_tags = Tag.get_top_10_recent_tags()
-        form = NoteForm(initial=data)
+        form = NoteForm(initial=data, note_id=note_id)
         return render(request, NOTE_FORM_TEMPLATE, {"form": form, "recent_tags": recent_tags})
 
     def _update_tags(self, note, tags_field):
@@ -401,7 +401,7 @@ class EditView(TemplateView):
 
     def post(self, request, note_id):
         note = Note.objects.get(user=self.request.user, pk=note_id)
-        form = NoteForm(request.POST)
+        form = NoteForm(request.POST, note_id=note_id)
         if not form.is_valid():
             print(form.errors)
             return render(request, NOTE_FORM_TEMPLATE, {"form": form})
