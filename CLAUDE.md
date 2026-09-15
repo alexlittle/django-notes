@@ -106,7 +106,11 @@ and old-note pruning together (`notes/management/commands/cron.py`).
   alongside `priority == "high"`), `link_check.days` (`cron`'s staleness threshold, in days, before
   `link_checker` re-checks a link — see below), `link_check.email_enabled` (`"true"`/`"false"`, default off)
   and `link_check.email_recipients` (comma-separated email addresses, falls back to `settings.ADMINS` when
-  blank) controlling whether/where `link_checker` emails its broken-link report.
+  blank) controlling whether/where `link_checker` emails its broken-link report, `link_check.batch_size`
+  (`cron`'s cap on links checked per run, default 50), and `link_check.email_interval_hours` (default 24;
+  minimum hours between report emails — links are still (re)checked every run, but the digest email is
+  throttled to at most once per interval, tracked via the `link_check.email_last_sent_at` key that
+  `link_checker` maintains itself).
 - **Tag suggestions**: `notes/libs/association.py` + the `build_tag_suggestions` management command generate
   `TagSuggestion`/`TagSuggestionInputTag` rows (association-rule mining over co-occurring tags, via
   `mlxtend`) that feed tag autocomplete/suggestion UI.

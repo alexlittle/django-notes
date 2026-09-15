@@ -15,6 +15,7 @@ from django.contrib.sites.models import Site
 from django.core.management.base import BaseCommand
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext_lazy as _
 
 from notes.models import Note, NotesConfig
@@ -52,6 +53,12 @@ RETRY_DELAY_SECONDS = 3
 # non-ok on this many consecutive runs - a single failed run is very often a
 # transient network issue or a one-off block, not a genuinely dead link.
 CONSECUTIVE_FAILURES_THRESHOLD = 2
+
+# Fallback used if NotesConfig's "link_check.email_interval_hours" is missing
+# or invalid - links are still checked every cron run, but the report email
+# is only sent once per interval so a noisy backlog doesn't mean an email a
+# run.
+DEFAULT_EMAIL_INTERVAL_HOURS = 24
 
 REQUEST_HEADERS = {
     "User-Agent": (
@@ -144,8 +151,7 @@ class Command(BaseCommand):
             ):
                 blocked_list.append(note)
 
-        if error_list or redirect_list or blocked_list:
-            self.send_report(error_list, redirect_list, blocked_list)
+        self.maybe_send_report()
 
         print(f"{len(error_list)} errors")
         for idx, el in enumerate(error_list):
@@ -215,12 +221,67 @@ class Command(BaseCommand):
             note.link_check_fail_count = 0
         note.save()
 
-    def send_report(self, error_list, redirect_list, blocked_list):
+    def maybe_send_report(self):
         # Off by default - enable via NotesConfig (e.g. in the admin) rather than code,
         # so it can be turned on/off and re-addressed without a deploy.
         if NotesConfig.get_value("link_check.email_enabled").strip().lower() != "true":
             return
 
+        last_sent_at = self.get_last_email_sent_at()
+        interval = datetime.timedelta(hours=self.get_email_interval_hours())
+        if last_sent_at is not None and timezone.now() - last_sent_at < interval:
+            print("Skipping link checker report email - not due yet")
+            return
+
+        # Query the full current backlog rather than just what this run checked -
+        # links flagged by an earlier run (and not yet due for a recheck) still
+        # belong in the digest.
+        error_list = list(
+            Note.objects.exclude(url="").filter(
+                link_check_result="error",
+                link_check_fail_count__gte=CONSECUTIVE_FAILURES_THRESHOLD,
+            )
+        )
+        blocked_list = list(
+            Note.objects.exclude(url="").filter(
+                link_check_result="blocked",
+                link_check_fail_count__gte=CONSECUTIVE_FAILURES_THRESHOLD,
+            )
+        )
+        redirect_list = list(
+            Note.objects.exclude(url="").filter(
+                link_check_result="redirect",
+                link_check_ignore_redirects=False,
+            )
+        )
+        if not (error_list or redirect_list or blocked_list):
+            return
+
+        if self.send_report(error_list, redirect_list, blocked_list):
+            NotesConfig.objects.update_or_create(
+                name="link_check.email_last_sent_at",
+                defaults={"value": timezone.now().isoformat()},
+            )
+
+    def get_email_interval_hours(self):
+        try:
+            hours = int(NotesConfig.get_value("link_check.email_interval_hours"))
+            if hours > 0:
+                return hours
+        except ValueError:
+            pass
+        return DEFAULT_EMAIL_INTERVAL_HOURS
+
+    def get_last_email_sent_at(self):
+        raw = NotesConfig.get_value("link_check.email_last_sent_at")
+        if not raw:
+            return None
+        parsed = parse_datetime(raw)
+        if parsed is not None and timezone.is_naive(parsed):
+            parsed = timezone.make_aware(parsed)
+        return parsed
+
+    def send_report(self, error_list, redirect_list, blocked_list):
         recipients = NotesConfig.get_value("link_check.email_recipients")
         recipient_list = [addr.strip() for addr in recipients.split(",") if addr.strip()] or None
 
@@ -241,6 +302,8 @@ class Command(BaseCommand):
                 },
                 recipient_list=recipient_list,
             )
+            return True
         except (OSError, smtplib.SMTPException) as exc:
             # don't let a broken mail server stop the rest of the cron run
             print(f"Failed to send link checker report email: {exc}")
+            return False

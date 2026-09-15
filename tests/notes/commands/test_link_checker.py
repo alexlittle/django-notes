@@ -419,3 +419,97 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
             call_command("link_checker", 0)
 
         self.assertEqual(len(mail.outbox), 0)
+
+    def test_the_report_includes_previously_flagged_links_even_when_not_rechecked_this_run(self):
+        self._enable_email()
+        already_flagged = self._make_link(
+            url="https://already-broken.example.com",
+            link_check_result="error",
+            link_check_fail_count=2,
+            link_check_date=timezone.now(),
+        )
+        ok_note = self._make_link(
+            url="https://ok.example.com",
+            link_check_date=timezone.now() - timedelta(days=10),
+        )
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0, limit=1)
+
+        # Only the oldest-checked note (ok_note) was actually re-checked this run...
+        mocked.assert_called_once()
+        ok_note.refresh_from_db()
+        self.assertEqual(ok_note.link_check_result, "ok")
+
+        # ...but the digest still reports the link flagged by an earlier run.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(already_flagged.url, mail.outbox[0].body)
+        self.assertNotIn(ok_note.url, mail.outbox[0].body)
+
+    def test_no_email_is_sent_when_the_configured_interval_has_not_elapsed(self):
+        self._enable_email()
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_last_sent_at",
+            defaults={"value": (timezone.now() - timedelta(hours=1)).isoformat()},
+        )
+
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_email_is_sent_again_once_the_configured_interval_has_elapsed(self):
+        self._enable_email()
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_last_sent_at",
+            defaults={"value": (timezone.now() - timedelta(hours=25)).isoformat()},
+        )
+
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_the_configured_interval_can_be_shortened(self):
+        self._enable_email()
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_interval_hours", defaults={"value": "1"}
+        )
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_last_sent_at",
+            defaults={"value": (timezone.now() - timedelta(hours=2)).isoformat()},
+        )
+
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_an_invalid_interval_configuration_falls_back_to_the_24_hour_default(self):
+        self._enable_email()
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_interval_hours", defaults={"value": "not-a-number"}
+        )
+        NotesConfig.objects.update_or_create(
+            name="link_check.email_last_sent_at",
+            defaults={"value": (timezone.now() - timedelta(hours=1)).isoformat()},
+        )
+
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_last_sent_at_is_recorded_after_a_successful_send(self):
+        self._enable_email()
+
+        self._check_one_broken_and_one_redirected_link()
+
+        self.assertNotEqual(NotesConfig.get_value("link_check.email_last_sent_at"), "")
+
+    def test_last_sent_at_is_not_updated_when_there_is_nothing_to_report(self):
+        self._enable_email()
+        self._make_link()
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0)
+
+        self.assertEqual(NotesConfig.get_value("link_check.email_last_sent_at"), "")
