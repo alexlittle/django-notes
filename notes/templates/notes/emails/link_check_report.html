@@ -26,4 +26,17 @@
   {% endfor %}
 </ul>
 {% endif %}
+
+{% if blocked_list %}
+<h3>Blocked links ({{ blocked_list|length }})</h3>
+<p style="color:#666; font-size:12px;">Likely bot/WAF protection rather than a dead link - not offered for deletion.</p>
+<ul style="padding-left:20px;">
+  {% for note in blocked_list %}
+  <li style="margin-bottom:8px;">
+    <a href="{{ note.edit_url }}">{{ note.title }}</a><br>
+    <span style="color:#666; font-size:12px;"><a href="{{ note.url }}">{{ note.url }}</a></span>
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}

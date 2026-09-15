@@ -16,3 +16,11 @@ Redirected links ({{ redirect_list|length }}):
   Edit: {{ note.edit_url }}
 {% endfor %}
 {% endif %}
+{% if blocked_list %}
+Blocked links - likely bot/WAF protection, not offered for deletion ({{ blocked_list|length }}):
+{% for note in blocked_list %}
+- {{ note.title }}
+  {{ note.url }}
+  Edit: {{ note.edit_url }}
+{% endfor %}
+{% endif %}

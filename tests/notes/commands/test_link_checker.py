@@ -1,5 +1,5 @@
 from datetime import timedelta
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 from urllib import error
 
 from django.conf import settings
@@ -13,6 +13,14 @@ from .base import NotesCommandTestCase
 
 
 class LinkCheckerCommandTests(NotesCommandTestCase):
+    def setUp(self):
+        super().setUp()
+        # Retries/consecutive-failure handling sleep between attempts - skip
+        # the real delay so these tests stay fast.
+        sleep_patcher = patch("notes.management.commands.link_checker.time.sleep")
+        sleep_patcher.start()
+        self.addCleanup(sleep_patcher.stop)
+
     def _make_link(self, url="https://example.com", **kwargs):
         return self.make_note(type="bookmark", title="A link", url=url, **kwargs)
 
@@ -115,8 +123,72 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "ok")
 
-    def test_connection_style_errors_are_recorded_and_deletion_is_offered(self):
+    def test_a_successful_check_resets_the_consecutive_failure_count(self):
+        note = self._make_link(link_check_fail_count=3)
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            mocked.return_value.code = 200
+            call_command("link_checker", 0)
+
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "ok")
+        self.assertEqual(note.link_check_fail_count, 0)
+
+    def test_a_single_failure_is_not_yet_reported_or_offered_for_deletion(self):
         note = self._make_link()
+        self._enable_email()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=TimeoutError,
+            ),
+            patch("builtins.input") as mocked_input,
+        ):
+            call_command("link_checker", 0)
+
+        mocked_input.assert_not_called()
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "error")
+        self.assertEqual(note.link_check_fail_count, 1)
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_transient_errors_are_retried_before_being_recorded_as_an_error(self):
+        note = self._make_link()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=[TimeoutError(), ConnectionResetError(), Mock(code=200)],
+            ) as mocked,
+        ):
+            call_command("link_checker", 0)
+
+        self.assertEqual(mocked.call_count, 3)
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "ok")
+
+    def test_a_5xx_response_is_retried(self):
+        note = self._make_link()
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=[
+                    error.HTTPError(note.url, 503, "Service Unavailable", None, None),
+                    Mock(code=200),
+                ],
+            ) as mocked,
+        ):
+            call_command("link_checker", 0)
+
+        self.assertEqual(mocked.call_count, 2)
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "ok")
+
+    def test_connection_style_errors_offer_deletion_after_two_consecutive_failures(self):
+        note = self._make_link(link_check_fail_count=1)
 
         with (
             patch(
@@ -131,7 +203,7 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         self.assertFalse(Note.objects.filter(pk=note.pk).exists())
 
     def test_declining_deletion_keeps_the_note_marked_as_an_error(self):
-        note = self._make_link()
+        note = self._make_link(link_check_fail_count=1)
 
         with (
             patch(
@@ -144,9 +216,10 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
 
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "error")
+        self.assertEqual(note.link_check_fail_count, 2)
 
     def test_noinput_records_errors_without_prompting_or_deleting(self):
-        note = self._make_link()
+        note = self._make_link(link_check_fail_count=1)
 
         with (
             patch(
@@ -199,12 +272,12 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         self.assertEqual(len(mail.outbox), 0)
 
     def test_non_redirect_http_errors_are_recorded_as_an_error_and_deletion_is_offered(self):
-        note = self._make_link()
+        note = self._make_link(link_check_fail_count=1)
 
         with (
             patch(
                 "notes.management.commands.link_checker.request.urlopen",
-                side_effect=error.HTTPError(note.url, 403, "Forbidden", None, None),
+                side_effect=error.HTTPError(note.url, 404, "Not Found", None, None),
             ),
             patch("builtins.input", return_value="n"),
         ):
@@ -214,7 +287,7 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         self.assertEqual(note.link_check_result, "error")
 
     def test_generic_url_errors_are_recorded_as_an_error_and_deletion_is_offered(self):
-        note = self._make_link()
+        note = self._make_link(link_check_fail_count=1)
 
         with (
             patch(
@@ -228,8 +301,43 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         note.refresh_from_db()
         self.assertEqual(note.link_check_result, "error")
 
+    def test_403_and_429_responses_are_recorded_as_blocked_not_error(self):
+        forbidden = self._make_link(url="https://forbidden.example.com")
+        rate_limited = self._make_link(url="https://ratelimited.example.com")
+
+        def fake_urlopen(req, timeout=20):
+            if req.full_url == forbidden.url:
+                raise error.HTTPError(forbidden.url, 403, "Forbidden", None, None)
+            raise error.HTTPError(rate_limited.url, 429, "Too Many Requests", None, None)
+
+        with patch(
+            "notes.management.commands.link_checker.request.urlopen",
+            side_effect=fake_urlopen,
+        ):
+            call_command("link_checker", 0)
+
+        forbidden.refresh_from_db()
+        rate_limited.refresh_from_db()
+        self.assertEqual(forbidden.link_check_result, "blocked")
+        self.assertEqual(rate_limited.link_check_result, "blocked")
+
+    def test_blocked_links_are_never_offered_for_deletion_even_after_repeated_failures(self):
+        note = self._make_link(link_check_fail_count=5)
+
+        with (
+            patch(
+                "notes.management.commands.link_checker.request.urlopen",
+                side_effect=error.HTTPError(note.url, 403, "Forbidden", None, None),
+            ),
+            patch("builtins.input") as mocked_input,
+        ):
+            call_command("link_checker", 0)
+
+        mocked_input.assert_not_called()
+        self.assertTrue(Note.objects.filter(pk=note.pk).exists())
+
     def _check_one_broken_and_one_redirected_link(self):
-        broken = self._make_link(url="https://broken.example.com")
+        broken = self._make_link(url="https://broken.example.com", link_check_fail_count=1)
         redirected = self._make_link(url="https://redirected.example.com")
 
         def fake_urlopen(req, timeout=20):
@@ -274,6 +382,21 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         html_body, _mimetype = sent.alternatives[0]
         self.assertIn(broken.url, html_body)
         self.assertIn(redirected.url, html_body)
+
+    def test_blocked_links_appear_in_the_report_email_in_their_own_section(self):
+        self._enable_email()
+        note = self._make_link(url="https://blocked.example.com", link_check_fail_count=1)
+
+        with patch(
+            "notes.management.commands.link_checker.request.urlopen",
+            side_effect=error.HTTPError(note.url, 403, "Forbidden", None, None),
+        ):
+            call_command("link_checker", 0)
+
+        self.assertEqual(len(mail.outbox), 1)
+        sent = mail.outbox[0]
+        self.assertIn(note.url, sent.body)
+        self.assertIn("Blocked", sent.body)
 
     def test_email_goes_to_the_admins_by_default_when_no_recipients_are_configured(self):
         self._enable_email()
