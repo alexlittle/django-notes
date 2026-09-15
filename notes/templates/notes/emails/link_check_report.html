@@ -9,7 +9,7 @@
   {% for note in error_list %}
   <li style="margin-bottom:8px;">
     <a href="{{ note.edit_url }}">{{ note.title }}</a><br>
-    <span style="color:#666; font-size:12px;">{{ note.url }}</span>
+    <span style="color:#666; font-size:12px;"><a href="{{ note.url }}">{{ note.url }}</a></span>
   </li>
   {% endfor %}
 </ul>
@@ -21,7 +21,7 @@
   {% for note in redirect_list %}
   <li style="margin-bottom:8px;">
     <a href="{{ note.edit_url }}">{{ note.title }}</a><br>
-    <span style="color:#666; font-size:12px;">{{ note.url }}</span>
+    <span style="color:#666; font-size:12px;"><a href="{{ note.url }}">{{ note.url }}</a></span>
   </li>
   {% endfor %}
 </ul>
