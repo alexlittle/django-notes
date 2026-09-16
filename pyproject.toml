@@ -3,7 +3,7 @@ name = "django-notes"
 version = "0.1.0"
 description = "Notes and Bookmarks web application"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 authors = [
     { name = "Alex Little", email = "alex@alexlittle.net" }
 ]
@@ -51,7 +51,7 @@ omit = ["*/migrations/*", "*/tests/*", "*/settings*.py", "manage.py", "env/*", "
 
 [tool.ruff]
 line-length = 100
-target-version = "py312"
+target-version = "py314"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
