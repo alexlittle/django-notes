@@ -31,7 +31,7 @@ def get_user_aware_datetime(user):
         if isinstance(user_timezone, str):
             user_timezone = ZoneInfo(user_timezone)
         return datetime.datetime.now(user_timezone)
-    except (AttributeError, TypeError, ValueError, ZoneInfoNotFoundError):
+    except AttributeError, TypeError, ValueError, ZoneInfoNotFoundError:
         return timezone.now()
 
 
