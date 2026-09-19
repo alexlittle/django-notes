@@ -49,6 +49,16 @@ class BookmarksViewTests(NotesTestCase):
 
         self.assertEqual(list(resp.context["notes"]), [bookmark])
 
+    def test_homepage_shows_bookmarks(self):
+        bookmark = self.make_note(type="bookmark", title="Bookmark")
+        self.make_note(type="task", title="Task")
+
+        resp = self.client.get(reverse("notes:home"))
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertTemplateUsed(resp, "notes/bookmarks.html")
+        self.assertEqual(list(resp.context["notes"]), [bookmark])
+
     def test_link_check_result_controls_which_status_icon_is_shown(self):
         self.make_note(
             type="bookmark", title="OK", url="https://ok.example.com", link_check_result="ok"

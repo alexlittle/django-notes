@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<a href="{% url 'notes:home' %}?showall={{ showall }}" class="btn btn-primary">{% trans 'Home' %}</a>
+<a href="{% url 'notes:notes_home' %}?showall={{ showall }}" class="btn btn-primary">{% trans 'Notes' %}</a>
 
 <a href="{% url 'notes:add' %}?type=task&tags={{ tag.name }}&showall={{ showall }}" class="btn btn-primary">{% trans 'Add' %}</a>
 

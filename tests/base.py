@@ -16,7 +16,7 @@ from notes.models import Note, NoteTag, Tag
 User = get_user_model()
 
 # Computed once at import time and reused everywhere, so every test agrees
-# on what "today" is - including the bits of HomeView that call
+# on what "today" is - including the bits of NotesView that call
 # datetime.now() directly rather than going through get_user_aware_date.
 TODAY = date.today()
 

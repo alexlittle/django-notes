@@ -17,8 +17,8 @@ HOME_URL_NAME = "notes:home"
 NOTE_FORM_TEMPLATE = "notes/form.html"
 
 
-class HomeView(TemplateView):
-    template_name = "notes/home.html"
+class NotesView(TemplateView):
+    template_name = "notes/notes.html"
 
     def _filter_for_reminders(self, base_query):
         reminder_items = []

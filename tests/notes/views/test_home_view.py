@@ -11,7 +11,7 @@ def _get(client, showall=False):
         patch("notes.views.get_user_aware_date", return_value=TODAY),
         patch("notes.views.is_showall", return_value=showall),
     ):
-        return client.get(reverse("notes:home"))
+        return client.get(reverse("notes:notes_home"))
 
 
 class HomeViewTests(NotesTestCase):
