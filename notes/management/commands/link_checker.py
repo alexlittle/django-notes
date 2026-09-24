@@ -61,10 +61,14 @@ CONSECUTIVE_FAILURES_THRESHOLD = 2
 DEFAULT_EMAIL_INTERVAL_HOURS = 24
 
 REQUEST_HEADERS = {
+    # A current-looking UA matters here - some sites' WAFs (Cloudflare, security
+    # plugins, etc.) block or reset connections from known stale/scraper UA
+    # strings (e.g. an old Chrome build), which was previously causing live
+    # sites to be misreported as broken links.
     "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) "
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/35.0.1916.47 Safari/537.36"
+        "Chrome/128.0.0.0 Safari/537.36"
     ),
     "Accept": (
         "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
