@@ -54,6 +54,11 @@ class NoteForm(forms.Form):
             "still checked, but not flagged as broken"
         ),
     )
+    link_check_known_good = forms.BooleanField(
+        required=False,
+        label=_("Known good link"),
+        help_text=_("e.g. a site that blocks bots - skipped by the link checker and its report"),
+    )
     referer = forms.CharField(required=False, widget=forms.HiddenInput)
 
     def __init__(self, *args, note_id=None, **kwargs):
@@ -90,6 +95,7 @@ class NoteForm(forms.Form):
             "recurrence",
             "reminder_days",
             "link_check_ignore_redirects",
+            "link_check_known_good",
             "description",
             "referer",
             Div(

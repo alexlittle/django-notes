@@ -46,6 +46,31 @@ class LinkCheckerCommandTests(NotesCommandTestCase):
         blank_url.refresh_from_db()
         self.assertEqual(blank_url.link_check_result, "")
 
+    def test_known_good_links_are_never_checked(self):
+        note = self._make_link(link_check_known_good=True)
+
+        with patch("notes.management.commands.link_checker.request.urlopen") as mocked:
+            call_command("link_checker", 0)
+
+        mocked.assert_not_called()
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_result, "")
+
+    def test_known_good_links_are_excluded_from_the_report_email(self):
+        self._enable_email()
+        note = self._make_link(
+            url="https://blocks-bots.example.com",
+            link_check_known_good=True,
+            link_check_result="error",
+            link_check_fail_count=5,
+        )
+
+        call_command("link_checker", 0)
+
+        self.assertEqual(len(mail.outbox), 0)
+        note.refresh_from_db()
+        self.assertEqual(note.link_check_fail_count, 5)
+
     def test_days_zero_checks_every_url_regardless_of_last_check_date(self):
         note = self._make_link(link_check_date=timezone.now() - timedelta(days=1000))
 

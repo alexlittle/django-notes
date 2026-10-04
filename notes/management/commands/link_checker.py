@@ -131,7 +131,12 @@ class Command(BaseCommand):
             today_minus_days = today - datetime.timedelta(days=days)
             notes = Note.objects.filter(link_check_date__lte=today_minus_days)
 
-        notes = notes.exclude(url__isnull=True).exclude(url="").order_by("link_check_date")
+        notes = (
+            notes.exclude(url__isnull=True)
+            .exclude(url="")
+            .exclude(link_check_known_good=True)
+            .order_by("link_check_date")
+        )
         if limit:
             notes = notes[:limit]
         return notes
@@ -278,19 +283,25 @@ class Command(BaseCommand):
         # links flagged by an earlier run (and not yet due for a recheck) still
         # belong in the digest.
         error_list = list(
-            Note.objects.exclude(url="").filter(
+            Note.objects.exclude(url="")
+            .exclude(link_check_known_good=True)
+            .filter(
                 link_check_result="error",
                 link_check_fail_count__gte=CONSECUTIVE_FAILURES_THRESHOLD,
             )
         )
         blocked_list = list(
-            Note.objects.exclude(url="").filter(
+            Note.objects.exclude(url="")
+            .exclude(link_check_known_good=True)
+            .filter(
                 link_check_result="blocked",
                 link_check_fail_count__gte=CONSECUTIVE_FAILURES_THRESHOLD,
             )
         )
         redirect_list = list(
-            Note.objects.exclude(url="").filter(
+            Note.objects.exclude(url="")
+            .exclude(link_check_known_good=True)
+            .filter(
                 link_check_result="redirect",
                 link_check_ignore_redirects=False,
             )
