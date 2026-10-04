@@ -380,7 +380,12 @@ class EditView(TemplateView):
         note.update_date = timezone.now()
         note.type = form.cleaned_data.get("type")
         note.title = form.cleaned_data.get("title")
-        note.url = form.cleaned_data.get("url")
+        new_url = form.cleaned_data.get("url")
+        if new_url != note.url:
+            # The old check outcome says nothing about the corrected link.
+            note.link_check_result = ""
+            note.link_check_fail_count = 0
+        note.url = new_url
         note.description = form.cleaned_data.get("description")
         note.status = form.cleaned_data.get("status")
         note.due_date = form.cleaned_data.get("due_date")

@@ -64,6 +64,38 @@ class EditViewPostTests(NotesTestCase):
         remaining_tags = sorted(nt.tag.name for nt in NoteTag.objects.filter(note=note))
         self.assertEqual(remaining_tags, ["new-tag"])
 
+    def test_changing_the_url_resets_the_link_check_result_and_fail_count(self):
+        note = self.make_note(
+            type="bookmark",
+            title="Link",
+            url="https://old.example.com",
+            link_check_result="error",
+            link_check_fail_count=3,
+        )
+
+        self._post(note, url="https://new.example.com", title="Renamed")
+
+        note.refresh_from_db()
+        self.assertEqual(note.url, "https://new.example.com")
+        self.assertEqual(note.link_check_result, "")
+        self.assertEqual(note.link_check_fail_count, 0)
+
+    def test_editing_other_fields_keeps_the_link_check_result_and_fail_count(self):
+        note = self.make_note(
+            type="bookmark",
+            title="Link",
+            url="https://old.example.com",
+            link_check_result="error",
+            link_check_fail_count=3,
+        )
+
+        self._post(note, title="Renamed")
+
+        note.refresh_from_db()
+        self.assertEqual(note.title, "Renamed")
+        self.assertEqual(note.link_check_result, "error")
+        self.assertEqual(note.link_check_fail_count, 3)
+
     def test_due_date_moved_later_is_recorded_as_deferred(self):
         note = self.make_task(title="Task", due_date=TODAY)
 
