@@ -10,7 +10,7 @@ authors = [
 
 dependencies = [
     "crispy-bootstrap4==2026.2",
-    "django==6.1.1",
+    "django==6.1.2",
     "django-autoslug==1.9.9",
     "django-crispy-forms==2.7",
     "django-tinymce==5.0.0",
@@ -66,17 +66,17 @@ dev = [
     "Sphinx==9.1.0",
     "sphinx_rtd_theme==3.1.0",
     "interrogate==1.7.0",
-    "pydoclint==0.11.0",
+    "pydoclint==0.11.1",
     "setuptools==84.0.0",
     "pytest==9.1.1",
-    "ruff==0.16.10",
+    "ruff==0.17.1",
     "pytest-django==4.14.0",
 ]
 local = [
     "django-extensions==4.1"
 ]
 deploy = [
-    "mod-wsgi==6.1.0"
+    "mod-wsgi==6.1.1"
 ]
 
 [tool.uv]
