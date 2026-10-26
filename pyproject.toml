@@ -17,7 +17,7 @@ dependencies = [
     "mlxtend==0.25.0",
     "mysqlclient==2.3.0",
     "nh3>=0.3.7",
-    "pandas==3.0.6",
+    "pandas==3.1.0",
     "pycodestyle==2.15.0",
     "python-dateutil==2.9.0.post0",
 ]
@@ -67,9 +67,9 @@ dev = [
     "sphinx_rtd_theme==3.1.0",
     "interrogate==1.7.0",
     "pydoclint==0.11.1",
-    "setuptools==84.1.0",
+    "setuptools==84.2.1",
     "pytest==9.1.1",
-    "ruff==0.17.1",
+    "ruff==0.17.2",
     "pytest-django==4.14.0",
 ]
 local = [
