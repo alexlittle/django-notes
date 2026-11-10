@@ -25,9 +25,9 @@ ADMINS = (("Admin", "org@example.com"),)
 
 SITE_ID = 1
 
-ROOT_URLCONF = "config.urls"
+ROOT_URLCONF = "settings.urls"
 
-WSGI_APPLICATION = "config.wsgi.application"
+WSGI_APPLICATION = "settings.wsgi.application"
 
 
 INSTALLED_APPS = [
@@ -160,16 +160,3 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 SESSION_COOKIE_NAME = "notes"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
-
-
-NOTES_ASSISTANT_ENABLED = False
-
-try:
-    from config.local_settings import *  # noqa: F403  # NOSONAR
-except ImportError:
-    import warnings
-
-    warnings.warn(
-        "Using default settings. Add `config/local_settings.py` for custom settings.",
-        stacklevel=2,
-    )

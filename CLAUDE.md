@@ -60,11 +60,11 @@ and old-note pruning together (`notes/management/commands/cron.py`).
 
 ## Settings
 
-- `config/settings.py` is the base settings module. It always ends by importing
-  `config/local_settings.py` (gitignored, not present in a fresh checkout) for machine-specific overrides
+- `settings` is the base settings module. It always ends by importing
+  `settings` (gitignored, not present in a fresh checkout) for machine-specific overrides
   (DB credentials, `SECRET_KEY`, etc.) — without it Django will still boot (with a warning) but the DB config
   is an empty MySQL config, so most DB-touching commands will fail until `local_settings.py` is created.
-- `config/settings_ci.py` extends the base settings and is what CI/tests actually run against — it reads
+- `settings` extends the base settings and is what CI/tests actually run against — it reads
   `DB_HOST`/`DB_PORT`/`DB_USER`/`DB_PASSWORD`/`DB_NAME` from the environment and sets a throwaway
   `SECRET_KEY`. Prefer testing against this module rather than assuming a `local_settings.py` exists.
 - `pyproject.toml`'s `[tool.pytest.ini_options]` sets `DJANGO_SETTINGS_MODULE = "config.settings"` as the
@@ -140,7 +140,7 @@ and old-note pruning together (`notes/management/commands/cron.py`).
 - `tests/notes/commands/base.py` provides a similar shared base for management-command tests.
 - Tests require a real MySQL database (no sqlite fallback) because of the raw-SQL full-text search and
   `utf8mb4`/collation-sensitive behavior — run with `--ds=config.settings_ci` and MySQL env vars set (see
-  Commands above) unless `config/local_settings.py` is already configured locally.
+  Commands above) unless `settings` is already configured locally.
 
 ## CI
 

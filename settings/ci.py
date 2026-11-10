@@ -1,7 +1,4 @@
-# config/settings_ci.py
-import os
-
-from config.settings import *  # NOSONAR
+from .base import *  # noqa: F403  # NOSONAR
 
 DATABASES = {
     "default": {

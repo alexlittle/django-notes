@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Case, Count, DateField, IntegerField, Value, When
 from django.http import HttpResponseRedirect, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import ListView, TemplateView, View
@@ -346,7 +346,7 @@ class AddView(TemplateView):
 
 class EditView(TemplateView):
     def get(self, request, note_id):
-        note = Note.objects.get(user=self.request.user, pk=note_id)
+        note = get_object_or_404(Note, user=self.request.user, pk=note_id)
         tags = Tag.objects.filter(user=self.request.user, notetag__note=note).values_list(
             "name", flat=True
         )
