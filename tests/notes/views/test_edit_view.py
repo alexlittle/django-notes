@@ -26,8 +26,9 @@ class EditViewGetTests(NotesTestCase):
     def test_cannot_load_another_users_note(self):
         note = self.make_note(user=self.other_user, title="Not mine")
 
-        with self.assertRaises(Note.DoesNotExist):
-            self.client.get(reverse("notes:edit", kwargs={"note_id": note.pk}))
+        response = self.client.get(reverse("notes:edit", kwargs={"note_id": note.pk}))
+
+        self.assertEqual(response.status_code, 404)
 
 
 class EditViewPostTests(NotesTestCase):
